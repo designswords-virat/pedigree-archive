@@ -5,7 +5,7 @@
 const STORAGE_KEY = 'genosys_family_tree_v2';
 const ADMIN_KEY = 'genosys_admin_pass_v1';
 const PHOTO_MIGRATION_KEY = 'genosys_photo_migration_v4';
-const DEFAULT_ADMIN_PASS = 'admin123';
+const DEFAULT_ADMIN_PASS = 'dineshdhawan123';
 
 // Maps person.name → filename in Profiles/ folder. Used by the one-time
 // photo migration so newly-dropped photos auto-attach to existing data
@@ -141,6 +141,18 @@ const Data = {
     });
     if (photoMutated) this.save(data);
     localStorage.setItem(PHOTO_MIGRATION_KEY, '1');
+
+    // One-time admin-key reset: any browser still using the old default
+    // 'admin123' gets quietly bumped to the new default. A user who has
+    // explicitly chosen a different password is left alone.
+    const ADMIN_RESET_KEY = 'genosys_admin_reset_v1';
+    if (!localStorage.getItem(ADMIN_RESET_KEY)) {
+      const cur = localStorage.getItem(ADMIN_KEY);
+      if (!cur || cur === 'admin123') {
+        localStorage.setItem(ADMIN_KEY, DEFAULT_ADMIN_PASS);
+      }
+      localStorage.setItem(ADMIN_RESET_KEY, '1');
+    }
 
     // One-time structure fixes — bump the version key when adding new ones.
     const STRUCT_FIX_KEY = 'genosys_struct_fix_v2';

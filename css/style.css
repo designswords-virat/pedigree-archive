@@ -990,6 +990,22 @@ input[type="checkbox"]:checked::after {
   color: var(--text-faint);
   letter-spacing: 0.18em;
 }
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 6px;
+  transition: all 0.15s;
+}
+.back-link:hover {
+  color: var(--cyan);
+  text-shadow: var(--glow);
+}
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25%      { transform: translateX(-8px); }
