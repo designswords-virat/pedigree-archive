@@ -303,3 +303,9 @@ const Data = {
   isLoggedIn()    { return this.isAdminLoggedIn(); },
   logout()        { return this.adminLogout(); },
 };
+
+// Run all migrations as soon as data.js is parsed, so they fire before any
+// login screen ever asks for a password. (Login flows previously skipped
+// Data.load() until *after* authentication, leaving the admin-key migration
+// dormant for users who landed straight on the login screen.)
+Data.load();

@@ -12,15 +12,18 @@
   [headers.values]
     Cache-Control = "public, max-age=3600"
 
+# Always revalidate JS and CSS so deploys propagate immediately. The browser
+# still keeps a copy and uses ETag/Last-Modified for fast 304 responses, but
+# it won't serve stale JS from cache for minutes after a deploy.
 [[headers]]
   for = "/css/*"
   [headers.values]
-    Cache-Control = "public, max-age=600"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=600"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Always serve fresh HTML so updates are picked up on next visit.
 [[headers]]
