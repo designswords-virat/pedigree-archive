@@ -58,7 +58,7 @@ const SAMPLE_DATA = {
 
     // Gen 1 — Children of Bhiva Ram & Chota Devi (and their spouses)
     { id: 'c1',  name: 'Kalyan Sahai Bairwa', gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Kalyan Sahai bairwa (M).png', parentIds: ['g1m','g1f'], partnerIds: ['c1s'] },
-    { id: 'c1s', name: 'Kusum',                gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: 'Married into family.',  parentIds: [],            partnerIds: ['c1']  },
+    { id: 'c1s', name: 'Kusum',                gender: 'female', affected: false, carrier: false, deceased: true,  birthYear: null, deathYear: null, notes: 'Married into family.',  parentIds: [],            partnerIds: ['c1']  },
 
     { id: 'c2',  name: 'Omprakash',            gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '',                      photo: 'Omprakash (M).png',  parentIds: ['g1m','g1f'], partnerIds: ['c2s'] },
     { id: 'c2s', name: 'Meera Devi',           gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: 'Married into family.', photo: 'Meera Devi (F).png', parentIds: [],            partnerIds: ['c2']  },
@@ -142,14 +142,24 @@ const Data = {
     if (photoMutated) this.save(data);
     localStorage.setItem(PHOTO_MIGRATION_KEY, '1');
 
-    // One-time structure fix: re-parent Pakhu to Ajay+Kusum Lata (sibling of Jiya).
-    const STRUCT_FIX_KEY = 'genosys_struct_fix_v1';
+    // One-time structure fixes — bump the version key when adding new ones.
+    const STRUCT_FIX_KEY = 'genosys_struct_fix_v2';
     if (!localStorage.getItem(STRUCT_FIX_KEY)) {
+      let mutated = false;
+      // Pakhu was originally placed under Anand+Kiran by column; she's actually
+      // a daughter of Ajay+Kusum Lata.
       const pakhu = data.people.find(p => p.id === 'gc7_1' || p.name === 'Pakhu');
       if (pakhu && Array.isArray(pakhu.parentIds) && pakhu.parentIds.includes('c7')) {
         pakhu.parentIds = ['c6', 'c6s'];
-        this.save(data);
+        mutated = true;
       }
+      // Kusum (Kalyan Sahai's wife) passed away.
+      const kusum = data.people.find(p => p.id === 'c1s');
+      if (kusum && !kusum.deceased) {
+        kusum.deceased = true;
+        mutated = true;
+      }
+      if (mutated) this.save(data);
       localStorage.setItem(STRUCT_FIX_KEY, '1');
     }
 
