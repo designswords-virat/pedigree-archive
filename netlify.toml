@@ -1,0 +1,29 @@
+# Netlify configuration — static site, no build step.
+# This file tells Netlify exactly what to publish so it doesn't
+# guess. The whole project root is the published site.
+
+[build]
+  publish = "."
+
+# Long cache for assets (images, css, js) — they're versioned by content
+# in this static project, but for safety just cache for 1 hour.
+[[headers]]
+  for = "/Profiles/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=600"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=600"
+
+# Always serve fresh HTML so updates are picked up on next visit.
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
