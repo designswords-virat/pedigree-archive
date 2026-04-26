@@ -193,8 +193,9 @@ a:hover { text-shadow: var(--glow); }
   color: #fff;
   text-shadow: var(--glow);
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+  transform: translateY(-1px);
 }
-.btn:active { transform: translateY(1px); }
+.btn:active { transform: translateY(0); }
 .btn.danger { color: var(--red); border-color: rgba(255, 56, 96, 0.5); }
 .btn.danger:hover { background: rgba(255, 56, 96, 0.15); box-shadow: 0 0 12px rgba(255, 56, 96, 0.5); }
 .btn.primary { background: rgba(0, 255, 136, 0.1); color: var(--green); border-color: rgba(0, 255, 136, 0.4); }
@@ -330,6 +331,9 @@ a:hover { text-shadow: var(--glow); }
   border-left: 2px solid var(--cyan);
   border-right: 1px solid var(--border-soft);
 }
+/* Trim corner-HUD noise — keep just the first readout per corner so the
+   corners feel intentional and informational, not overwhelming. */
+.hud-corner > div:nth-child(n+2) { display: none; }
 .hud-tl { top: 22px;    left: 44px;  align-items: flex-start; }
 .hud-tr { top: 22px;    right: 44px; align-items: flex-end; }
 .hud-bl { bottom: 22px; left: 44px;  align-items: flex-start; }

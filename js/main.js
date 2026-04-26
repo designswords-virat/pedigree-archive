@@ -93,8 +93,7 @@
       t.textContent = txt;
       status.appendChild(t);
     };
-    if (person.deceased) tag('DECEASED', 'muted');
-    else tag('LIVING', 'green');
+    if (person.deceased) tag('IN MEMORIAM', 'muted');
 
     const byId = {};
     data.people.forEach(p => byId[p.id] = p);

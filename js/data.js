@@ -4,7 +4,7 @@
 
 const STORAGE_KEY = 'genosys_family_tree_v2';
 const ADMIN_KEY = 'genosys_admin_pass_v1';
-const PHOTO_MIGRATION_KEY = 'genosys_photo_migration_v4';
+const PHOTO_MIGRATION_KEY = 'genosys_photo_migration_v5';
 const DEFAULT_ADMIN_PASS = 'dineshdhawan123';
 
 // Maps person.name → filename in Profiles/ folder. Used by the one-time
@@ -17,6 +17,7 @@ const PHOTO_MAP = {
   'Chota Devi':          'Chota Devi (F).png',
   // gen 1
   'Kalyan Sahai Bairwa': 'Kalyan Sahai bairwa (M).png',
+  'Kusum':               'Kusum (F).jpeg',
   'Omprakash':           'Omprakash (M).png',
   'Meera Devi':          'Meera Devi (F).png',
   'Ramesh':              'Ramesh (M).png',
@@ -47,6 +48,7 @@ const PHOTO_MAP = {
   'Jiya':                'Jiya (F).png',
   'Pakhu':               'Pakhu (F).png',
   'Aaditya (Gunnu)':     'Aaditya (M) urf Gunnu.jpeg',
+  'Ishika':              'Ishika (F).jpeg',
 };
 
 // === BHIVA RAM LINEAGE — sourced from Family pedigree.xlsx ===
@@ -58,7 +60,7 @@ const SAMPLE_DATA = {
 
     // Gen 1 — Children of Bhiva Ram & Chota Devi (and their spouses)
     { id: 'c1',  name: 'Kalyan Sahai Bairwa', gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Kalyan Sahai bairwa (M).png', parentIds: ['g1m','g1f'], partnerIds: ['c1s'] },
-    { id: 'c1s', name: 'Kusum',                gender: 'female', affected: false, carrier: false, deceased: true,  birthYear: null, deathYear: null, notes: 'Married into family.',  parentIds: [],            partnerIds: ['c1']  },
+    { id: 'c1s', name: 'Kusum',                gender: 'female', affected: false, carrier: false, deceased: true,  birthYear: null, deathYear: null, notes: 'Married into family.', photo: 'Kusum (F).jpeg', parentIds: [],            partnerIds: ['c1']  },
 
     { id: 'c2',  name: 'Omprakash',            gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '',                      photo: 'Omprakash (M).png',  parentIds: ['g1m','g1f'], partnerIds: ['c2s'] },
     { id: 'c2s', name: 'Meera Devi',           gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: 'Married into family.', photo: 'Meera Devi (F).png', parentIds: [],            partnerIds: ['c2']  },
@@ -109,7 +111,7 @@ const SAMPLE_DATA = {
 
     // Anand + Kiran
     { id: 'gc7_2', name: 'Aaditya (Gunnu)',    gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: 'Also known as Gunnu.', photo: 'Aaditya (M) urf Gunnu.jpeg', parentIds: ['c7','c7s'], partnerIds: [] },
-    { id: 'gc7_3', name: 'Ishika',             gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', parentIds: ['c7','c7s'], partnerIds: [] },
+    { id: 'gc7_3', name: 'Ishika',             gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Ishika (F).jpeg', parentIds: ['c7','c7s'], partnerIds: [] },
   ],
   meta: { title: 'BHIVA RAM LINEAGE', subtitle: 'PEDIGREE ARCHIVE // FAMILY OF BHIVA RAM & CHOTA DEVI' }
 };
