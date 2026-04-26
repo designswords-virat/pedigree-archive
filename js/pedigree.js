@@ -19,6 +19,17 @@ const Pedigree = (() => {
   let viewState = { scale: 1, tx: 0, ty: 0 };
   let svg, g, currentData, currentLayout, onSelectCb;
 
+  // VERTICAL MODE — on narrow screens we rotate the tree's axes:
+  //   generations flow left→right (instead of top→bottom)
+  //   siblings stack top→bottom  (instead of left→right)
+  // The layout algorithm always runs in "logical horizontal" coords; we
+  // swap (x,y)→(y,x) at draw time when isVertical is true.
+  let isVertical = false;
+  const VERTICAL_BREAKPOINT = 720;
+  function detectVertical() { return window.innerWidth < VERTICAL_BREAKPOINT; }
+  // Helper: swap a logical (x,y) pair if we're in vertical mode.
+  const xy = (lx, ly) => isVertical ? [ly, lx] : [lx, ly];
+
   function el(tag, attrs = {}, parent = null) {
     const e = document.createElementNS(NS, tag);
     for (const k in attrs) e.setAttribute(k, attrs[k]);
@@ -167,11 +178,11 @@ const Pedigree = (() => {
   }
 
   function drawNode(person, x, y, parent, layout) {
-    const cx = x + NODE / 2, cy = y + NODE / 2;
+    const [tx, ty] = xy(x, y);
     const group = el('g', {
       class: 'node-group',
       'data-id': person.id,
-      transform: `translate(${x},${y})`,
+      transform: `translate(${tx},${ty})`,
       style: `--depth:${layout.nodes[person.id].depth}`
     }, parent);
 
@@ -222,27 +233,43 @@ const Pedigree = (() => {
       }, group);
     }
 
-    // label (wraps long names across multiple lines)
-    const lines = wrapName(person.name.toUpperCase(), LABEL_WRAP);
-    const label = el('text', {
-      x: NODE / 2, y: NODE + 22,
-      class: 'node-label', 'text-anchor': 'middle'
-    }, group);
-    lines.forEach((ln, i) => {
-      const ts = el('tspan', { x: NODE / 2, dy: i === 0 ? 0 : 13 }, label);
-      ts.textContent = ln;
-    });
-
-    // years
+    // label — placement depends on orientation
     const years = [];
     if (person.birthYear) years.push(person.birthYear);
     if (person.deceased && person.deathYear) years.push('†' + person.deathYear);
-    if (years.length) {
-      const yt = el('text', {
-        x: NODE / 2, y: NODE + 22 + lines.length * 13 + 4,
-        class: 'node-years', 'text-anchor': 'middle'
+
+    if (isVertical) {
+      // VERTICAL: label sits to the right of the node, single line
+      const label = el('text', {
+        x: NODE + 10, y: NODE / 2 - 1,
+        class: 'node-label', 'text-anchor': 'start'
       }, group);
-      yt.textContent = years.join(' – ');
+      label.textContent = person.name.toUpperCase();
+      if (years.length) {
+        const yt = el('text', {
+          x: NODE + 10, y: NODE / 2 + 14,
+          class: 'node-years', 'text-anchor': 'start'
+        }, group);
+        yt.textContent = years.join(' – ');
+      }
+    } else {
+      // HORIZONTAL: label below, wrapped
+      const lines = wrapName(person.name.toUpperCase(), LABEL_WRAP);
+      const label = el('text', {
+        x: NODE / 2, y: NODE + 22,
+        class: 'node-label', 'text-anchor': 'middle'
+      }, group);
+      lines.forEach((ln, i) => {
+        const ts = el('tspan', { x: NODE / 2, dy: i === 0 ? 0 : 13 }, label);
+        ts.textContent = ln;
+      });
+      if (years.length) {
+        const yt = el('text', {
+          x: NODE / 2, y: NODE + 22 + lines.length * 13 + 4,
+          class: 'node-years', 'text-anchor': 'middle'
+        }, group);
+        yt.textContent = years.join(' – ');
+      }
     }
 
     // ID tag (top left)
@@ -271,12 +298,19 @@ const Pedigree = (() => {
     const linesG = el('g', { class: 'lines-layer' }, g);
 
     // Helper: line with pathLength="1" so the dasharray draw-in animation
-    // works regardless of how long the line is.
-    const line = (attrs, cls) => el('line', { ...attrs, pathLength: 1, class: cls }, linesG);
+    // works regardless of how long the line is. All inputs are in *logical*
+    // (horizontal) coords; we swap to real coords here when isVertical.
+    const line = (attrs, cls) => {
+      const [x1, y1] = xy(attrs.x1, attrs.y1);
+      const [x2, y2] = xy(attrs.x2, attrs.y2);
+      return el('line', { x1, y1, x2, y2, pathLength: 1, class: cls }, linesG);
+    };
 
     // Travels a small circle along (x1,y1)→(x2,y2) on a loop. Used to make
     // the static lines feel like data is flowing through them.
-    const flow = (x1, y1, x2, y2, dur = 3) => {
+    const flow = (lx1, ly1, lx2, ly2, dur = 3) => {
+      const [x1, y1] = xy(lx1, ly1);
+      const [x2, y2] = xy(lx2, ly2);
       const p = el('circle', { r: 2.4, class: 'flow-particle' }, linesG);
       const ax = document.createElementNS(NS, 'animate');
       ax.setAttribute('attributeName', 'cx');
@@ -386,32 +420,78 @@ const Pedigree = (() => {
       applyTransform();
     }, { passive: false });
 
-    // touch pan
-    let touchStart = null;
+    // touch pan (1 finger) + pinch zoom (2 fingers)
+    let touchStart = null, pinch = null;
     svgEl.addEventListener('touchstart', e => {
-      if (e.touches.length === 1) {
+      if (e.touches.length === 2) {
+        const t1 = e.touches[0], t2 = e.touches[1];
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const cx = (t1.clientX + t2.clientX) / 2;
+        const cy = (t1.clientY + t2.clientY) / 2;
+        pinch = { dist, cx, cy, scale: viewState.scale, tx: viewState.tx, ty: viewState.ty };
+        touchStart = null;
+      } else if (e.touches.length === 1 && !pinch) {
         touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, tx: viewState.tx, ty: viewState.ty };
       }
-    });
+    }, { passive: true });
     svgEl.addEventListener('touchmove', e => {
-      if (touchStart && e.touches.length === 1) {
+      if (e.touches.length === 2 && pinch) {
+        e.preventDefault();
+        const t1 = e.touches[0], t2 = e.touches[1];
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const ratio = dist / pinch.dist;
+        const newScale = Math.max(0.2, Math.min(4, pinch.scale * ratio));
+        // anchor zoom around the pinch midpoint so it zooms toward the fingers
+        const rect = svgEl.getBoundingClientRect();
+        const ax = pinch.cx - rect.left, ay = pinch.cy - rect.top;
+        const sx = (ax - pinch.tx) / pinch.scale;
+        const sy = (ay - pinch.ty) / pinch.scale;
+        viewState.scale = newScale;
+        viewState.tx = ax - sx * newScale;
+        viewState.ty = ay - sy * newScale;
+        applyTransform();
+      } else if (touchStart && e.touches.length === 1) {
         viewState.tx = touchStart.tx + (e.touches[0].clientX - touchStart.x);
         viewState.ty = touchStart.ty + (e.touches[0].clientY - touchStart.y);
         applyTransform();
       }
-    }, { passive: true });
-    svgEl.addEventListener('touchend', () => { touchStart = null; });
+    }, { passive: false });
+    svgEl.addEventListener('touchend', e => {
+      if (e.touches.length === 0) { touchStart = null; pinch = null; }
+      else if (e.touches.length === 1) { pinch = null; touchStart = null; }
+    });
+
+    // re-render when crossing the orientation breakpoint
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const wantsVertical = detectVertical();
+        if (wantsVertical !== isVertical && currentData) {
+          // axis swap — full re-render needed
+          viewState = { scale: 1, tx: 0, ty: 0 };
+          // Pedigree.render handles isVertical detection internally
+          const ev = new CustomEvent('pedigree-orient-change');
+          window.dispatchEvent(ev);
+        } else {
+          fitToView();
+        }
+      }, 180);
+    });
   }
 
   function fitToView() {
     if (!currentData) return;
-    const layout = buildLayout(currentData);
+    const layout = currentLayout || buildLayout(currentData);
     const rect = svg.getBoundingClientRect();
-    const sx = (rect.width - 80) / layout.width;
-    const sy = (rect.height - 80) / layout.height;
+    // logical layout dims swap when rendered vertically
+    const lW = isVertical ? layout.height : layout.width;
+    const lH = isVertical ? layout.width  : layout.height;
+    const sx = (rect.width  - 60) / lW;
+    const sy = (rect.height - 60) / lH;
     viewState.scale = Math.min(1, Math.min(sx, sy));
-    viewState.tx = (rect.width - layout.width * viewState.scale) / 2;
-    viewState.ty = 40;
+    viewState.tx = (rect.width  - lW * viewState.scale) / 2;
+    viewState.ty = (rect.height - lH * viewState.scale) / 2;
     applyTransform();
   }
 
@@ -434,10 +514,13 @@ const Pedigree = (() => {
 
     render(data) {
       currentData = data;
+      isVertical = detectVertical();
       while (g.firstChild) g.removeChild(g.firstChild);
       const layout = buildLayout(data);
       currentLayout = layout;
-      svg.setAttribute('viewBox', `0 0 ${Math.max(layout.width, 800)} ${Math.max(layout.height, 600)}`);
+      const vbW = isVertical ? layout.height : layout.width;
+      const vbH = isVertical ? layout.width  : layout.height;
+      svg.setAttribute('viewBox', `0 0 ${Math.max(vbW, 600)} ${Math.max(vbH, 400)}`);
       drawConnections(layout);
       const nodesG = el('g', { class: 'nodes-layer' }, g);
       data.people.forEach(p => {

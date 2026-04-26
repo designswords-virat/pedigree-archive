@@ -4,7 +4,7 @@
 
 const STORAGE_KEY = 'genosys_family_tree_v2';
 const ADMIN_KEY = 'genosys_admin_pass_v1';
-const PHOTO_MIGRATION_KEY = 'genosys_photo_migration_v3';
+const PHOTO_MIGRATION_KEY = 'genosys_photo_migration_v4';
 const DEFAULT_ADMIN_PASS = 'admin123';
 
 // Maps person.name → filename in Profiles/ folder. Used by the one-time
@@ -30,16 +30,23 @@ const PHOTO_MAP = {
   'Anand':               'Anand (M).png',
   'Kiran':               'Kiran (F).png',
   // gen 2
+  'Naman':               'Naman (M).jpeg',
+  'Sandhya':             'Sandhya (F).jpeg',
   'Dinesh Kumar Dhawan': 'Dinesh Kumar Dhawan (M).png',
   'Manish Dhawan':       'Manish Dhawan (M).png',
   'Manisha':             'Manisha (F).png',
   'Amit Dhawan':         'Amit Dhawan (M).png',
+  'Shubham':             'Shubham (M).jpeg',
   'Boby':                'Boby (M).png',
+  'Amar':                'Amar (M).jpeg',
+  'Sanjay':              'Sanjay (M).jpeg',
   'Mamta':               'Mamta (F).png',
+  'Vijay':               'Vijay (M).jpeg',
   'Mohit':               'Mohit (M).png',
   'Priyanka':            'Priyanka (F).png',
   'Jiya':                'Jiya (F).png',
   'Pakhu':               'Pakhu (F).png',
+  'Aaditya (Gunnu)':     'Aaditya (M) urf Gunnu.jpeg',
 };
 
 // === BHIVA RAM LINEAGE — sourced from Family pedigree.xlsx ===
@@ -73,8 +80,8 @@ const SAMPLE_DATA = {
 
     // Gen 2 — Grandchildren
     // Kalyan Sahai + Kusum
-    { id: 'gc1_1', name: 'Naman',              gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', parentIds: ['c1','c1s'], partnerIds: [] },
-    { id: 'gc1_2', name: 'Sandhya',            gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', parentIds: ['c1','c1s'], partnerIds: [] },
+    { id: 'gc1_1', name: 'Naman',              gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Naman (M).jpeg',   parentIds: ['c1','c1s'], partnerIds: [] },
+    { id: 'gc1_2', name: 'Sandhya',            gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Sandhya (F).jpeg', parentIds: ['c1','c1s'], partnerIds: [] },
 
     // Omprakash + Meera Devi
     { id: 'gc2_1',  name: 'Dinesh Kumar Dhawan', gender: 'male', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Dinesh Kumar Dhawan (M).png', parentIds: ['c2','c2s'], partnerIds: [] },
@@ -83,16 +90,16 @@ const SAMPLE_DATA = {
     { id: 'gc2_3',  name: 'Amit Dhawan',       gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Amit Dhawan (M).png', parentIds: ['c2','c2s'], partnerIds: [] },
 
     // Ramesh + Neeru
-    { id: 'gc3_1', name: 'Shubham',            gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', parentIds: ['c3','c3s'], partnerIds: [] },
+    { id: 'gc3_1', name: 'Shubham',            gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Shubham (M).jpeg', parentIds: ['c3','c3s'], partnerIds: [] },
     { id: 'gc3_2', name: 'Boby',               gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Boby (M).png', parentIds: ['c3','c3s'], partnerIds: [] },
 
     // Anokh + Ramphool
-    { id: 'gc4_1', name: 'Amar',               gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', parentIds: ['c4','c4s'], partnerIds: [] },
-    { id: 'gc4_2', name: 'Sanjay',             gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', parentIds: ['c4','c4s'], partnerIds: [] },
+    { id: 'gc4_1', name: 'Amar',               gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Amar (M).jpeg',   parentIds: ['c4','c4s'], partnerIds: [] },
+    { id: 'gc4_2', name: 'Sanjay',             gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Sanjay (M).jpeg', parentIds: ['c4','c4s'], partnerIds: [] },
     { id: 'gc4_3', name: 'Mamta',              gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Mamta (F).png', parentIds: ['c4','c4s'], partnerIds: [] },
 
     // Krishna + Dayaram
-    { id: 'gc5_1', name: 'Vijay',              gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', parentIds: ['c5','c5s'], partnerIds: [] },
+    { id: 'gc5_1', name: 'Vijay',              gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Vijay (M).jpeg', parentIds: ['c5','c5s'], partnerIds: [] },
     { id: 'gc5_2', name: 'Mohit',              gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Mohit (M).png',    parentIds: ['c5','c5s'], partnerIds: [] },
     { id: 'gc5_3', name: 'Priyanka',           gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Priyanka (F).png', parentIds: ['c5','c5s'], partnerIds: [] },
 
@@ -101,7 +108,7 @@ const SAMPLE_DATA = {
     { id: 'gc7_1', name: 'Pakhu',              gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Pakhu (F).png', parentIds: ['c6','c6s'], partnerIds: [] },
 
     // Anand + Kiran
-    { id: 'gc7_2', name: 'Aaditya (Gunnu)',    gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: 'Also known as Gunnu.', parentIds: ['c7','c7s'], partnerIds: [] },
+    { id: 'gc7_2', name: 'Aaditya (Gunnu)',    gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: 'Also known as Gunnu.', photo: 'Aaditya (M) urf Gunnu.jpeg', parentIds: ['c7','c7s'], partnerIds: [] },
     { id: 'gc7_3', name: 'Ishika',             gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', parentIds: ['c7','c7s'], partnerIds: [] },
   ],
   meta: { title: 'BHIVA RAM LINEAGE', subtitle: 'PEDIGREE ARCHIVE // FAMILY OF BHIVA RAM & CHOTA DEVI' }

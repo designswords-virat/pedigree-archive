@@ -1540,9 +1540,102 @@ input[type="checkbox"]:checked::after {
 
 /* =================== RESPONSIVE =================== */
 @media (max-width: 900px) {
-  .inspector { width: calc(100vw - 44px); top: auto; bottom: 60px; right: 22px; max-height: 50vh; }
+  .inspector { width: calc(100vw - 28px); top: auto; bottom: 56px; right: 14px; left: 14px; max-height: 55vh; }
   .hud-stats { display: none; }
-  .admin-content { grid-template-columns: 1fr; grid-template-rows: 240px 1fr; }
+  .admin-content { grid-template-columns: 1fr; grid-template-rows: 220px 1fr; }
   .admin-list { border-right: 0; border-bottom: 1px solid var(--border); }
   .form-grid { grid-template-columns: 1fr; }
+}
+
+/* ----- PHONE-SIZE LAYOUT (≤ 720px) ----- */
+@media (max-width: 720px) {
+  body { font-size: 13px; }
+
+  /* topbar: shrink brand, collapse button labels */
+  .topbar {
+    padding: 8px 10px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .topbar .brand { gap: 8px; flex: 1; min-width: 0; }
+  .brand-logo { width: 32px; height: 32px; }
+  .brand-logo span { font-size: 14px; }
+  .brand-text .title { font-size: 13px; letter-spacing: 0.12em; }
+  .brand-text .subtitle { display: none; }
+
+  .toolbar { gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .btn {
+    padding: 8px 9px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    /* better tap targets */
+    min-height: 36px;
+  }
+  .btn-icon { padding: 8px; min-width: 36px; }
+  /* hide text labels inside the ORIGIN + ADMIN buttons; keep the icons */
+  #btnOrigin, #btnAdmin { font-size: 0; }
+  #btnOrigin::before { content: '📍'; font-size: 14px; }
+  #btnAdmin::before  { content: '⚙';  font-size: 14px; }
+
+  /* bottom bar: tighter legend, swap pan/zoom hint for tap hint */
+  .bottombar { padding: 6px 10px; font-size: 9px; letter-spacing: 0.18em; flex-wrap: wrap; gap: 8px; }
+  .legend { gap: 10px; flex-wrap: wrap; }
+  .legend-item { font-size: 9px; }
+  .bottombar > div:last-child { white-space: nowrap; }
+  .bottombar .pan-hint-desktop { display: none; }
+
+  /* corner brackets smaller */
+  .bracket-tl, .bracket-tr, .bracket-bl, .bracket-br { width: 16px; height: 16px; }
+
+  /* atmosphere: keep starfield/sweep but kill the pulse rings (clutter) */
+  .center-pulse { display: none; }
+
+  /* login box fits narrow viewports */
+  .login-box { width: calc(100vw - 32px); max-width: 380px; padding: 22px 20px; }
+
+  /* boot screen text */
+  .boot-title { font-size: 22px; letter-spacing: 0.25em; }
+  .boot-log { font-size: 11px; line-height: 1.7; }
+
+  /* inspector on phone */
+  .inspector { width: calc(100vw - 16px); right: 8px; left: 8px; bottom: 50px; padding: 14px 14px 12px; }
+  .inspector .name { font-size: 14px; }
+  .inspector .i-photo { width: 90px; height: 90px; }
+
+  /* fullscreen card */
+  .fc { padding: 8px; }
+  .fc-frame { max-height: calc(100vh - 16px); }
+  .fc-top { flex-direction: column; align-items: stretch; gap: 6px; padding: 8px; }
+  .fc-timer-block { border: 1px solid var(--border-soft); padding: 6px 10px; justify-content: space-between; }
+  .fc-tabs { display: none; }
+  .fc-brand-row { padding: 10px 12px; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .fc-brand-mark { width: 44px; height: 44px; font-size: 14px; }
+  .fc-brand-text strong { font-size: 16px; letter-spacing: 0.18em; }
+  .fc-codes { grid-template-columns: 1fr 1fr; font-size: 9px; gap: 4px 12px; }
+  .fc-main { grid-template-columns: 1fr; padding: 10px; gap: 10px; }
+  .fc-left, .fc-right { display: none; }
+  .fc-center-body { grid-template-columns: 1fr; padding: 10px; gap: 14px; }
+  .fc-photo-frame { max-width: 220px; margin: 0 auto; }
+  .fc-data-grid { grid-template-columns: 1fr 1fr; }
+  .fc-name { font-size: 18px; letter-spacing: 0.12em; }
+  .fc-bottom { padding: 6px 8px; flex-wrap: wrap; gap: 4px; }
+  .fc-bottom span { font-size: 8px; padding: 3px 6px; }
+  .fc-close { top: 6px; right: 6px; padding: 5px 10px; font-size: 10px; }
+
+  /* admin panel */
+  .admin-content { grid-template-rows: 200px 1fr; }
+  .admin-form { padding: 14px 14px; }
+
+  /* toast position above bottom bar */
+  .toast-stack { bottom: 50px; right: 8px; left: 8px; }
+  .toast { max-width: none; font-size: 10px; padding: 8px 12px; }
+}
+
+/* ----- TINY PHONES (≤ 380px) ----- */
+@media (max-width: 380px) {
+  .brand-text .title { font-size: 11px; }
+  .topbar { padding: 6px 8px; }
+  .btn { padding: 6px 8px; font-size: 9px; min-height: 32px; }
+  .btn-icon { min-width: 32px; padding: 6px; }
+  .legend { font-size: 8px; }
 }

@@ -609,12 +609,18 @@
 
     // refresh on storage change (e.g. from admin in another tab)
     window.addEventListener('storage', (e) => {
-      if (e.key === 'genosys_family_tree_v1') {
+      if (e.key === 'genosys_family_tree_v1' || e.key === 'genosys_family_tree_v2') {
         const fresh = Data.load();
         Pedigree.render(fresh);
         renderStats(fresh);
         toast('ARCHIVE SYNCED');
       }
+    });
+
+    // re-render when the pedigree axes need to flip (mobile <-> desktop)
+    window.addEventListener('pedigree-orient-change', () => {
+      const fresh = Data.load();
+      Pedigree.render(fresh);
     });
 
     // unlock audio on first gesture (browser policy)
