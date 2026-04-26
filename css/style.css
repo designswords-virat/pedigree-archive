@@ -432,10 +432,20 @@ a:hover { text-shadow: var(--glow); }
   mix-blend-mode: screen;
 }
 
-.deceased-slash {
-  stroke: var(--red);
-  stroke-width: 2;
-  filter: drop-shadow(0 0 4px var(--red));
+/* deceased — soft "in memoriam" treatment, no slash */
+.node-group.deceased .node-shape {
+  stroke-dasharray: 4 3;
+  stroke-opacity: 0.65;
+  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.25));
+}
+.node-group.deceased .node-photo {
+  opacity: 0.55;
+  filter: var(--photo-filter) brightness(0.78) contrast(0.95);
+}
+.node-group.deceased .node-label,
+.node-group.deceased .node-years,
+.node-group.deceased .node-id {
+  fill-opacity: 0.7;
 }
 
 .node-label {
@@ -662,10 +672,10 @@ a:hover { text-shadow: var(--glow); }
 }
 .legend-icon.affected { background: var(--cyan); }
 .legend-icon.female   { border-radius: 50%; }
-.legend-icon.deceased { position: relative; }
-.legend-icon.deceased::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(45deg, transparent 45%, var(--red) 47%, var(--red) 53%, transparent 55%);
+.legend-icon.deceased {
+  border-style: dashed;
+  border-color: rgba(0, 240, 255, 0.55);
+  opacity: 0.65;
 }
 
 .status-dot {

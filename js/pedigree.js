@@ -223,15 +223,9 @@ const Pedigree = (() => {
       }, group);
     }
 
-    // (Genetic-status overlays removed — only deceased indicator remains.)
-
-    // deceased slash (diagonal across)
-    if (person.deceased) {
-      el('line', {
-        x1: -6, y1: NODE + 6, x2: NODE + 6, y2: -6,
-        class: 'deceased-slash'
-      }, group);
-    }
+    // Deceased — quiet "in memoriam" treatment via class. CSS dims the photo,
+    // softens the label, and switches the outline to a dashed stroke. No slash.
+    if (person.deceased) group.classList.add('deceased');
 
     // label — placement depends on orientation
     const years = [];
