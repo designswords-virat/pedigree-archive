@@ -388,6 +388,18 @@ const Pedigree = (() => {
     g.setAttribute('transform', `translate(${viewState.tx},${viewState.ty}) scale(${viewState.scale})`);
   }
 
+  // Current viewBox→screen scale. Used to convert mouse/touch deltas (which are
+  // in screen pixels) into user-coord deltas (which is what `tx`/`ty` are in).
+  // Without this, pan feels slow on mobile because vbScale gets small (~0.36).
+  function vbScaleNow() {
+    if (!svg) return 1;
+    const vb = svg.viewBox.baseVal;
+    if (!vb || !vb.width || !vb.height) return 1;
+    const r = svg.getBoundingClientRect();
+    if (!r.width || !r.height) return 1;
+    return Math.min(r.width / vb.width, r.height / vb.height);
+  }
+
   function attachPanZoom(svgEl) {
     let dragging = false, startX = 0, startY = 0, startTx = 0, startTy = 0;
     svgEl.addEventListener('mousedown', e => {
@@ -399,8 +411,9 @@ const Pedigree = (() => {
     });
     window.addEventListener('mousemove', e => {
       if (!dragging) return;
-      viewState.tx = startTx + (e.clientX - startX);
-      viewState.ty = startTy + (e.clientY - startY);
+      const s = vbScaleNow();
+      viewState.tx = startTx + (e.clientX - startX) / s;
+      viewState.ty = startTy + (e.clientY - startY) / s;
       applyTransform();
     });
     window.addEventListener('mouseup', () => {
@@ -411,7 +424,10 @@ const Pedigree = (() => {
       e.preventDefault();
       const delta = e.deltaY > 0 ? 0.9 : 1.1;
       const rect = svgEl.getBoundingClientRect();
-      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      const vbS = vbScaleNow();
+      // mouse position in user coords (so anchor stays under cursor at any zoom)
+      const mx = (e.clientX - rect.left) / vbS;
+      const my = (e.clientY - rect.top)  / vbS;
       const sx = (mx - viewState.tx) / viewState.scale;
       const sy = (my - viewState.ty) / viewState.scale;
       viewState.scale = Math.max(0.25, Math.min(3, viewState.scale * delta));
@@ -441,9 +457,11 @@ const Pedigree = (() => {
         const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
         const ratio = dist / pinch.dist;
         const newScale = Math.max(0.2, Math.min(4, pinch.scale * ratio));
-        // anchor zoom around the pinch midpoint so it zooms toward the fingers
+        // anchor zoom around the pinch midpoint, in user coords
         const rect = svgEl.getBoundingClientRect();
-        const ax = pinch.cx - rect.left, ay = pinch.cy - rect.top;
+        const vbS = vbScaleNow();
+        const ax = (pinch.cx - rect.left) / vbS;
+        const ay = (pinch.cy - rect.top)  / vbS;
         const sx = (ax - pinch.tx) / pinch.scale;
         const sy = (ay - pinch.ty) / pinch.scale;
         viewState.scale = newScale;
@@ -451,8 +469,9 @@ const Pedigree = (() => {
         viewState.ty = ay - sy * newScale;
         applyTransform();
       } else if (touchStart && e.touches.length === 1) {
-        viewState.tx = touchStart.tx + (e.touches[0].clientX - touchStart.x);
-        viewState.ty = touchStart.ty + (e.touches[0].clientY - touchStart.y);
+        const s = vbScaleNow();
+        viewState.tx = touchStart.tx + (e.touches[0].clientX - touchStart.x) / s;
+        viewState.ty = touchStart.ty + (e.touches[0].clientY - touchStart.y) / s;
         applyTransform();
       }
     }, { passive: false });
@@ -481,17 +500,36 @@ const Pedigree = (() => {
   }
 
   function fitToView() {
-    if (!currentData) return;
+    if (!currentData || !svg) return;
     const layout = currentLayout || buildLayout(currentData);
     const rect = svg.getBoundingClientRect();
-    // logical layout dims swap when rendered vertically
-    const lW = isVertical ? layout.height : layout.width;
-    const lH = isVertical ? layout.width  : layout.height;
-    const sx = (rect.width  - 60) / lW;
-    const sy = (rect.height - 60) / lH;
-    viewState.scale = Math.min(1, Math.min(sx, sy));
-    viewState.tx = (rect.width  - lW * viewState.scale) / 2;
-    viewState.ty = (rect.height - lH * viewState.scale) / 2;
+    if (!rect.width || !rect.height) return;
+    const vb = svg.viewBox.baseVal;
+    if (!vb.width || !vb.height) return;
+
+    const lW = isVertical ? layout.height : layout.width;   // real content width
+    const lH = isVertical ? layout.width  : layout.height;  // real content height
+    const vbScale  = Math.min(rect.width / vb.width, rect.height / vb.height);
+    const offsetX  = (rect.width  - vb.width  * vbScale) / 2;
+    const offsetY  = (rect.height - vb.height * vbScale) / 2;
+    const margin   = 12;
+
+    if (isVertical) {
+      // MOBILE — fit-to-width; content can extend below visible area (scrollable
+      // via 1-finger pan). Top-aligned with a small top margin.
+      viewState.scale = (rect.width - 2 * margin) / (lW * vbScale);
+      viewState.tx    = (margin - offsetX) / vbScale;
+      viewState.ty    = (margin - offsetY) / vbScale;
+    } else {
+      // DESKTOP — fit-to-meet, content centred in viewport.
+      const sx = (rect.width  - 2 * margin) / (lW * vbScale);
+      const sy = (rect.height - 2 * margin) / (lH * vbScale);
+      viewState.scale = Math.min(1, Math.min(sx, sy));
+      const screenW = lW * viewState.scale * vbScale;
+      const screenH = lH * viewState.scale * vbScale;
+      viewState.tx = ((rect.width  - screenW) / 2 - offsetX) / vbScale;
+      viewState.ty = ((rect.height - screenH) / 2 - offsetY) / vbScale;
+    }
     applyTransform();
   }
 

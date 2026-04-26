@@ -54,6 +54,8 @@
     currentPerson = person;
     const insp = $('#inspector');
     insp.classList.remove('hidden');
+    const stage = $('#stage');
+    if (stage) stage.classList.add('has-inspector');
     $('#iName').textContent = person.name;
     $('#iId').textContent = '// ' + person.id.toUpperCase();
     $('#iGender').textContent = person.gender.toUpperCase();
@@ -595,16 +597,17 @@
     });
 
     // close inspector
-    $('#iClose').addEventListener('click', () => {
+    const closeInspector = () => {
       $('#inspector').classList.add('hidden');
+      $('#stage').classList.remove('has-inspector');
       Pedigree.hoverHighlight(null);
-      Sound.click();
-    });
+    };
+    $('#iClose').addEventListener('click', () => { closeInspector(); Sound.click(); });
     $('#stage').addEventListener('click', (e) => {
       if (e.target.closest('.inspector')) return;
       if (e.target.closest('.node-group')) return;
       if (e.target.closest('.toolbar')) return;
-      $('#inspector').classList.add('hidden');
+      closeInspector();
     });
 
     // refresh on storage change (e.g. from admin in another tab)

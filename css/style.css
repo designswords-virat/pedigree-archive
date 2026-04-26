@@ -684,7 +684,11 @@ a:hover { text-shadow: var(--glow); }
 
 /* =================== BOOT OVERLAY =================== */
 .boot {
-  position: fixed; inset: 0;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 100vh;     /* fallback */
+  height: 100dvh;    /* dynamic viewport — excludes mobile URL bar so the content
+                        actually centres in the *visible* area */
   background: var(--bg-0);
   z-index: 99999;
   display: grid;
@@ -957,7 +961,10 @@ input[type="checkbox"]:checked::after {
 
 /* =================== LOGIN =================== */
 .login-screen {
-  position: fixed; inset: 0;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 100vh;
+  height: 100dvh;
   display: grid; place-items: center;
   background: var(--bg-0);
   z-index: 100;
@@ -1613,30 +1620,64 @@ input[type="checkbox"]:checked::after {
   .boot-title { font-size: 22px; letter-spacing: 0.25em; }
   .boot-log { font-size: 11px; line-height: 1.7; }
 
-  /* inspector on phone */
-  .inspector { width: calc(100vw - 16px); right: 8px; left: 8px; bottom: 50px; padding: 14px 14px 12px; }
+  /* inspector on phone — centred modal with backdrop, replaces bottom-anchored panel */
+  .stage::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: rgba(0, 6, 14, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 9;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .stage.has-inspector::before { opacity: 1; pointer-events: auto; }
+  .inspector {
+    top: 50%; left: 50%;
+    right: auto; bottom: auto;
+    transform: translate(-50%, -50%);
+    width: calc(100vw - 24px); max-width: 420px;
+    max-height: 80vh; max-height: 80dvh;
+    padding: 18px 16px 14px;
+    z-index: 11;
+    animation: insMobileIn 0.3s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  @keyframes insMobileIn {
+    from { transform: translate(-50%, -45%); opacity: 0; }
+    to   { transform: translate(-50%, -50%); opacity: 1; }
+  }
   .inspector .name { font-size: 14px; }
   .inspector .i-photo { width: 90px; height: 90px; }
 
-  /* fullscreen card */
-  .fc { padding: 8px; }
-  .fc-frame { max-height: calc(100vh - 16px); }
-  .fc-top { flex-direction: column; align-items: stretch; gap: 6px; padding: 8px; }
+  /* fullscreen subject card — make the entire frame the scroll container so
+     content flows naturally and nothing gets cropped */
+  .fc { padding: 0; place-items: stretch; }
+  .fc-frame {
+    max-height: 100vh; max-height: 100dvh;
+    height: 100vh; height: 100dvh;
+    width: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;        /* abandon grid; let children flow */
+  }
+  .fc-frame::before, .fc-frame::after { display: none; }   /* corner brackets clutter on phone */
+  .fc-top { flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 10px 8px; position: sticky; top: 0; background: rgba(3, 8, 18, 0.96); backdrop-filter: blur(6px); z-index: 4; }
   .fc-timer-block { border: 1px solid var(--border-soft); padding: 6px 10px; justify-content: space-between; }
   .fc-tabs { display: none; }
-  .fc-brand-row { padding: 10px 12px; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .fc-brand-row { padding: 12px; flex-direction: column; gap: 10px; align-items: flex-start; }
   .fc-brand-mark { width: 44px; height: 44px; font-size: 14px; }
   .fc-brand-text strong { font-size: 16px; letter-spacing: 0.18em; }
   .fc-codes { grid-template-columns: 1fr 1fr; font-size: 9px; gap: 4px 12px; }
-  .fc-main { grid-template-columns: 1fr; padding: 10px; gap: 10px; }
+  .fc-main { display: block; padding: 10px; }
   .fc-left, .fc-right { display: none; }
-  .fc-center-body { grid-template-columns: 1fr; padding: 10px; gap: 14px; }
-  .fc-photo-frame { max-width: 220px; margin: 0 auto; }
+  .fc-center { display: block; overflow: visible; }
+  .fc-center-body { grid-template-columns: 1fr; padding: 12px; gap: 14px; overflow: visible; }
+  .fc-photo-col { align-items: center; }
+  .fc-photo-frame { max-width: 240px; width: 100%; margin: 0 auto; }
   .fc-data-grid { grid-template-columns: 1fr 1fr; }
   .fc-name { font-size: 18px; letter-spacing: 0.12em; }
-  .fc-bottom { padding: 6px 8px; flex-wrap: wrap; gap: 4px; }
+  .fc-bottom { padding: 8px; flex-wrap: wrap; gap: 4px; justify-content: center; }
   .fc-bottom span { font-size: 8px; padding: 3px 6px; }
-  .fc-close { top: 6px; right: 6px; padding: 5px 10px; font-size: 10px; }
+  .fc-close { position: fixed; top: 8px; right: 8px; padding: 6px 12px; font-size: 10px; box-shadow: 0 0 12px rgba(0,0,0,0.6); }
 
   /* admin panel */
   .admin-content { grid-template-rows: 200px 1fr; }
