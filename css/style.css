@@ -242,7 +242,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   text-transform: uppercase;
 }
 .hud-stats .stat .val {
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   font-weight: 700;
   font-size: 18px;
   font-family: var(--font-display);
@@ -578,7 +578,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 19px;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   letter-spacing: 0.08em;
   line-height: 1.2;
 }
@@ -650,14 +650,14 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   font-size: 9px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--gold-bright);
-  background: rgba(40, 28, 12, 0.5);
+  color: var(--gold-deep);
+  background: var(--ink-2);
   border-radius: 1px;
 }
 .tag.danger { color: var(--rose); border-color: var(--rose); background: rgba(60, 12, 18, 0.5); }
-.tag.warn   { color: var(--gold-bright); border-color: var(--gold); }
+.tag.warn   { color: var(--gold-deep); border-color: var(--gold); }
 .tag.green  { color: #b3d6a3; border-color: var(--ivy); background: rgba(40, 60, 38, 0.4); }
-.tag.muted  { color: var(--parchment-dim); border-color: var(--parchment-faint); background: rgba(30,25,18,0.5); font-style: italic; }
+.tag.muted  { color: var(--parchment-dim); border-color: var(--parchment-faint); background: var(--ink-2); font-style: italic; }
 
 .inspector .notes {
   margin-top: 12px;
@@ -689,10 +689,10 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
 .inspector .relations .rel-link {
   display: inline-block;
   cursor: pointer;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   padding: 3px 10px;
   border: 1px solid var(--gold-soft);
-  background: rgba(40, 28, 12, 0.4);
+  background: var(--ink-2);
   font-family: var(--font-body);
   font-size: 13px;
   letter-spacing: 0.04em;
@@ -701,7 +701,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
 }
 .inspector .relations .rel-link:hover {
   background: linear-gradient(180deg, var(--gold), var(--gold-deep));
-  border-color: var(--gold-bright);
+  border-color: var(--gold-deep);
   color: var(--ink-0);
   box-shadow: 0 0 10px rgba(241, 214, 138, 0.5);
   text-shadow: 0 1px 0 rgba(255,235,180,0.4);
@@ -826,7 +826,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   padding: 6px;
   transition: all 0.15s;
 }
-.back-link:hover { color: var(--gold-bright); }
+.back-link:hover { color: var(--gold-deep); }
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25%      { transform: translateX(-8px); }
@@ -863,7 +863,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   margin-bottom: 10px;
   cursor: pointer;
   transition: all 0.15s;
-  background: rgba(40, 28, 12, 0.18);
+  background: var(--ink-1);
   position: relative;
   display: flex; align-items: center; gap: 12px;
   border-radius: 1px;
@@ -874,14 +874,14 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   box-shadow: 0 0 12px rgba(203, 166, 86, 0.25);
 }
 .person-card.selected {
-  border-color: var(--gold-bright);
+  border-color: var(--gold-deep);
   background: rgba(80, 56, 22, 0.4);
   box-shadow: inset 0 0 14px rgba(203, 166, 86, 0.2);
 }
 .person-card .card-text { flex: 1; min-width: 0; }
 .person-card .pname {
   font-family: var(--font-display);
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   font-weight: 600;
   font-size: 14px;
   letter-spacing: 0.06em;
@@ -906,7 +906,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
 }
 .person-card:hover .card-thumb { filter: var(--photo-filter-hover); }
 .card-thumb.placeholder {
-  background: rgba(40, 28, 12, 0.5);
+  background: var(--ink-2);
 }
 
 .admin-form {
@@ -998,15 +998,15 @@ input[type="checkbox"]:checked::after {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--parchment-dim);
-  background: rgba(20, 16, 10, 0.4);
+  background: var(--ink-2);
   border-radius: 1px;
   transition: all 0.15s;
 }
-.tag-pick:hover { border-color: var(--gold); color: var(--gold-bright); }
+.tag-pick:hover { border-color: var(--gold); color: var(--gold-deep); }
 .tag-pick.active {
   background: linear-gradient(180deg, var(--gold), var(--gold-deep));
   color: var(--ink-0);
-  border-color: var(--gold-bright);
+  border-color: var(--gold-deep);
   text-shadow: 0 1px 0 rgba(255,235,180,0.4);
 }
 
@@ -1139,7 +1139,7 @@ input[type="checkbox"]:checked::after {
   color: var(--gold);
   border: 1px solid var(--gold-soft);
   padding: 6px 12px;
-  background: rgba(40, 28, 12, 0.4);
+  background: var(--ink-2);
 }
 .fc-pill em { color: var(--parchment-dim); font-style: italic; margin-left: 6px; }
 .fc-arms {
@@ -1231,7 +1231,7 @@ input[type="checkbox"]:checked::after {
   font-weight: 700;
   font-size: 32px;
   letter-spacing: 0.06em;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   line-height: 1.15;
   text-shadow: 0 1px 0 rgba(26, 37, 64, 0.10);
   border-bottom: 1px solid var(--border-soft);
@@ -1255,7 +1255,7 @@ input[type="checkbox"]:checked::after {
   color: var(--parchment);
   line-height: 1.5;
 }
-.fc-lineage em { color: var(--gold-bright); font-style: italic; }
+.fc-lineage em { color: var(--gold-deep); font-style: italic; }
 
 .fc-section-h {
   font-family: var(--font-display);
@@ -1327,10 +1327,10 @@ input[type="checkbox"]:checked::after {
 .fc-rel-link {
   display: inline-block;
   cursor: pointer;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   padding: 4px 12px;
   border: 1px solid var(--gold-soft);
-  background: rgba(40, 28, 12, 0.4);
+  background: var(--ink-2);
   font-family: var(--font-body);
   font-size: 14px;
   border-radius: 1px;
@@ -1338,7 +1338,7 @@ input[type="checkbox"]:checked::after {
 }
 .fc-rel-link:hover {
   background: linear-gradient(180deg, var(--gold), var(--gold-deep));
-  border-color: var(--gold-bright);
+  border-color: var(--gold-deep);
   color: var(--ink-0);
   box-shadow: 0 0 10px rgba(241, 214, 138, 0.5);
 }
@@ -1403,7 +1403,7 @@ input[type="checkbox"]:checked::after {
   padding: 12px 18px;
   font-family: var(--font-display);
   font-size: 11px;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.4s forwards;
@@ -1411,7 +1411,7 @@ input[type="checkbox"]:checked::after {
   max-width: 360px;
   border-radius: 1px;
 }
-.toast.error   { border-color: var(--rose); color: #f8d2d2; box-shadow: 0 6px 20px rgba(156, 35, 48, 0.35); }
+.toast.error   { border-color: var(--rose); color: var(--rose-deep); box-shadow: 0 6px 20px rgba(156, 35, 48, 0.35); }
 .toast.success { border-color: var(--ivy);  color: #c5dab8; box-shadow: 0 6px 20px rgba(74, 112, 72, 0.35); }
 @keyframes toastIn  { from { transform: translateX(60px); opacity: 0; } }
 @keyframes toastOut { to   { transform: translateX(60px); opacity: 0; } }
@@ -1577,12 +1577,12 @@ input[type="checkbox"]:checked::after {
   50%      { transform: scale(1.02); }
 }
 
-/* edge vignette to push focus to centre */
+/* soft ivory haze around the edges to keep focus centred */
 .landing-vignette {
   position: absolute; inset: 0;
   z-index: 2;
   background:
-    radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(0,0,0,0.65) 95%);
+    radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(251, 248, 241, 0.55) 95%);
   pointer-events: none;
 }
 
@@ -1608,7 +1608,7 @@ input[type="checkbox"]:checked::after {
   margin: 0 0 14px;
   display: inline-block;
   padding: 6px 18px;
-  background: rgba(20, 16, 10, 0.65);
+  background: var(--ink-2);
   border-top: 1px solid var(--gold-soft);
   border-bottom: 1px solid var(--gold-soft);
   backdrop-filter: blur(2px);
@@ -1616,16 +1616,13 @@ input[type="checkbox"]:checked::after {
 
 .hero-title {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: clamp(38px, 7vw, 76px);
-  letter-spacing: 0.08em;
-  color: var(--gold-bright);
+  letter-spacing: 0.10em;
+  color: var(--ivory);              /* navy */
   margin: 0 0 18px;
   line-height: 1.05;
-  text-shadow:
-    0 2px 0 rgba(26, 37, 64, 0.10),
-    0 0 30px rgba(0, 0, 0, 0.85),
-    0 0 60px rgba(120, 80, 30, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 .hero-title .ornate {
   display: block;
@@ -1704,7 +1701,7 @@ input[type="checkbox"]:checked::after {
   text-decoration: none;
   transition: color 0.15s;
 }
-.hero-sub-link:hover { color: var(--gold-bright); }
+.hero-sub-link:hover { color: var(--gold-deep); }
 
 /* small flourish above the title */
 .hero-flourish {
@@ -1752,7 +1749,7 @@ input[type="checkbox"]:checked::after {
   font-weight: 600;
   font-size: 14px;
   letter-spacing: 0.1em;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   position: relative;
   z-index: 1;
 }
@@ -1780,12 +1777,12 @@ input[type="checkbox"]:checked::after {
   text-decoration: none;
   padding: 6px 12px;
   border: 1px solid var(--border-soft);
-  background: rgba(20, 16, 10, 0.6);
+  background: var(--ink-2);
   backdrop-filter: blur(2px);
   border-radius: 1px;
   transition: all 0.15s;
 }
-.steward-corner:hover { color: var(--gold-bright); border-color: var(--gold); }
+.steward-corner:hover { color: var(--gold-deep); border-color: var(--gold); }
 
 /* small brand mark at top-left of the landing page */
 .landing-brand {
@@ -1806,7 +1803,7 @@ input[type="checkbox"]:checked::after {
 .landing-brand .title {
   font-family: var(--font-display);
   font-weight: 600;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   font-size: 13px;
   letter-spacing: 0.18em;
   text-shadow: none;
@@ -1875,7 +1872,7 @@ input[type="checkbox"]:checked::after {
   font-size: clamp(28px, 4vw, 38px);
   letter-spacing: 0.12em;
   margin-bottom: 8px;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
 }
 .create-card .lead {
   text-align: center;
@@ -1901,7 +1898,7 @@ input[type="checkbox"]:checked::after {
 
 .create-option {
   border: 1px solid var(--gold-soft);
-  background: rgba(40, 28, 12, 0.3);
+  background: var(--ink-1);
   padding: 24px;
   border-radius: 1px;
   display: flex;
@@ -1924,7 +1921,7 @@ input[type="checkbox"]:checked::after {
   text-align: center;
   font-size: 16px;
   letter-spacing: 0.16em;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   margin-bottom: 6px;
 }
 .create-option p {
@@ -1993,7 +1990,7 @@ input[type="checkbox"]:checked::after {
 .create-status.error {
   background: rgba(60, 12, 18, 0.4);
   border: 1px solid var(--rose);
-  color: #f8d2d2;
+  color: var(--rose-deep);
   display: block;
 }
 
@@ -2053,7 +2050,7 @@ input[type="checkbox"]:checked::after {
 }
 .auth-tab:hover { color: var(--gold); }
 .auth-tab.active {
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   border-bottom-color: var(--gold);
 }
 
@@ -2097,7 +2094,7 @@ input[type="checkbox"]:checked::after {
 .auth-status.error {
   background: rgba(60, 12, 18, 0.4);
   border: 1px solid var(--rose);
-  color: #f8d2d2;
+  color: var(--rose-deep);
   display: block;
 }
 
@@ -2139,7 +2136,7 @@ input[type="checkbox"]:checked::after {
 
 .profile-section {
   border: 1px solid var(--border-soft);
-  background: rgba(40, 28, 12, 0.18);
+  background: var(--ink-1);
   padding: 18px 20px 20px;
   border-radius: 2px;
   margin-bottom: 18px;
@@ -2343,7 +2340,7 @@ input[type="date"]:focus {
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   letter-spacing: 0.06em;
   line-height: 1.15;
 }
@@ -2387,7 +2384,7 @@ input[type="date"]:focus {
 .next-note {
   margin-top: 18px;
   padding: 12px 16px;
-  background: rgba(40, 28, 12, 0.4);
+  background: var(--ink-2);
   border-left: 3px solid var(--gold);
   font-family: var(--font-body);
   font-style: italic;
@@ -2428,7 +2425,7 @@ input[type="date"]:focus {
   font-weight: 700;
   font-size: 24px;
   letter-spacing: 0.06em;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   margin-bottom: 12px;
 }
 .ud-line {
@@ -2625,7 +2622,7 @@ input[type="date"]:focus {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 18px;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   letter-spacing: 0.06em;
   margin-top: 2px;
 }
@@ -2659,7 +2656,7 @@ input[type="date"]:focus {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   background: linear-gradient(180deg, rgba(50, 38, 18, 0.85), rgba(28, 22, 12, 0.85));
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   border: 1px solid var(--gold-dim);
   padding: 14px 12px;
   cursor: pointer;
@@ -2695,7 +2692,7 @@ input[type="date"]:focus {
   text-align: left;
   padding: 14px 16px;
   border: 1px solid var(--gold-soft);
-  background: rgba(40, 28, 12, 0.4);
+  background: var(--ink-2);
   cursor: pointer;
   border-radius: 1px;
   display: flex; flex-direction: column; gap: 3px;
@@ -2706,7 +2703,7 @@ input[type="date"]:focus {
   font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 0.18em;
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   text-transform: uppercase;
 }
 .kp-qual-opt span {
@@ -2850,7 +2847,7 @@ input[type="date"]:focus {
   border-radius: 1px;
   transition: all 0.15s;
 }
-.details-head .back-link:hover { color: var(--gold-bright); border-color: var(--gold); }
+.details-head .back-link:hover { color: var(--gold-deep); border-color: var(--gold); }
 
 /* TABS */
 .details-tabs {
@@ -2880,7 +2877,7 @@ input[type="date"]:focus {
 }
 .details-tab:hover { color: var(--gold); }
 .details-tab.active {
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   border-bottom-color: var(--gold);
 }
 
@@ -2927,7 +2924,7 @@ input[type="date"]:focus {
   line-height: 1.55;
 }
 .details-privacy strong {
-  color: #f8d2d2;
+  color: var(--rose-deep);
   font-style: normal;
   letter-spacing: 0.05em;
 }
@@ -2937,7 +2934,7 @@ input[type="date"]:focus {
   margin-bottom: 22px;
   padding: 14px 16px 16px;
   border: 1px solid var(--border-soft);
-  background: rgba(40, 28, 12, 0.18);
+  background: var(--ink-1);
   border-radius: 1px;
 }
 .media-section h3 {
@@ -2984,7 +2981,7 @@ input[type="date"]:focus {
   gap: 10px;
   padding: 6px 8px 6px 6px;
   border: 1px solid var(--gold-soft);
-  background: rgba(20, 16, 10, 0.55);
+  background: var(--ink-2);
   border-radius: 1px;
   max-width: 280px;
 }
@@ -2998,7 +2995,7 @@ input[type="date"]:focus {
 .media-thumb-doc {
   width: 44px; height: 44px;
   display: grid; place-items: center;
-  background: rgba(40, 28, 12, 0.4);
+  background: var(--ink-2);
   font-size: 22px;
   color: var(--gold);
   border-radius: 1px;
