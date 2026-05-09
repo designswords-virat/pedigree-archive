@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Your Tree — Pedigree Archive</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo"><span>✦</span></div>
+      <div class="brand-text">
+        <div class="title" id="brandTitle">Your Tree</div>
+        <div class="subtitle" id="brandSubtitle">A view of the lineage</div>
+      </div>
+    </div>
+    <div class="hud-stats">
+      <div class="stat"><span class="lbl">Souls</span><span class="val" id="statCount">0</span></div>
+      <div class="stat"><span class="lbl">Generations</span><span class="val" id="statGens">0</span></div>
+    </div>
+    <div class="toolbar">
+      <div class="view-toggle" role="group" aria-label="Layout">
+        <button class="vt-btn active" id="btnLayoutWrap" data-layout="wrap" title="Compact: wide sibling rows wrap into stacked sub-rows">✦ Compact</button>
+        <button class="vt-btn"        id="btnLayoutFull" data-layout="full" title="Full tree: every generation on its own horizontal line">⇆ Full Tree</button>
+      </div>
+      <button class="btn btn-icon" id="btnTop"      title="Scroll to top">↑</button>
+      <button class="btn"          id="btnDownload" title="Download as printable JPG">⤓ Download</button>
+      <a class="btn"          href="tree-edit.html" title="Open the edit canvas">✎ Edit</a>
+      <a class="btn"          href="dashboard.html">⌂ Dashboard</a>
+    </div>
+  </header>
+
+  <main class="stage scroll-mode" id="stage">
+    <div class="bracket-tl"></div><div class="bracket-tr"></div>
+    <div class="bracket-bl"></div><div class="bracket-br"></div>
+
+    <svg id="pedigreeSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
+
+    <div class="canvas-empty hidden" id="canvasEmpty">
+      <div class="ce-card">
+        <h2>An empty page</h2>
+        <p>Your book has no kindred yet. Open the edit canvas to begin adding relations.</p>
+        <a class="btn primary" href="tree-edit.html" style="margin-top:14px;">⏵ Open the edit canvas</a>
+      </div>
+    </div>
+
+    <aside class="inspector hidden" id="inspector">
+      <header>
+        <div style="flex:1;min-width:0;">
+          <div class="name" id="iName">—</div>
+          <div class="id-badge" id="iRel">—</div>
+        </div>
+        <button class="btn btn-icon danger" id="iClose" title="Close (Esc)">×</button>
+      </header>
+      <div class="i-photo-wrap" id="iPhotoWrap" style="display:none;">
+        <img class="i-photo" id="iPhoto" alt="" />
+      </div>
+      <div class="status" id="iStatus"></div>
+      <div class="field"><span class="k">Sex</span><span class="v" id="iGender">—</span></div>
+      <div class="field"><span class="k">Born</span><span class="v" id="iBorn">—</span></div>
+      <div class="field"><span class="k">Birthplace</span><span class="v" id="iBornPlace">—</span></div>
+      <div class="field"><span class="k">Estate</span><span class="v" id="iAlive">—</span></div>
+      <div class="notes" id="iNotes">—</div>
+      <div class="relations" id="iRelations"></div>
+    </aside>
+
+  </main>
+
+  <footer class="bottombar">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-icon"></div>Of the line</div>
+      <div class="legend-item"><div class="legend-icon deceased"></div>In memoriam</div>
+    </div>
+    <div>
+      <span class="status-dot"></span>Scroll to grow the lineage
+    </div>
+  </footer>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supa.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/sounds.js"></script>
+<script src="js/pedigree.js"></script>
+<script src="js/tree-view.js"></script>
+</body>
+</html>

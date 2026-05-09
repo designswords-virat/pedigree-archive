@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Edit Your Tree — Pedigree Archive</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo"><span>✦</span></div>
+      <div class="brand-text">
+        <div class="title" id="brandTitle">Edit Your Tree</div>
+        <div class="subtitle" id="brandSubtitle">Click + on any portrait to add a kinship</div>
+      </div>
+    </div>
+    <div class="hud-stats">
+      <div class="stat"><span class="lbl">Souls</span><span class="val" id="statCount">0</span></div>
+      <div class="stat"><span class="lbl">Generations</span><span class="val" id="statGens">0</span></div>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-icon" id="btnZoomIn"  title="Closer">+</button>
+      <button class="btn btn-icon" id="btnZoomOut" title="Further">−</button>
+      <button class="btn btn-icon" id="btnFit"     title="Whole canvas">⊡</button>
+      <button class="btn"          id="btnDownload" title="Download as printable JPG">⤓ Download</button>
+      <a class="btn"          href="tree-view.html" title="Open the read-only chart view">⊡ View as chart</a>
+      <a class="btn"          href="dashboard.html">⌂ Dashboard</a>
+      <button class="btn danger" id="btnSignout" title="Sign out">⏻</button>
+    </div>
+  </header>
+
+  <!-- STAGE -->
+  <main class="stage" id="stage">
+    <div class="bracket-tl"></div><div class="bracket-tr"></div>
+    <div class="bracket-bl"></div><div class="bracket-br"></div>
+
+    <svg id="pedigreeSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
+
+    <!-- empty-tree banner -->
+    <div class="canvas-empty hidden" id="canvasEmpty">
+      <div class="ce-card">
+        <h2>An empty page</h2>
+        <p>Your book has no kindred yet. Click the + on your portrait to add the first relation — a parent, a partner, a child.</p>
+      </div>
+    </div>
+
+    <!-- KINSHIP-ADD PANEL (slides from right) -->
+    <aside class="kin-panel hidden" id="kinPanel">
+      <header class="kp-head">
+        <div class="kp-head-text">
+          <div class="kp-head-eyebrow">Add a kinship to</div>
+          <div class="kp-head-name" id="kpToName">—</div>
+        </div>
+        <button class="btn btn-icon danger" id="kpClose" title="Close (Esc)">×</button>
+      </header>
+
+      <!-- step 1: pick relation type -->
+      <div class="kp-step" id="kpStepType">
+        <div class="kp-section-h">Choose the relation</div>
+        <div class="kp-relation-grid">
+          <button class="kp-rel" data-rel="father"      title="Add a father">♂ Father</button>
+          <button class="kp-rel" data-rel="mother"      title="Add a mother">♀ Mother</button>
+          <button class="kp-rel" data-rel="spouse"      title="Add a husband or wife">⚭ Spouse</button>
+          <button class="kp-rel" data-rel="child"       title="Add a son or daughter">⚲ Child</button>
+          <button class="kp-rel" data-rel="sibling"     title="Add a brother or sister (shares parents)">⚭ Sibling</button>
+          <button class="kp-rel" data-rel="grandparent" title="Add a parent of one of this person's parents">✦ Grandparent</button>
+          <button class="kp-rel" data-rel="cousin"      title="Add a child of one of this person's aunts or uncles">✦ Cousin</button>
+        </div>
+        <div class="kp-hint" id="kpHint"></div>
+      </div>
+
+      <!-- step 2: any qualifier picker (e.g. via father/mother for grandparent) -->
+      <div class="kp-step hidden" id="kpStepQualifier">
+        <div class="kp-section-h" id="kpQualHead">Through which line?</div>
+        <div class="kp-qual-grid" id="kpQualOptions"></div>
+        <div class="kp-actions">
+          <button type="button" class="btn" id="kpQualBack">← Back</button>
+        </div>
+      </div>
+
+      <!-- step 3: person form -->
+      <div class="kp-step hidden" id="kpStepForm">
+        <div class="kp-section-h" id="kpFormHead">Particulars</div>
+        <form id="kpForm" class="kp-form">
+
+          <!-- relationship type (only for parents/grandparents) -->
+          <div class="field-group full" id="kpRelTypeGroup" style="display:none;">
+            <label>Relationship type</label>
+            <div class="tag-picker" id="kpRelTypePicker">
+              <div class="tag-pick active" data-val="biological">Biological</div>
+              <div class="tag-pick"        data-val="adoptive">Adoptive</div>
+              <div class="tag-pick"        data-val="step">Step</div>
+            </div>
+          </div>
+
+          <div class="kp-grid">
+            <div class="field-group">
+              <label for="kpName">Full name <em>required</em></label>
+              <input type="text" id="kpName" required maxlength="100" />
+            </div>
+            <div class="field-group">
+              <label for="kpNick">Nickname</label>
+              <input type="text" id="kpNick" maxlength="60" />
+            </div>
+
+            <div class="field-group full">
+              <label>Sex</label>
+              <div class="tag-picker" id="kpGenderPicker">
+                <div class="tag-pick" data-val="male">♂ Man</div>
+                <div class="tag-pick" data-val="female">♀ Woman</div>
+                <div class="tag-pick" data-val="unknown">✦ Unrecorded</div>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="kpBirthDate">Date of birth</label>
+              <input type="date" id="kpBirthDate" />
+            </div>
+            <div class="field-group">
+              <label for="kpBirthPlace">Place of birth</label>
+              <input type="text" id="kpBirthPlace" maxlength="120" />
+            </div>
+
+            <div class="field-group full">
+              <label>Status</label>
+              <div class="tag-picker" id="kpStatusPicker">
+                <div class="tag-pick active" data-val="alive">✦ Living</div>
+                <div class="tag-pick"        data-val="deceased">† Departed</div>
+              </div>
+            </div>
+
+            <div class="field-group death-only" style="display:none;">
+              <label for="kpDeathDate">Date of death</label>
+              <input type="date" id="kpDeathDate" />
+            </div>
+            <div class="field-group death-only" style="display:none;">
+              <label for="kpDeathPlace">Place of death</label>
+              <input type="text" id="kpDeathPlace" maxlength="120" />
+            </div>
+
+            <!-- spouse-only fields -->
+            <div class="field-group spouse-only" style="display:none;">
+              <label for="kpMarriageDate">Date of marriage</label>
+              <input type="date" id="kpMarriageDate" />
+            </div>
+            <div class="field-group spouse-only" style="display:none;">
+              <label for="kpDivorceDate">Date of divorce <em>(if any)</em></label>
+              <input type="date" id="kpDivorceDate" />
+            </div>
+
+            <div class="field-group full">
+              <label for="kpPhotoFile">Likeness</label>
+              <div class="photo-upload-row">
+                <div class="photo-upload-preview" id="kpPhotoPreview">
+                  <span class="ph">No likeness</span>
+                </div>
+                <div class="photo-upload-controls">
+                  <input type="file" id="kpPhotoFile" accept="image/*" />
+                  <button type="button" class="btn" id="kpPhotoClear" style="margin-top:8px;">Clear</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-group full">
+              <label for="kpNotes">A short note</label>
+              <textarea id="kpNotes" maxlength="600"></textarea>
+            </div>
+          </div>
+
+          <div class="kp-actions">
+            <button type="button" class="btn" id="kpFormBack">← Back</button>
+            <button type="submit" class="btn primary">⏵ Save kinship</button>
+          </div>
+
+          <div class="auth-status" id="kpStatus"></div>
+        </form>
+      </div>
+    </aside>
+
+    <!-- INSPECTOR (small read-only summary on click; offers Edit/Delete) -->
+    <aside class="inspector hidden" id="inspector">
+      <header>
+        <div style="flex:1;min-width:0;">
+          <div class="name" id="iName">—</div>
+          <div class="id-badge" id="iRel">—</div>
+        </div>
+        <button class="btn btn-icon danger" id="iClose" title="Close (Esc)">×</button>
+      </header>
+      <div class="i-photo-wrap" id="iPhotoWrap" style="display:none;">
+        <img class="i-photo" id="iPhoto" alt="" />
+      </div>
+      <div class="status" id="iStatus"></div>
+      <div class="field"><span class="k">Sex</span><span class="v" id="iGender">—</span></div>
+      <div class="field"><span class="k">Born</span><span class="v" id="iBorn">—</span></div>
+      <div class="field"><span class="k">Birthplace</span><span class="v" id="iBornPlace">—</span></div>
+      <div class="field"><span class="k">Estate</span><span class="v" id="iAlive">—</span></div>
+      <div class="notes" id="iNotes">—</div>
+      <div class="relations" id="iRelations"></div>
+
+      <div class="form-actions" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border-soft);">
+        <button class="btn primary" id="iEdit">✎ Edit</button>
+        <button class="btn"         id="iAddKin">+ Add kinship</button>
+        <button class="btn danger"  id="iDelete">⚠ Remove</button>
+      </div>
+    </aside>
+
+    <!-- EDIT-PERSON MODAL -->
+    <div class="kp-modal hidden" id="editModal">
+      <div class="kp-modal-card">
+        <header class="kp-head">
+          <div class="kp-head-text">
+            <div class="kp-head-eyebrow">Edit particulars</div>
+            <div class="kp-head-name" id="emHeadName">—</div>
+          </div>
+          <button class="btn btn-icon danger" id="emClose" title="Close">×</button>
+        </header>
+        <form id="emForm" class="kp-form" style="padding:18px 22px 22px;">
+          <div class="kp-grid">
+            <div class="field-group">
+              <label for="emName">Full name <em>required</em></label>
+              <input type="text" id="emName" required maxlength="100" />
+            </div>
+            <div class="field-group">
+              <label for="emNick">Nickname</label>
+              <input type="text" id="emNick" maxlength="60" />
+            </div>
+
+            <div class="field-group full">
+              <label>Sex</label>
+              <div class="tag-picker" id="emGenderPicker">
+                <div class="tag-pick" data-val="male">♂ Man</div>
+                <div class="tag-pick" data-val="female">♀ Woman</div>
+                <div class="tag-pick" data-val="unknown">✦ Unrecorded</div>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="emBirthDate">Date of birth</label>
+              <input type="date" id="emBirthDate" />
+            </div>
+            <div class="field-group">
+              <label for="emBirthPlace">Place of birth</label>
+              <input type="text" id="emBirthPlace" maxlength="120" />
+            </div>
+
+            <div class="field-group full">
+              <label>Status</label>
+              <div class="tag-picker" id="emStatusPicker">
+                <div class="tag-pick active" data-val="alive">✦ Living</div>
+                <div class="tag-pick"        data-val="deceased">† Departed</div>
+              </div>
+            </div>
+
+            <div class="field-group em-death-only" style="display:none;">
+              <label for="emDeathDate">Date of death</label>
+              <input type="date" id="emDeathDate" />
+            </div>
+            <div class="field-group em-death-only" style="display:none;">
+              <label for="emDeathPlace">Place of death</label>
+              <input type="text" id="emDeathPlace" maxlength="120" />
+            </div>
+
+            <div class="field-group full">
+              <label>Likeness</label>
+              <div class="photo-upload-row">
+                <div class="photo-upload-preview" id="emPhotoPreview">
+                  <span class="ph">No likeness</span>
+                </div>
+                <div class="photo-upload-controls">
+                  <input type="file" id="emPhotoFile" accept="image/*" />
+                  <button type="button" class="btn" id="emPhotoClear" style="margin-top:8px;">Clear</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-group full">
+              <label for="emNotes">A short note</label>
+              <textarea id="emNotes" maxlength="600"></textarea>
+            </div>
+          </div>
+          <div class="kp-actions">
+            <button type="button" class="btn" id="emCancel">Cancel</button>
+            <button type="submit" class="btn primary">⏵ Save</button>
+          </div>
+          <div class="auth-status" id="emStatus"></div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="bottombar">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-icon"></div>Of the line</div>
+      <div class="legend-item"><div class="legend-icon deceased"></div>In memoriam</div>
+    </div>
+    <div>
+      <span class="status-dot"></span>Editing — drag to pan, scroll to draw closer
+    </div>
+  </footer>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supa.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/sounds.js"></script>
+<script src="js/pedigree.js"></script>
+<script src="js/tree-edit.js"></script>
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Extended Details — Pedigree Archive</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<main class="details-shell">
+  <article class="details-card">
+
+    <header class="details-head">
+      <div class="details-eyebrow" id="dHeadEyebrow">Extended details</div>
+      <h1 id="dHeadName">—</h1>
+      <p class="lead">All fields are optional. Fill what you know, leave the rest.</p>
+      <a class="back-link" id="dBack" href="dashboard.html">← Back</a>
+    </header>
+
+    <!-- TABS -->
+    <nav class="details-tabs" id="dTabs">
+      <button class="details-tab active" data-tab="basic">Basic</button>
+      <button class="details-tab"        data-tab="contact">Contact</button>
+      <button class="details-tab"        data-tab="cultural">Cultural</button>
+      <button class="details-tab"        data-tab="professional">Professional</button>
+      <button class="details-tab"        data-tab="historical">Historical</button>
+      <button class="details-tab"        data-tab="media">Media</button>
+      <button class="details-tab"        data-tab="medical">Medical</button>
+    </nav>
+
+    <form id="dForm" class="details-form">
+
+      <!-- ============ BASIC ============ -->
+      <section class="details-pane active" data-pane="basic">
+        <p class="details-pane-lead">Name, dates, photo — the spine of the record.</p>
+        <div class="details-grid">
+          <div class="field-group">
+            <label for="bName">Full name <em>required</em></label>
+            <input type="text" id="bName" maxlength="100" required />
+          </div>
+          <div class="field-group">
+            <label for="bNick">Nickname</label>
+            <input type="text" id="bNick" maxlength="60" />
+          </div>
+
+          <div class="field-group full">
+            <label>Sex</label>
+            <div class="tag-picker" id="bGenderPicker">
+              <div class="tag-pick" data-val="male">♂ Man</div>
+              <div class="tag-pick" data-val="female">♀ Woman</div>
+              <div class="tag-pick" data-val="unknown">✦ Unrecorded</div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="bBirthDate">Date of birth</label>
+            <input type="date" id="bBirthDate" />
+          </div>
+          <div class="field-group">
+            <label for="bBirthPlace">Place of birth</label>
+            <input type="text" id="bBirthPlace" maxlength="120" />
+          </div>
+
+          <div class="field-group full">
+            <label>Status</label>
+            <div class="tag-picker" id="bStatusPicker">
+              <div class="tag-pick active" data-val="alive">✦ Living</div>
+              <div class="tag-pick"        data-val="deceased">† Departed</div>
+            </div>
+          </div>
+
+          <div class="field-group b-death-only" style="display:none;">
+            <label for="bDeathDate">Date of death</label>
+            <input type="date" id="bDeathDate" />
+          </div>
+          <div class="field-group b-death-only" style="display:none;">
+            <label for="bDeathPlace">Place of death</label>
+            <input type="text" id="bDeathPlace" maxlength="120" />
+          </div>
+
+          <div class="field-group full">
+            <label>Likeness</label>
+            <div class="photo-upload-row">
+              <div class="photo-upload-preview" id="bPhotoPreview">
+                <span class="ph">No likeness</span>
+              </div>
+              <div class="photo-upload-controls">
+                <input type="file" id="bPhotoFile" accept="image/*" />
+                <button type="button" class="btn" id="bPhotoClear" style="margin-top:8px;">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group full">
+            <label for="bNotes">A short note</label>
+            <textarea id="bNotes" maxlength="600" rows="3"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CONTACT ============ -->
+      <section class="details-pane" data-pane="contact">
+        <p class="details-pane-lead">Useful for living family members.</p>
+        <div class="details-grid">
+          <div class="field-group"><label for="cPhone">Phone number</label><input type="tel"   id="cPhone"   maxlength="40" /></div>
+          <div class="field-group"><label for="cEmail">Email</label>       <input type="email" id="cEmail"   maxlength="120" /></div>
+          <div class="field-group full"><label for="cAddress">Address</label><textarea id="cAddress" maxlength="400"></textarea></div>
+          <div class="field-group"><label for="cWebsite">Personal website</label><input type="url" id="cWebsite" maxlength="200" placeholder="https://" /></div>
+          <div class="field-group"><label for="cInstagram">Instagram</label><input type="text" id="cInstagram" maxlength="100" placeholder="@handle or URL" /></div>
+          <div class="field-group"><label for="cFacebook">Facebook</label><input type="text" id="cFacebook" maxlength="200" placeholder="profile URL" /></div>
+          <div class="field-group"><label for="cTwitter">X / Twitter</label><input type="text" id="cTwitter" maxlength="100" placeholder="@handle or URL" /></div>
+          <div class="field-group"><label for="cLinkedin">LinkedIn</label><input type="text" id="cLinkedin" maxlength="200" placeholder="profile URL" /></div>
+        </div>
+      </section>
+
+      <!-- ============ CULTURAL / IDENTITY ============ -->
+      <section class="details-pane" data-pane="cultural">
+        <p class="details-pane-lead">Heritage and identity. Caste / clan / gotra are sensitive — fill only if appropriate.</p>
+        <div class="details-grid">
+          <div class="field-group"><label for="uReligion">Religion</label>          <input type="text" id="uReligion"   maxlength="80" /></div>
+          <div class="field-group"><label for="uCaste">Caste / community</label>     <input type="text" id="uCaste"      maxlength="80" /></div>
+          <div class="field-group"><label for="uLanguage">Native language</label>    <input type="text" id="uLanguage"   maxlength="80" /></div>
+          <div class="field-group"><label for="uNationality">Nationality</label>     <input type="text" id="uNationality" maxlength="80" /></div>
+          <div class="field-group"><label for="uHometown">Family origin / hometown</label><input type="text" id="uHometown" maxlength="120" /></div>
+          <div class="field-group"><label for="uGotra">Clan / gotra</label>          <input type="text" id="uGotra"      maxlength="80" /></div>
+        </div>
+      </section>
+
+      <!-- ============ PROFESSIONAL & EDUCATIONAL ============ -->
+      <section class="details-pane" data-pane="professional">
+        <p class="details-pane-lead">Work and learning.</p>
+        <div class="details-grid">
+          <div class="field-group"><label for="pOccupation">Occupation</label>     <input type="text" id="pOccupation" maxlength="120" /></div>
+          <div class="field-group"><label for="pCompany">Company / business</label><input type="text" id="pCompany"    maxlength="120" /></div>
+          <div class="field-group"><label for="pEducation">Education</label>       <input type="text" id="pEducation"  maxlength="200" placeholder="School / university" /></div>
+          <div class="field-group"><label for="pQualification">Degree / qualification</label><input type="text" id="pQualification" maxlength="120" /></div>
+          <div class="field-group full"><label for="pSkills">Skills &amp; achievements</label><textarea id="pSkills" maxlength="800" placeholder="One per line, or a paragraph"></textarea></div>
+        </div>
+      </section>
+
+      <!-- ============ HISTORICAL & PERSONAL ============ -->
+      <section class="details-pane" data-pane="historical">
+        <p class="details-pane-lead">Stories that make the lineage meaningful.</p>
+        <div class="details-grid">
+          <div class="field-group full"><label for="hBio">Biography / story</label><textarea id="hBio" maxlength="2400" rows="6"></textarea></div>
+          <div class="field-group full"><label for="hEvents">Important life events</label><textarea id="hEvents" maxlength="1200" rows="4" placeholder="Marriage, migration, business, etc."></textarea></div>
+          <div class="field-group"><label for="hAwards">Awards</label>           <textarea id="hAwards" maxlength="600" rows="3"></textarea></div>
+          <div class="field-group"><label for="hMilitary">Military service</label><textarea id="hMilitary" maxlength="600" rows="3"></textarea></div>
+          <div class="field-group"><label for="hMigration">Migration history</label><textarea id="hMigration" maxlength="600" rows="3"></textarea></div>
+          <div class="field-group"><label for="hHobbies">Hobbies</label>          <textarea id="hHobbies"  maxlength="400" rows="3"></textarea></div>
+          <div class="field-group"><label for="hTraits">Personality traits</label><textarea id="hTraits"   maxlength="400" rows="3"></textarea></div>
+          <div class="field-group"><label for="hQuotes">Favourite quotes</label>  <textarea id="hQuotes"   maxlength="600" rows="3"></textarea></div>
+        </div>
+      </section>
+
+      <!-- ============ MEDIA & DOCUMENTS ============ -->
+      <section class="details-pane" data-pane="media">
+        <p class="details-pane-lead">
+          Photographs, recordings and documents. Each file must be under 500 KB,
+          total under about 4 MB (browser-storage limit).
+          <br />
+          <em id="mediaUsedLabel" style="color:var(--parchment-faint);font-size:12px;">Used so far: 0 KB</em>
+        </p>
+
+        <div class="media-section" data-media="childhoodPhotos">
+          <h3>Childhood photos</h3>
+          <input type="file" multiple accept="image/*" />
+          <div class="media-files"></div>
+        </div>
+        <div class="media-section" data-media="weddingPhotos">
+          <h3>Wedding photos</h3>
+          <input type="file" multiple accept="image/*" />
+          <div class="media-files"></div>
+        </div>
+        <div class="media-section" data-media="audioVideo">
+          <h3>Audio / video memories</h3>
+          <input type="file" multiple accept="audio/*,video/*" />
+          <div class="media-files"></div>
+        </div>
+        <div class="media-section" data-media="certificates">
+          <h3>Certificates</h3>
+          <input type="file" multiple accept="image/*,application/pdf" />
+          <div class="media-files"></div>
+        </div>
+        <div class="media-section" data-media="letters">
+          <h3>Old letters</h3>
+          <input type="file" multiple accept="image/*,application/pdf" />
+          <div class="media-files"></div>
+        </div>
+        <div class="media-section" data-media="idProofs">
+          <h3>ID proofs <em style="color:var(--rose);font-size:11px;font-style:normal;letter-spacing:0.18em;">private</em></h3>
+          <input type="file" multiple accept="image/*,application/pdf" />
+          <div class="media-files"></div>
+        </div>
+      </section>
+
+      <!-- ============ MEDICAL ============ -->
+      <section class="details-pane" data-pane="medical">
+        <div class="details-privacy">
+          <strong>Private.</strong> These fields are stored only in this browser
+          (and visible to the site administrator). They never leave your device
+          unless you export the data yourself.
+        </div>
+        <div class="details-grid">
+          <div class="field-group">
+            <label for="mBlood">Blood group</label>
+            <select id="mBlood">
+              <option value="">— unknown —</option>
+              <option>A+</option><option>A−</option>
+              <option>B+</option><option>B−</option>
+              <option>AB+</option><option>AB−</option>
+              <option>O+</option><option>O−</option>
+            </select>
+          </div>
+          <div class="field-group full"><label for="mGenetic">Genetic conditions</label><textarea id="mGenetic" maxlength="600" rows="3"></textarea></div>
+          <div class="field-group full"><label for="mDiseases">Major diseases</label><textarea id="mDiseases" maxlength="600" rows="3"></textarea></div>
+          <div class="field-group full"><label for="mAllergies">Allergies</label><textarea id="mAllergies" maxlength="400" rows="3"></textarea></div>
+        </div>
+      </section>
+
+      <!-- save bar (sticky at the bottom of the form) -->
+      <div class="details-actions">
+        <button type="button" class="btn"        id="dCancel">Cancel</button>
+        <button type="submit" class="btn primary" id="dSave">⏵ Save details</button>
+      </div>
+
+      <div class="auth-status" id="dStatus"></div>
+    </form>
+
+  </article>
+</main>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supa.js"></script>
+<script src="js/auth.js"></script>
+<script>
+(async function () {
+  const $  = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
+
+  await Auth.init();
+
+  if (!Auth.isLoggedIn()) { location.href = 'signup.html'; return; }
+  const sessionUser = Auth.currentUser();
+  if (!sessionUser) { await Auth.logout(); location.href = 'signup.html'; return; }
+
+  // --- determine source ---
+  const params = new URLSearchParams(location.search);
+  const source = params.get('source') || 'self';   // 'self' | 'person'
+  const personId = params.get('id') || null;
+
+  let target = null;        // the object whose .extended we'll edit
+  let backHref = 'dashboard.html';
+  let headName = '';
+  let headEyebrow = 'Extended details';
+
+  if (source === 'person') {
+    if (!personId) { location.href = 'tree-edit.html'; return; }
+    const person = (sessionUser.people || []).find(p => p.id === personId);
+    if (!person) { alert('That person is no longer in your tree.'); location.href = 'tree-edit.html'; return; }
+    target = person;
+    backHref = 'tree-edit.html';
+    headName = person.name || 'Unnamed';
+    headEyebrow = 'Details for';
+  } else {
+    target = sessionUser.profile || {};
+    backHref = 'dashboard.html';
+    headName = (sessionUser.profile && sessionUser.profile.fullName) || sessionUser.email;
+    headEyebrow = 'Your extended details';
+  }
+
+  $('#dHeadName').textContent = headName;
+  $('#dHeadEyebrow').textContent = headEyebrow;
+  $('#dBack').href = backHref;
+  $('#dCancel').addEventListener('click', () => { location.href = backHref; });
+
+  // --- toast ---
+  function toast(msg, kind = '') {
+    const stack = $('#toasts');
+    const el = document.createElement('div');
+    el.className = 'toast ' + kind;
+    el.textContent = msg;
+    stack.appendChild(el);
+    setTimeout(() => el.remove(), 2900);
+  }
+
+  // --- tabs ---
+  $$('.details-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const name = tab.dataset.tab;
+      $$('.details-tab').forEach(t => t.classList.toggle('active', t === tab));
+      $$('.details-pane').forEach(p => p.classList.toggle('active', p.dataset.pane === name));
+    });
+  });
+
+  // ============================================================
+  // MEDIA HANDLING
+  //   Each .media-section keeps an array of {name, type, size, dataUrl}.
+  //   On change we read each picked file → data URL → append.
+  //   A budget-meter at the top warns about localStorage limits.
+  // ============================================================
+  const MEDIA_BUDGET_BYTES = 4 * 1024 * 1024;   // ~4 MB total
+  const MEDIA_FILE_LIMIT   = 500 * 1024;        // 500 KB per file
+
+  const mediaState = {};   // { childhoodPhotos: [...], ... }
+  $$('.media-section').forEach(sec => { mediaState[sec.dataset.media] = []; });
+
+  function totalMediaBytes() {
+    let total = 0;
+    Object.values(mediaState).forEach(list => list.forEach(f => total += f.size || 0));
+    return total;
+  }
+  function fmtKB(bytes) {
+    return (bytes / 1024).toFixed(0) + ' KB';
+  }
+  function refreshUsedLabel() {
+    $('#mediaUsedLabel').textContent = 'Used so far: ' + fmtKB(totalMediaBytes()) + ' of ' + fmtKB(MEDIA_BUDGET_BYTES);
+  }
+  function isImage(type) { return /^image\//.test(type || ''); }
+
+  function renderMediaSection(sec) {
+    const key = sec.dataset.media;
+    const wrap = $('.media-files', sec);
+    wrap.innerHTML = '';
+    const list = mediaState[key] || [];
+    list.forEach((f, idx) => {
+      const chip = document.createElement('div');
+      chip.className = 'media-chip';
+      const thumb = isImage(f.type)
+        ? `<img src="${f.dataUrl}" alt="" />`
+        : `<div class="media-thumb-doc">📄</div>`;
+      chip.innerHTML = `
+        ${thumb}
+        <div class="media-meta">
+          <strong>${escapeHtml(f.name)}</strong>
+          <span>${fmtKB(f.size)}</span>
+        </div>
+        <button type="button" class="media-x" title="Remove">×</button>
+      `;
+      $('.media-x', chip).addEventListener('click', () => {
+        list.splice(idx, 1);
+        renderMediaSection(sec);
+        refreshUsedLabel();
+      });
+      wrap.appendChild(chip);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  $$('.media-section').forEach(sec => {
+    const inp = $('input[type="file"]', sec);
+    inp.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      for (const f of files) {
+        if (f.size > 8 * 1024 * 1024) {
+          toast('“' + f.name + '” is too large (max 8 MB).', 'error');
+          continue;
+        }
+        try {
+          if (/^image\//.test(f.type)) {
+            // images go through the resize+upload pipeline
+            const url = await Photos.upload(f);
+            mediaState[sec.dataset.media].push({
+              name: f.name, type: 'image/jpeg', size: 0, dataUrl: url
+            });
+          } else {
+            // non-images (audio/video/PDF): upload to storage as-is
+            const url = await uploadRaw(f);
+            mediaState[sec.dataset.media].push({
+              name: f.name, type: f.type, size: f.size, dataUrl: url
+            });
+          }
+        } catch (err) {
+          toast('Could not upload ' + f.name + ': ' + err.message, 'error');
+        }
+      }
+      e.target.value = '';
+      renderMediaSection(sec);
+      refreshUsedLabel();
+    });
+  });
+
+  async function uploadRaw(file) {
+    const supa = window.supabaseClient;
+    if (!supa) throw new Error('Supabase not configured');
+    const { data: { user } } = await supa.auth.getUser();
+    if (!user) throw new Error('Not signed in');
+    const stem = Math.random().toString(36).slice(2, 8) + Date.now().toString(36);
+    const ext  = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const path = user.id + '/media/' + stem + '.' + ext;
+    const { error } = await supa.storage.from('photos').upload(path, file, {
+      contentType: file.type || 'application/octet-stream',
+      cacheControl: '31536000',
+    });
+    if (error) throw error;
+    const { data: { publicUrl } } = supa.storage.from('photos').getPublicUrl(path);
+    return publicUrl;
+  }
+
+  // ============================================================
+  // BASIC TAB — name, sex, dates, photo, notes (the spine record)
+  // ============================================================
+  let bPhotoData = '';
+
+  function renderBPhoto() {
+    const p = $('#bPhotoPreview');
+    if (bPhotoData) {
+      p.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = bPhotoData;
+      p.appendChild(img);
+    } else {
+      p.innerHTML = '<span class="ph">No likeness</span>';
+    }
+  }
+
+  // pickers
+  $$('#bGenderPicker .tag-pick').forEach(t => t.addEventListener('click', () => {
+    $$('#bGenderPicker .tag-pick').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+  }));
+  $$('#bStatusPicker .tag-pick').forEach(t => t.addEventListener('click', () => {
+    $$('#bStatusPicker .tag-pick').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const dec = t.dataset.val === 'deceased';
+    document.querySelectorAll('.b-death-only').forEach(el => el.style.display = dec ? '' : 'none');
+  }));
+  $('#bPhotoFile').addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (f.size > 8 * 1024 * 1024) { toast('Image too large (max 8 MB).', 'error'); e.target.value = ''; return; }
+    try {
+      toast('Uploading photo…', '');
+      bPhotoData = await Photos.upload(f);
+      renderBPhoto();
+    } catch (err) {
+      toast('Upload failed: ' + err.message, 'error');
+      e.target.value = '';
+    }
+  });
+  $('#bPhotoClear').addEventListener('click', () => {
+    if (bPhotoData) Photos.deleteByUrl(bPhotoData);
+    bPhotoData = '';
+    $('#bPhotoFile').value = '';
+    renderBPhoto();
+  });
+
+  function prefillBasic() {
+    if (source === 'self') {
+      const p = sessionUser.profile || {};
+      $('#bName').value       = p.fullName    || '';
+      $('#bNick').value       = p.nickname    || '';
+      $('#bBirthDate').value  = p.birthDate   || '';
+      $('#bBirthPlace').value = p.birthPlace  || '';
+      $('#bDeathDate').value  = p.deathDate   || '';
+      $('#bDeathPlace').value = p.deathPlace  || '';
+      $('#bNotes').value      = p.notes       || '';
+      const gender = p.gender || 'unknown';
+      $$('#bGenderPicker .tag-pick').forEach(t => t.classList.toggle('active', t.dataset.val === gender));
+      const status = p.status === 'deceased' ? 'deceased' : 'alive';
+      $$('#bStatusPicker .tag-pick').forEach(t => t.classList.toggle('active', t.dataset.val === status));
+      document.querySelectorAll('.b-death-only').forEach(el => el.style.display = status === 'deceased' ? '' : 'none');
+      bPhotoData = p.photo || '';
+    } else {
+      const p = target;
+      $('#bName').value       = p.name        || '';
+      $('#bNick').value       = p.nickname    || '';
+      $('#bBirthDate').value  = p.birthDate   || '';
+      $('#bBirthPlace').value = p.birthPlace  || '';
+      $('#bDeathDate').value  = p.deathDate   || '';
+      $('#bDeathPlace').value = p.deathPlace  || '';
+      $('#bNotes').value      = p.notes       || '';
+      const gender = p.gender || 'unknown';
+      $$('#bGenderPicker .tag-pick').forEach(t => t.classList.toggle('active', t.dataset.val === gender));
+      const status = p.deceased ? 'deceased' : 'alive';
+      $$('#bStatusPicker .tag-pick').forEach(t => t.classList.toggle('active', t.dataset.val === status));
+      document.querySelectorAll('.b-death-only').forEach(el => el.style.display = status === 'deceased' ? '' : 'none');
+      bPhotoData = p.photo || '';
+    }
+    renderBPhoto();
+  }
+
+  function gatherBasic() {
+    const status = ($('#bStatusPicker .tag-pick.active') || {dataset:{val:'alive'}}).dataset.val;
+    const gender = ($('#bGenderPicker .tag-pick.active') || {dataset:{val:'unknown'}}).dataset.val;
+    const yearOf = (d) => d ? parseInt(String(d).slice(0,4), 10) : null;
+    const common = {
+      nickname:   $('#bNick').value.trim(),
+      gender:     gender,
+      birthDate:  $('#bBirthDate').value || null,
+      birthPlace: $('#bBirthPlace').value.trim(),
+      photo:      bPhotoData,
+      notes:      $('#bNotes').value.trim(),
+    };
+    if (status === 'deceased') {
+      common.deathDate  = $('#bDeathDate').value || null;
+      common.deathPlace = $('#bDeathPlace').value.trim();
+    } else {
+      common.deathDate = null;
+      common.deathPlace = '';
+    }
+    if (source === 'self') {
+      return { ...common, fullName: $('#bName').value.trim(), status: status };
+    } else {
+      return {
+        ...common,
+        name: $('#bName').value.trim(),
+        deceased: status === 'deceased',
+        birthYear: yearOf(common.birthDate),
+        deathYear: yearOf(common.deathDate),
+      };
+    }
+  }
+
+  // ============================================================
+  // PREFILL from existing extended data
+  // ============================================================
+  function prefill() {
+    prefillBasic();
+    const ext = (target && target.extended) || {};
+    const c = ext.contact      || {};
+    const u = ext.cultural     || {};
+    const p = ext.professional || {};
+    const h = ext.historical   || {};
+    const med = ext.medical    || {};
+    const m = ext.media        || {};
+
+    $('#cPhone').value     = c.phone     || '';
+    $('#cEmail').value     = c.email     || '';
+    $('#cAddress').value   = c.address   || '';
+    $('#cWebsite').value   = c.website   || '';
+    $('#cInstagram').value = c.instagram || '';
+    $('#cFacebook').value  = c.facebook  || '';
+    $('#cTwitter').value   = c.twitter   || '';
+    $('#cLinkedin').value  = c.linkedin  || '';
+
+    $('#uReligion').value    = u.religion    || '';
+    $('#uCaste').value       = u.caste       || '';
+    $('#uLanguage').value    = u.language    || '';
+    $('#uNationality').value = u.nationality || '';
+    $('#uHometown').value    = u.hometown    || '';
+    $('#uGotra').value       = u.gotra       || '';
+
+    $('#pOccupation').value    = p.occupation    || '';
+    $('#pCompany').value       = p.company       || '';
+    $('#pEducation').value     = p.education     || '';
+    $('#pQualification').value = p.qualification || '';
+    $('#pSkills').value        = p.skills        || '';
+
+    $('#hBio').value       = h.biography || '';
+    $('#hEvents').value    = h.lifeEvents || '';
+    $('#hAwards').value    = h.awards    || '';
+    $('#hMilitary').value  = h.military  || '';
+    $('#hMigration').value = h.migration || '';
+    $('#hHobbies').value   = h.hobbies   || '';
+    $('#hTraits').value    = h.traits    || '';
+    $('#hQuotes').value    = h.quotes    || '';
+
+    $('#mBlood').value     = med.bloodGroup || '';
+    $('#mGenetic').value   = med.genetic || '';
+    $('#mDiseases').value  = med.diseases || '';
+    $('#mAllergies').value = med.allergies || '';
+
+    Object.keys(mediaState).forEach(k => {
+      mediaState[k] = Array.isArray(m[k]) ? m[k].slice() : [];
+    });
+    $$('.media-section').forEach(renderMediaSection);
+    refreshUsedLabel();
+  }
+
+  // ============================================================
+  // SAVE
+  // ============================================================
+  function gather() {
+    return {
+      contact: {
+        phone:     $('#cPhone').value.trim(),
+        email:     $('#cEmail').value.trim(),
+        address:   $('#cAddress').value.trim(),
+        website:   $('#cWebsite').value.trim(),
+        instagram: $('#cInstagram').value.trim(),
+        facebook:  $('#cFacebook').value.trim(),
+        twitter:   $('#cTwitter').value.trim(),
+        linkedin:  $('#cLinkedin').value.trim(),
+      },
+      cultural: {
+        religion:    $('#uReligion').value.trim(),
+        caste:       $('#uCaste').value.trim(),
+        language:    $('#uLanguage').value.trim(),
+        nationality: $('#uNationality').value.trim(),
+        hometown:    $('#uHometown').value.trim(),
+        gotra:       $('#uGotra').value.trim(),
+      },
+      professional: {
+        occupation:    $('#pOccupation').value.trim(),
+        company:       $('#pCompany').value.trim(),
+        education:     $('#pEducation').value.trim(),
+        qualification: $('#pQualification').value.trim(),
+        skills:        $('#pSkills').value.trim(),
+      },
+      historical: {
+        biography:  $('#hBio').value.trim(),
+        lifeEvents: $('#hEvents').value.trim(),
+        awards:     $('#hAwards').value.trim(),
+        military:   $('#hMilitary').value.trim(),
+        migration:  $('#hMigration').value.trim(),
+        hobbies:    $('#hHobbies').value.trim(),
+        traits:     $('#hTraits').value.trim(),
+        quotes:     $('#hQuotes').value.trim(),
+      },
+      media: {
+        childhoodPhotos: mediaState.childhoodPhotos.slice(),
+        weddingPhotos:   mediaState.weddingPhotos.slice(),
+        audioVideo:      mediaState.audioVideo.slice(),
+        certificates:    mediaState.certificates.slice(),
+        letters:         mediaState.letters.slice(),
+        idProofs:        mediaState.idProofs.slice(),
+      },
+      medical: {
+        bloodGroup: $('#mBlood').value,
+        genetic:    $('#mGenetic').value.trim(),
+        diseases:   $('#mDiseases').value.trim(),
+        allergies:  $('#mAllergies').value.trim(),
+      },
+      updated: Date.now(),
+    };
+  }
+
+  function setStatus(msg, kind) {
+    const el = $('#dStatus');
+    el.textContent = msg;
+    el.className = 'auth-status ' + (kind || '');
+  }
+
+  $('#dForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const ext   = gather();
+    const basic = gatherBasic();
+    if (!basic.fullName && !basic.name) {
+      setStatus('Name cannot be empty (Basic tab).', 'error');
+      $$('.details-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'basic'));
+      $$('.details-pane').forEach(p => p.classList.toggle('active', p.dataset.pane === 'basic'));
+      return;
+    }
+    try {
+      if (source === 'person') {
+        const u = Auth.currentUser();
+        const tree = (u.people || []).slice();
+        const idx = tree.findIndex(p => p.id === personId);
+        if (idx === -1) throw new Error('Person no longer exists.');
+        tree[idx] = { ...tree[idx], ...basic, extended: ext };
+        await Auth.saveTree(tree);
+      } else {
+        const cur = (sessionUser.profile || {});
+        await Auth.saveProfile({ ...cur, ...basic, extended: ext });
+      }
+      toast('Details saved', 'success');
+      setStatus('Saved.', 'success');
+      setTimeout(() => { location.href = backHref; }, 700);
+    } catch (err) {
+      const msg = err.message || 'Could not save.';
+      setStatus(msg, 'error');
+      toast(msg, 'error');
+    }
+  });
+
+  prefill();
+})();
+</script>
+</body>
+</html>

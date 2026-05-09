@@ -3,305 +3,58 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GENOSYS // Pedigree Archive</title>
+<title>Pedigree Archive — A book of kindred</title>
+<meta name="description" content="Build your family tree as a hand-painted manuscript. Oval portraits, gold lineage lines, an heirloom for your house." />
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<!-- USER LOGIN GATE -->
-<div class="login-screen hidden" id="userLogin">
-  <form class="login-box" id="userLoginForm">
-    <h1>OPERATOR ACCESS</h1>
-    <div class="sub">// AUTHENTICATION REQUIRED //</div>
-    <div class="field-group">
-      <label for="userPass">ACCESS KEY</label>
-      <input type="password" id="userPass" autocomplete="current-password" />
-    </div>
-    <button class="btn primary" type="submit">⏵ AUTHENTICATE</button>
-    <div class="login-hint">DEFAULT KEY: family123 // ADMIN KEY ALSO ACCEPTED</div>
-  </form>
-</div>
+<div class="landing">
 
-<!-- BOOT SEQUENCE OVERLAY -->
-<div class="boot hidden" id="boot">
-  <div class="boot-inner">
-    <div class="boot-title">
-      <span>GENOSYS</span>
-      <span class="ver">v4.7 // BUILD 2026.04</span>
-    </div>
-    <div class="boot-log" id="bootLog"></div>
-    <div class="boot-bar"></div>
-  </div>
-</div>
-
-<div class="app">
-
-  <!-- TOP BAR -->
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-logo"><span>G</span></div>
-      <div class="brand-text">
-        <div class="title" id="brandTitle">VEGA LINEAGE</div>
-        <div class="subtitle" id="brandSubtitle">GENOSYS PEDIGREE ARCHIVE // CLASSIFIED</div>
-      </div>
-    </div>
-
-    <div class="hud-stats">
-      <div class="stat"><span class="lbl">SUBJECTS</span><span class="val" id="statCount">0</span></div>
-      <div class="stat"><span class="lbl">GENERATIONS</span><span class="val" id="statGens">0</span></div>
-      <div class="stat"><span class="lbl">LIVING</span><span class="val" id="statLiving">0</span></div>
-      <div class="stat"><span class="lbl">BRANCHES</span><span class="val" id="statBranches">0</span></div>
-    </div>
-
-    <div class="toolbar">
-      <button class="btn btn-icon" id="btnZoomIn"  title="Zoom in">+</button>
-      <button class="btn btn-icon" id="btnZoomOut" title="Zoom out">−</button>
-      <button class="btn btn-icon" id="btnFit"     title="Reset view">⊡</button>
-      <button class="btn btn-icon" id="btnMute"    title="Toggle audio">♪</button>
-      <a class="btn" id="btnOrigin" href="https://maps.app.goo.gl/y11LRCPJUEmhciiU7" target="_blank" rel="noopener" title="View family origin on Google Maps">📍 ORIGIN</a>
-      <a class="btn primary" href="admin.html" id="btnAdmin">⚙ ADMIN</a>
-      <button class="btn" id="btnLogout" title="End session">⏻</button>
-    </div>
-  </header>
-
-  <!-- STAGE -->
-  <main class="stage" id="stage">
-    <!-- atmosphere -->
-    <div class="starfield" id="starfield"></div>
-    <div class="center-pulse"></div>
-    <div class="center-pulse delay-1"></div>
-    <div class="center-pulse delay-2"></div>
-    <div class="radar-sweep"></div>
-    <div class="vignette"></div>
-
-    <div class="bracket-tl"></div><div class="bracket-tr"></div>
-    <div class="bracket-bl"></div><div class="bracket-br"></div>
-
-    <!-- corner HUD readouts -->
-    <div class="hud-corner hud-tl">
-      <div><span class="lbl">HDG</span><span class="val" id="hudHdg">--</span></div>
-      <div><span class="lbl">FREQ</span><span class="val" id="hudFreq">--</span></div>
-      <div><span class="lbl">NODES</span><span class="val" id="hudNodes">--</span></div>
-    </div>
-    <div class="hud-corner hud-tr">
-      <div><span class="lbl">SIG</span><span class="val" id="hudSig">▮▮▮▮▮</span></div>
-      <div><span class="lbl">SCAN</span><span class="val active" id="hudScan">ACTIVE</span></div>
-      <div><span class="lbl">SYNC</span><span class="val" id="hudSync">100%</span></div>
-    </div>
-    <div class="hud-corner hud-bl">
-      <div><span class="lbl">PWR</span><span class="val" id="hudPwr">--</span></div>
-      <div><span class="lbl">NET</span><span class="val active">ONLINE</span></div>
-      <div><span class="lbl">CHANNEL</span><span class="val" id="hudCh">--</span></div>
-    </div>
-    <div class="hud-corner hud-br">
-      <div><span class="lbl">COORD</span><span class="val" id="hudCoord">28.61°N · 77.20°E</span></div>
-      <div><span class="lbl">ARCV</span><span class="val">BHIVA-RAM-LIN</span></div>
-      <div><span class="lbl">FLUX</span><span class="val" id="hudFlux">--</span></div>
-    </div>
-
+  <!-- decorative tree (background) -->
+  <div class="landing-canvas">
     <svg id="pedigreeSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
-
-    <!-- INSPECTOR PANEL -->
-    <aside class="inspector hidden" id="inspector">
-      <header>
-        <div style="flex:1;min-width:0;">
-          <div class="name" id="iName">—</div>
-          <div class="id-badge" id="iId">—</div>
-        </div>
-        <button class="btn btn-icon" id="iZoom" title="Open subject file (Z)">⛶</button>
-        <button class="btn btn-icon danger" id="iClose" title="Close (Esc)">×</button>
-      </header>
-      <div class="i-photo-wrap" id="iPhotoWrap" style="display:none;">
-        <img class="i-photo" id="iPhoto" alt="" />
-      </div>
-      <div class="status" id="iStatus"></div>
-      <div class="field"><span class="k">Gender</span><span class="v" id="iGender">—</span></div>
-      <div class="field"><span class="k">Born</span><span class="v" id="iBorn">—</span></div>
-      <div class="field"><span class="k">Status</span><span class="v" id="iAlive">—</span></div>
-      <div class="notes" id="iNotes">—</div>
-      <div class="relations">
-        <h3>RELATIONS</h3>
-        <div class="rel-group"><span class="k" style="font-size:10px;color:var(--text-faint);letter-spacing:0.2em;">PARENTS:</span> <span id="iParents">—</span></div>
-        <div class="rel-group"><span class="k" style="font-size:10px;color:var(--text-faint);letter-spacing:0.2em;">PARTNER:</span> <span id="iPartner">—</span></div>
-        <div class="rel-group"><span class="k" style="font-size:10px;color:var(--text-faint);letter-spacing:0.2em;">CHILDREN:</span> <span id="iChildren">—</span></div>
-      </div>
-    </aside>
-  </main>
-
-  <!-- BOTTOM BAR -->
-  <footer class="bottombar">
-    <div class="legend">
-      <div class="legend-item"><div class="legend-icon"></div>MALE</div>
-      <div class="legend-item"><div class="legend-icon female"></div>FEMALE</div>
-      <div class="legend-item"><div class="legend-icon deceased"></div>DECEASED</div>
-    </div>
-    <div>
-      <span class="status-dot"></span>SYS // ONLINE<span class="pan-hint-desktop"> — DRAG TO PAN, SCROLL TO ZOOM</span>
-    </div>
-  </footer>
-</div>
-
-<!-- ============== FULLSCREEN SUBJECT FILE ============== -->
-<div class="fc hidden" id="fullCard" aria-hidden="true">
-  <div class="fc-bg"></div>
-  <div class="fc-frame">
-
-    <!-- top header: timer + tabs -->
-    <header class="fc-top">
-      <div class="fc-pill">INTERVIEW <em id="fcPillEm">// SUB</em></div>
-      <div class="fc-timer-block">
-        <span class="fc-timer" id="fcTimer">00:00:00</span>
-        <span class="fc-timer-lbl">TIME ELAPSED</span>
-        <span class="fc-rec">● REC</span>
-      </div>
-      <div class="fc-tabs">
-        <span class="fc-tab" id="fcTab1">&laquo; SYS REGULATORY PROFILE ADMIN &raquo;</span>
-        <span class="fc-tab" id="fcTab2">&laquo; SYS INFO PARAMETER DIOS-TRI &raquo;</span>
-        <span class="fc-tab" id="fcTab3">&laquo; SYS REGULATORY PROFILE ADMIN &raquo;</span>
-      </div>
-    </header>
-
-    <!-- brand strip -->
-    <div class="fc-brand-row">
-      <div class="fc-brand">
-        <div class="fc-brand-mark">GSY</div>
-        <div class="fc-brand-text">
-          <strong>SUBJECT FILE</strong>
-          <span>SECURE ARCHIVE PROTOCOLS &middot; PLATE ALPHA-E1</span>
-          <em>ARCHIVING IN PROGRESS</em>
-        </div>
-      </div>
-      <div class="fc-codes">
-        <span id="fcCode1">J-J100-846</span>
-        <span id="fcCode2">D-TRIAD-864</span>
-        <span id="fcCode3">D-TRIAD-864</span>
-        <span id="fcCode4">J-J100-846</span>
-      </div>
-    </div>
-
-    <!-- main 3-column layout -->
-    <main class="fc-main">
-
-      <!-- LEFT: side panels -->
-      <aside class="fc-left">
-        <div class="fc-block">
-          <header>COM-1 IDENTIFICATION</header>
-          <div id="fcCom1">--</div>
-        </div>
-        <div class="fc-block">
-          <header>BACKUP DAT-A78-H</header>
-          <div id="fcBackup">--</div>
-        </div>
-        <div class="fc-block">
-          <header>INF MISSION OBJ</header>
-          <div id="fcMission">--</div>
-        </div>
-        <div class="fc-block">
-          <header>STABILITY LAPSE</header>
-          <div id="fcStability">--</div>
-        </div>
-        <div class="fc-block">
-          <header id="fcStorageHdr">STORAGE</header>
-          <div class="fc-bars">
-            <div class="bar"><span>ANC</span><div class="track"><div class="fill" id="fcS1F"></div></div><span id="fcS1V">--</span></div>
-            <div class="bar"><span>DSC</span><div class="track"><div class="fill" id="fcS2F"></div></div><span id="fcS2V">--</span></div>
-            <div class="bar"><span>SIB</span><div class="track"><div class="fill" id="fcS3F"></div></div><span id="fcS3V">--</span></div>
-            <div class="bar"><span>PRT</span><div class="track"><div class="fill" id="fcS4F"></div></div><span id="fcS4V">--</span></div>
-          </div>
-        </div>
-        <div class="fc-block">
-          <header>SUBJECT PROFILE</header>
-          <ul class="fc-prof">
-            <li>STATUS: <em id="fcAlive">--</em></li>
-            <li>INF TAG: <em id="fcInfTag">--</em></li>
-            <li>RECORD: <em id="fcRecord">--</em></li>
-            <li>LOCALISATION: <em id="fcLocal">--</em></li>
-            <li>IPF HISTORY: <em id="fcIpf">--</em></li>
-            <li>PROCESS: <em id="fcProcess">--</em></li>
-          </ul>
-        </div>
-      </aside>
-
-      <!-- CENTER: subject panel -->
-      <section class="fc-center">
-        <div class="fc-center-h">CONTAINMENT PROTOCOLS &middot; SOURCING ROUTE OPEN</div>
-        <div class="fc-center-h2">&lt;&lt; ISIU CONTINGENCY ROUTING VIA ACCRO-VARAN INTERMEDIATE ALLOWANCES &gt;&gt;</div>
-
-        <div class="fc-center-body">
-          <!-- photo column -->
-          <div class="fc-photo-col">
-            <div class="fc-alpha">
-              <span class="fc-alpha-name" id="fcAlphaName">ALPHA</span>
-              <em id="fcAlphaSub">CLASSIFICATION CERTIFIED</em>
-            </div>
-            <div class="fc-photo-frame">
-              <span class="fcb fcb-tl"></span><span class="fcb fcb-tr"></span>
-              <span class="fcb fcb-bl"></span><span class="fcb fcb-br"></span>
-              <div class="fc-scan"></div>
-              <img id="fcPhoto" class="fc-photo" alt="" />
-              <div class="fc-no-photo" id="fcNoPhoto">NO IMAGE ON FILE</div>
-              <div class="fc-photo-id" id="fcPhotoId">FILE :: 364757</div>
-            </div>
-            <div class="fc-subject-status">
-              <span>SUBJECT: <em id="fcSubjectStat">--</em></span>
-              <span id="fcCat">--</span>
-            </div>
-          </div>
-
-          <!-- data column -->
-          <div class="fc-data-col">
-            <div class="fc-data-h">DATABASE TAG</div>
-            <div class="fc-name" id="fcName">— SUBJECT —</div>
-
-            <div class="fc-data-h">TECHNICAL DATA TRANSMISSION OVERVIEW</div>
-            <div class="fc-data-grid">
-              <div><span>GENDER</span><strong id="fcGender">--</strong></div>
-              <div><span>BORN</span><strong id="fcBorn">--</strong></div>
-              <div><span>STATUS</span><strong id="fcStatus">--</strong></div>
-              <div><span>TAG ID</span><strong id="fcId">--</strong></div>
-              <div><span>LINEAGE</span><strong id="fcLineage">--</strong></div>
-              <div><span>GEN</span><strong id="fcGen">--</strong></div>
-            </div>
-            <div class="fc-notes" id="fcNotes">— No recorded observations —</div>
-
-            <div class="fc-data-h" id="fcRelHdr">CONTROL ACCESS POINT &middot; NETWORK GRAPH</div>
-            <div class="fc-rels">
-              <div class="fc-rel"><span>GRANDPARENTS</span><div id="fcGrandparents">—</div></div>
-              <div class="fc-rel"><span>PARENTS</span><div id="fcParents">—</div></div>
-              <div class="fc-rel"><span>SIBLINGS</span><div id="fcSiblings">—</div></div>
-              <div class="fc-rel"><span>PARTNER</span><div id="fcPartner">—</div></div>
-              <div class="fc-rel"><span>CHILDREN</span><div id="fcChildren">—</div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="fc-center-foot">HIERARCHICAL BACK-DATA TRANSFER &middot; SYSTEM OPEN</div>
-      </section>
-
-      <!-- RIGHT: micro stats column -->
-      <aside class="fc-right">
-        <div class="fc-numbers">
-          <span id="fcN1">--</span><span id="fcN2">--</span>
-          <span id="fcN3">--</span><span id="fcN4">--</span>
-        </div>
-        <div class="fc-id-tag">ID: <strong id="fcTagId">SUB</strong></div>
-        <div class="fc-scale"></div>
-      </aside>
-    </main>
-
-    <!-- bottom strip -->
-    <footer class="fc-bottom">
-      <span id="fcB1">--</span>
-      <span id="fcB2">--</span>
-      <span id="fcB3">--</span>
-      <span id="fcB4">--</span>
-    </footer>
-
-    <button class="fc-close" id="fcClose" title="CLOSE (ESC)">× CLOSE</button>
   </div>
-</div>
 
-<div class="toast-stack" id="toasts"></div>
+  <!-- vignette -->
+  <div class="landing-vignette"></div>
+
+  <!-- corner brand -->
+  <div class="landing-brand">
+    <div class="brand-logo"><span>✦</span></div>
+    <div class="brand-text">
+      <div class="title">Pedigree Archive</div>
+      <div class="subtitle">a book of kindred</div>
+    </div>
+  </div>
+
+  <!-- corner admin link -->
+  <a class="steward-corner" href="superadmin.html" title="Site admin">⚙ Admin</a>
+
+  <!-- hero copy -->
+  <section class="hero">
+    <div class="hero-flourish">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <div class="hero-eyebrow">Your family, in the old style</div>
+    <h1 class="hero-title">
+      <span class="ornate">A book of</span>
+      Kindred &amp; Lineage
+    </h1>
+    <p class="hero-tagline">
+      Inscribe your ancestors in oval portraits framed in gold,
+      joined by the threads of generation. An heirloom for your house —
+      built in a quiet hour.
+    </p>
+    <a class="hero-cta" href="signup.html" target="_blank" rel="noopener">Develop Your Family Tree</a>
+    <a class="hero-sub-link" href="signup.html?mode=login" target="_blank" rel="noopener">— already have a book? Sign in</a>
+  </section>
+
+  <!-- floating caption (positioned by main.js to follow the spotlight) -->
+  <div class="spotlight-caption" id="spotlightCaption" aria-hidden="true">
+    <div class="caption-name" id="captionName"></div>
+    <div class="caption-meta" id="captionMeta"></div>
+  </div>
+
+</div>
 
 <script src="js/data.js"></script>
 <script src="js/sounds.js"></script>

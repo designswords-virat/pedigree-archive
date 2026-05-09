@@ -113,7 +113,7 @@ const SAMPLE_DATA = {
     { id: 'gc7_2', name: 'Aaditya (Gunnu)',    gender: 'male',   affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: 'Also known as Gunnu.', photo: 'Aaditya (M) urf Gunnu.jpeg', parentIds: ['c7','c7s'], partnerIds: [] },
     { id: 'gc7_3', name: 'Ishika',             gender: 'female', affected: false, carrier: false, deceased: false, birthYear: null, deathYear: null, notes: '', photo: 'Ishika (F).jpeg', parentIds: ['c7','c7s'], partnerIds: [] },
   ],
-  meta: { title: 'BHIVA RAM LINEAGE', subtitle: 'PEDIGREE ARCHIVE // FAMILY OF BHIVA RAM & CHOTA DEVI' }
+  meta: { title: 'Bhiva Ram Lineage', subtitle: 'A book of kindred — the house of Bhiva Ram & Chota Devi' }
 };
 
 const Data = {
@@ -223,6 +223,17 @@ const Data = {
     const data = this.load();
     data.meta = { ...data.meta, ...meta };
     this.save(data);
+  },
+
+  // Returns a deep copy of the seed family — used by the public landing
+  // hero, which always shows the same demo regardless of what's in the
+  // visitor's localStorage.
+  demo() {
+    const data = JSON.parse(JSON.stringify(SAMPLE_DATA));
+    data.people.forEach(p => {
+      if (!p.photo && PHOTO_MAP[p.name]) p.photo = PHOTO_MAP[p.name];
+    });
+    return data;
   },
 
   exportJSON() {

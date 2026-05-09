@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Your Book — Pedigree Archive</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="dash-shell">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo"><span>✦</span></div>
+      <div class="brand-text">
+        <div class="title" id="brandTitle">Your Family Book</div>
+        <div class="subtitle" id="brandSubtitle">Welcome back</div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <a class="btn" href="index.html" title="Public landing">⌂ Landing</a>
+      <a class="btn" href="details.html?source=self" id="btnDetails">✎ Edit Details</a>
+      <button class="btn danger" id="btnSignout">⏻ Sign out</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+
+    <!-- profile summary -->
+    <section class="dash-card profile-summary">
+      <div class="ps-portrait">
+        <div class="ps-frame" id="psFrame">
+          <span class="ph">No likeness</span>
+        </div>
+        <div class="ps-name" id="psName">—</div>
+        <div class="ps-meta" id="psMeta">—</div>
+      </div>
+      <div class="ps-grid">
+        <div><span>Nickname</span><strong id="psNick">—</strong></div>
+        <div><span>Sex</span><strong id="psSex">—</strong></div>
+        <div><span>Born</span><strong id="psBirth">—</strong></div>
+        <div><span>Birthplace</span><strong id="psBirthPlace">—</strong></div>
+        <div><span>Status</span><strong id="psStatus">—</strong></div>
+        <div class="death-only" style="display:none;"><span>Departed</span><strong id="psDeath">—</strong></div>
+        <div class="death-only" style="display:none;"><span>Place of death</span><strong id="psDeathPlace">—</strong></div>
+      </div>
+    </section>
+
+    <!-- next-step CTA -->
+    <section class="dash-card next-step">
+      <h2>Next: build your tree</h2>
+      <p class="lead">
+        Your particulars are recorded. The next step is to add your kindred
+        — parents, partners, children, siblings — and watch the lineage take shape.
+      </p>
+      <div class="next-actions">
+        <a class="btn primary big" id="btnEditTree" href="tree-edit.html">⏵ Open the edit canvas</a>
+        <a class="btn"             id="btnViewTree" href="tree-view.html">⊡ View as chart</a>
+      </div>
+      <p class="next-note">
+        Click <strong>edit canvas</strong> to add fathers, mothers, spouses, children
+        and more — each portrait shows a + when you can add a kinship to it.
+        <strong>View as chart</strong> shows the lineage as a clean read-only book.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supa.js"></script>
+<script src="js/auth.js"></script>
+<script>
+(async function () {
+  const $ = (s) => document.querySelector(s);
+
+  await Auth.init();
+
+  if (!Auth.isLoggedIn()) { location.href = 'signup.html'; return; }
+  const user = Auth.currentUser();
+  if (!user) { await Auth.logout(); location.href = 'signup.html'; return; }
+  if (!user.profile) { location.href = 'profile.html'; return; }
+
+  const p = user.profile;
+
+  // header
+  $('#brandTitle').textContent    = (p.fullName || 'Your Family') + '’s Book';
+  $('#brandSubtitle').textContent = 'Signed in as ' + user.email;
+
+  // portrait
+  const frame = $('#psFrame');
+  if (p.photo) {
+    frame.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = p.photo;
+    frame.appendChild(img);
+  }
+
+  // name + meta
+  $('#psName').textContent = p.fullName || '—';
+  const metaBits = [];
+  if (p.birthDate) metaBits.push('b. ' + p.birthDate);
+  if (p.status === 'deceased' && p.deathDate) metaBits.push('d. ' + p.deathDate);
+  $('#psMeta').textContent = metaBits.join(' · ') || (p.status === 'deceased' ? 'in memoriam' : 'living');
+
+  // grid
+  const titleCase = (s) => String(s || '').replace(/\b\w/g, c => c.toUpperCase());
+  $('#psNick').textContent       = p.nickname   || '—';
+  $('#psSex').textContent        = titleCase(p.gender) || '—';
+  $('#psBirth').textContent      = p.birthDate  || '—';
+  $('#psBirthPlace').textContent = p.birthPlace || '—';
+  $('#psStatus').textContent     = p.status === 'deceased' ? 'Departed' : 'Living';
+  if (p.status === 'deceased') {
+    document.querySelectorAll('.death-only').forEach(el => el.style.display = '');
+    $('#psDeath').textContent      = p.deathDate  || '—';
+    $('#psDeathPlace').textContent = p.deathPlace || '—';
+  }
+
+  // actions — Edit Details is now an <a> link, no JS needed
+  $('#btnSignout').addEventListener('click', async () => {
+    if (!confirm('Sign out?')) return;
+    await Auth.logout();
+    location.href = 'index.html';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 // ============================================================
-// SOUND ENGINE — Web Audio API synthesized sci-fi SFX
-// All sounds are generated in-browser, no external files.
+// SOUND ENGINE — soft chime SFX (Tudor portrait theme)
+// All sounds are synthesized in-browser; no external files.
+// Tones use sine waves and gentle filtering for a candle-warm feel.
 // ============================================================
 
 const Sound = (() => {
@@ -13,11 +14,10 @@ const Sound = (() => {
     const AC = window.AudioContext || window.webkitAudioContext;
     ctx = new AC();
     masterGain = ctx.createGain();
-    masterGain.gain.value = 0.35;
+    masterGain.gain.value = 0.22;     // softer overall — chamber, not arcade
     masterGain.connect(ctx.destination);
   }
 
-  // resume on first user gesture (browser autoplay policy)
   function unlock() {
     ensure();
     if (ctx.state === 'suspended') ctx.resume();
@@ -25,12 +25,12 @@ const Sound = (() => {
 
   function setMuted(v) {
     muted = !!v;
-    if (masterGain) masterGain.gain.value = muted ? 0 : 0.35;
+    if (masterGain) masterGain.gain.value = muted ? 0 : 0.22;
   }
   function isMuted() { return muted; }
 
-  // ---- helpers ----
-  function tone({ freq = 440, type = 'sine', dur = 0.15, attack = 0.005, release = 0.08, volume = 0.4, freqEnd = null, filter = null }) {
+  // Soft bell-like tone — sine carrier with a gentle decay envelope.
+  function chime({ freq = 660, dur = 0.6, volume = 0.18, freqEnd = null, attack = 0.01, release = 0.4, type = 'sine' }) {
     if (muted) return;
     ensure();
     const t0 = ctx.currentTime;
@@ -42,93 +42,95 @@ const Sound = (() => {
     gain.gain.setValueAtTime(0, t0);
     gain.gain.linearRampToValueAtTime(volume, t0 + attack);
     gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur + release);
-    let node = osc;
-    if (filter) {
-      const f = ctx.createBiquadFilter();
-      f.type = filter.type || 'lowpass';
-      f.frequency.value = filter.freq || 1200;
-      f.Q.value = filter.Q || 1;
-      node.connect(f);
-      f.connect(gain);
-    } else {
-      node.connect(gain);
-    }
-    gain.connect(masterGain);
+
+    // gentle low-pass to remove harshness
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 2200;
+    lp.Q.value = 0.7;
+
+    osc.connect(lp); lp.connect(gain); gain.connect(masterGain);
     osc.start(t0);
     osc.stop(t0 + dur + release + 0.05);
   }
 
-  function noiseBurst({ dur = 0.3, volume = 0.2, filterFreq = 1200, filterQ = 1, type = 'lowpass', sweep = false }) {
+  // Soft breath / page-turn — narrow filtered noise.
+  function breath({ dur = 0.4, volume = 0.10, filterFreq = 900, filterQ = 1, sweep = false }) {
     if (muted) return;
     ensure();
     const t0 = ctx.currentTime;
     const bufLen = Math.floor(ctx.sampleRate * dur);
     const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
     const ch = buf.getChannelData(0);
-    for (let i = 0; i < bufLen; i++) ch[i] = (Math.random() * 2 - 1);
+    for (let i = 0; i < bufLen; i++) ch[i] = (Math.random() * 2 - 1) * 0.6;
     const src = ctx.createBufferSource();
     src.buffer = buf;
     const f = ctx.createBiquadFilter();
-    f.type = type;
+    f.type = 'bandpass';
     f.frequency.setValueAtTime(filterFreq, t0);
     f.Q.value = filterQ;
-    if (sweep) f.frequency.exponentialRampToValueAtTime(Math.max(80, filterFreq * 0.15), t0 + dur);
+    if (sweep) f.frequency.exponentialRampToValueAtTime(Math.max(80, filterFreq * 0.25), t0 + dur);
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0, t0);
-    gain.gain.linearRampToValueAtTime(volume, t0 + 0.01);
+    gain.gain.linearRampToValueAtTime(volume, t0 + 0.04);
     gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     src.connect(f); f.connect(gain); gain.connect(masterGain);
     src.start(t0);
     src.stop(t0 + dur + 0.02);
   }
 
-  // ---- public effects ----
   return {
     unlock, setMuted, isMuted,
 
+    // page turning open — soft chord
     boot() {
-      // multi-stage boot sequence
       unlock();
-      tone({ freq: 220, type: 'sawtooth', dur: 0.2, freqEnd: 880, volume: 0.25, filter: { type: 'lowpass', freq: 2000, Q: 4 } });
-      setTimeout(() => tone({ freq: 660, type: 'square', dur: 0.08, volume: 0.18 }), 220);
-      setTimeout(() => tone({ freq: 990, type: 'square', dur: 0.08, volume: 0.18 }), 320);
-      setTimeout(() => tone({ freq: 1320, type: 'sine',  dur: 0.18, volume: 0.22, freqEnd: 1760 }), 420);
-      setTimeout(() => noiseBurst({ dur: 0.5, volume: 0.08, filterFreq: 1800, sweep: true, type: 'bandpass', filterQ: 2 }), 200);
+      chime({ freq: 523.25, dur: 0.35, volume: 0.12, release: 0.5 });           // C5
+      setTimeout(() => chime({ freq: 659.25, dur: 0.35, volume: 0.10, release: 0.5 }), 110); // E5
+      setTimeout(() => chime({ freq: 783.99, dur: 0.45, volume: 0.10, release: 0.6 }), 230); // G5
+      breath({ dur: 0.5, volume: 0.05, filterFreq: 1200, sweep: true });
     },
 
-    click() { tone({ freq: 1400, type: 'square', dur: 0.04, volume: 0.18 }); },
-    blip()  { tone({ freq: 880,  type: 'sine',   dur: 0.05, volume: 0.18, freqEnd: 1320 }); },
-    hover() { tone({ freq: 2200, type: 'sine',   dur: 0.03, volume: 0.08 }); },
+    // light pluck on click
+    click() { chime({ freq: 880, dur: 0.06, volume: 0.10, release: 0.12 }); },
+    blip()  { chime({ freq: 988, dur: 0.10, volume: 0.10, freqEnd: 1244, release: 0.18 }); },
+    hover() { chime({ freq: 1318, dur: 0.04, volume: 0.04, release: 0.08 }); },
 
+    // small two-note motif on selection
     select() {
-      tone({ freq: 660,  type: 'square', dur: 0.05, volume: 0.18 });
-      setTimeout(() => tone({ freq: 990, type: 'square', dur: 0.06, volume: 0.18 }), 50);
+      chime({ freq: 659.25, dur: 0.10, volume: 0.10, release: 0.15 });
+      setTimeout(() => chime({ freq: 880, dur: 0.14, volume: 0.10, release: 0.22 }), 90);
     },
 
+    // happy three-note on success
     success() {
-      tone({ freq: 660,  type: 'sine', dur: 0.1, volume: 0.22 });
-      setTimeout(() => tone({ freq: 990,  type: 'sine', dur: 0.1, volume: 0.22 }), 100);
-      setTimeout(() => tone({ freq: 1320, type: 'sine', dur: 0.18, volume: 0.22 }), 200);
+      chime({ freq: 523.25, dur: 0.14, volume: 0.12, release: 0.25 }); // C5
+      setTimeout(() => chime({ freq: 659.25, dur: 0.14, volume: 0.12, release: 0.25 }), 110); // E5
+      setTimeout(() => chime({ freq: 783.99, dur: 0.22, volume: 0.12, release: 0.35 }), 220); // G5
     },
 
+    // soft mournful descending tone on error
     error() {
-      tone({ freq: 220, type: 'sawtooth', dur: 0.18, volume: 0.28, freqEnd: 110 });
-      setTimeout(() => tone({ freq: 180, type: 'sawtooth', dur: 0.22, volume: 0.28, freqEnd: 90 }), 180);
+      chime({ freq: 392.00, dur: 0.30, volume: 0.16, freqEnd: 261.63, release: 0.4, type: 'triangle' }); // G4 → C4
     },
 
+    // soft swish — used on view changes
     whoosh() {
-      noiseBurst({ dur: 0.4, volume: 0.18, filterFreq: 2400, type: 'bandpass', filterQ: 3, sweep: true });
+      breath({ dur: 0.45, volume: 0.10, filterFreq: 1600, filterQ: 2, sweep: true });
     },
 
+    // a single soft bell — used when the tree first paints
     scan() {
-      tone({ freq: 1200, type: 'sine', dur: 0.6, volume: 0.12, freqEnd: 200, filter: { type: 'bandpass', freq: 1500, Q: 6 } });
+      chime({ freq: 1046.50, dur: 0.50, volume: 0.10, release: 0.7 }); // C6
     },
 
-    typing() { tone({ freq: 2000 + Math.random() * 1000, type: 'square', dur: 0.015, volume: 0.05 }); },
+    // typing sound — kept for any future use, very quiet
+    typing() { chime({ freq: 1800 + Math.random() * 600, dur: 0.012, volume: 0.04, release: 0.04 }); },
 
+    // soft knock — replaces harsh glitch
     glitch() {
-      noiseBurst({ dur: 0.12, volume: 0.22, filterFreq: 3500, type: 'highpass', filterQ: 2 });
-      tone({ freq: 100, type: 'sawtooth', dur: 0.08, volume: 0.18, freqEnd: 40 });
+      chime({ freq: 196.00, dur: 0.10, volume: 0.18, freqEnd: 130.81, release: 0.2, type: 'triangle' });
+      breath({ dur: 0.18, volume: 0.06, filterFreq: 700, filterQ: 2 });
     },
   };
 })();

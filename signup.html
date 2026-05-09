@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Begin Your Family Book — Pedigree Archive</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<main class="auth-shell">
+  <article class="auth-card">
+
+    <!-- mode toggle -->
+    <nav class="auth-tabs">
+      <button class="auth-tab active" data-mode="signup" id="tabSignup">Open a new book</button>
+      <button class="auth-tab"        data-mode="login"  id="tabLogin">Return to your book</button>
+    </nav>
+
+    <!-- SIGNUP MODE -->
+    <section class="auth-form" id="signupForm">
+      <h1>Open a new book</h1>
+      <p class="lead">Begin a family record of your own. One key, one keeper.</p>
+
+      <form id="signupFormEl">
+        <div class="field-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" autocomplete="email" required />
+        </div>
+
+        <div class="field-group" style="margin-top:14px;">
+          <label for="signupPass">Choose a password</label>
+          <input type="password" id="signupPass" autocomplete="new-password" minlength="6" required />
+          <span class="field-hint">At least 6 characters.</span>
+        </div>
+
+        <div class="field-group" style="margin-top:14px;">
+          <label for="signupPass2">Confirm password</label>
+          <input type="password" id="signupPass2" autocomplete="new-password" minlength="6" required />
+        </div>
+
+        <button type="submit" class="btn primary" style="width:100%;margin-top:22px;">⏵ Open the book</button>
+      </form>
+    </section>
+
+    <!-- LOGIN MODE -->
+    <section class="auth-form" id="loginFormSec" style="display:none;">
+      <h1>Return to your book</h1>
+      <p class="lead">Enter the keys you set when you opened it.</p>
+
+      <form id="loginFormEl">
+        <div class="field-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" autocomplete="email" required />
+        </div>
+
+        <div class="field-group" style="margin-top:14px;">
+          <label for="loginPass">Password</label>
+          <input type="password" id="loginPass" autocomplete="current-password" required />
+        </div>
+
+        <button type="submit" class="btn primary" style="width:100%;margin-top:22px;">⏵ Enter</button>
+
+        <div style="text-align:center;margin-top:14px;">
+          <a href="#" id="linkForgot" style="font-family:var(--font-body);font-style:italic;font-size:13px;color:var(--gold);">Forgot your password?</a>
+        </div>
+      </form>
+    </section>
+
+    <div class="auth-status" id="status"></div>
+
+    <footer class="auth-foot">
+      Your book lives in this browser only — for now.
+      <br />
+      <a href="index.html">← Return to the archive</a>
+    </footer>
+
+  </article>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supa.js"></script>
+<script src="js/auth.js"></script>
+<script>
+(async function () {
+  const $ = (s) => document.querySelector(s);
+
+  function setStatus(msg, kind) {
+    const el = $('#status');
+    el.textContent = msg;
+    el.className = 'auth-status ' + (kind || '');
+  }
+  function clearStatus() {
+    $('#status').className = 'auth-status';
+    $('#status').textContent = '';
+  }
+
+  function setMode(mode) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+    $('#signupForm').style.display    = mode === 'signup' ? '' : 'none';
+    $('#loginFormSec').style.display  = mode === 'login'  ? '' : 'none';
+    clearStatus();
+  }
+
+  $('#tabSignup').addEventListener('click', () => setMode('signup'));
+  $('#tabLogin').addEventListener('click',  () => setMode('login'));
+
+  // pick mode from query string for deep-links (?mode=login)
+  const params = new URLSearchParams(location.search);
+  if (params.get('mode') === 'login') setMode('login');
+
+  // wait for Supabase session to be restored before checking
+  await Auth.init();
+
+  // if already logged in, skip straight to the next step
+  if (Auth.isLoggedIn()) {
+    const u = Auth.currentUser();
+    if (u && u.profile) location.href = 'dashboard.html';
+    else location.href = 'profile.html';
+    return;
+  }
+
+  // ===== signup =====
+  $('#signupFormEl').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('#signupEmail').value.trim();
+    const pw  = $('#signupPass').value;
+    const pw2 = $('#signupPass2').value;
+    if (pw !== pw2) { setStatus('The two passwords do not match.', 'error'); return; }
+    try {
+      const result = await Auth.signup(email, pw);
+      if (result.requiresEmailConfirmation) {
+        setStatus('Almost there — we’ve sent a confirmation link to ' + email + '. Click it, then come back and sign in.', 'success');
+      } else {
+        setStatus('Welcome — opening your basic information page…', 'success');
+        setTimeout(() => { location.href = 'profile.html'; }, 700);
+      }
+    } catch (err) {
+      setStatus(err.message, 'error');
+    }
+  });
+
+  // ===== login =====
+  $('#loginFormEl').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('#loginEmail').value.trim();
+    const pw    = $('#loginPass').value;
+    try {
+      const u = await Auth.login(email, pw);
+      setStatus('Welcome back — opening your book…', 'success');
+      setTimeout(() => { location.href = (u && u.profile) ? 'dashboard.html' : 'profile.html'; }, 600);
+    } catch (err) {
+      setStatus(err.message, 'error');
+    }
+  });
+
+  // ===== forgot password =====
+  $('#linkForgot').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = ($('#loginEmail').value || prompt('Enter the email on your account:') || '').trim();
+    if (!email) return;
+    try {
+      await Auth.resetPassword(email);
+      setStatus('A password-reset link has been sent to ' + email + '. Check your inbox.', 'success');
+    } catch (err) {
+      setStatus(err.message, 'error');
+    }
+  });
+})();
+</script>
+</body>
+</html>
