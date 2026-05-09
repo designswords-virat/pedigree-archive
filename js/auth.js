@@ -61,6 +61,46 @@ const Auth = (() => {
 
     return { profile: null, extended: null, people: [] };
   }
+
+  // The details form saves into `profile` but the tree renderer reads from
+  // `people`. Without bridging the two the tree shows nothing after the user
+  // fills in their basics. This makes sure a person flagged `isSelf` exists
+  // in the people array and stays in sync with whatever's in profile.
+  function syncSelf(state) {
+    const prof = state && state.profile;
+    if (!prof || !prof.fullName) return state;
+    const yearOf = (d) => d ? parseInt(String(d).slice(0, 4), 10) : null;
+    const people = Array.isArray(state.people) ? state.people.slice() : [];
+    const selfIdx = people.findIndex(p => p && p.isSelf);
+    const fields = {
+      name:       prof.fullName,
+      nickname:   prof.nickname || '',
+      gender:     ['male','female','unknown'].includes(prof.gender) ? prof.gender : 'unknown',
+      birthDate:  prof.birthDate || null,
+      birthYear:  yearOf(prof.birthDate),
+      birthPlace: prof.birthPlace || '',
+      deceased:   prof.status === 'deceased',
+      deathDate:  prof.deathDate || null,
+      deathYear:  yearOf(prof.deathDate),
+      deathPlace: prof.deathPlace || '',
+      photo:      prof.photo || '',
+      notes:      prof.notes || '',
+    };
+    if (selfIdx === -1) {
+      const id = 'p_self_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      people.unshift({
+        id, ...fields,
+        parentIds: [], parentMeta: {},
+        partnerIds: [], partnerMeta: {},
+        affected: false, carrier: false,
+        isSelf: true,
+      });
+    } else {
+      people[selfIdx] = { ...people[selfIdx], ...fields, isSelf: true };
+    }
+    return { ...state, people };
+  }
+
   function persist(data) {
     try { localStorage.setItem(KEY, JSON.stringify(data)); }
     catch (e) {
@@ -73,7 +113,15 @@ const Auth = (() => {
 
   return {
     // ----- session (no-ops in single-user mode) -----
-    async init() { _user = load(); return _user; },
+    async init() {
+      _user = load();
+      const synced = syncSelf(_user);
+      if (synced !== _user) {
+        _user = synced;
+        try { persist(_user); } catch (e) { /* surfaced elsewhere */ }
+      }
+      return _user;
+    },
     isLoggedIn:    () => true,
     currentUser:   () => _user,
     currentEmail:  () => '',
@@ -93,7 +141,7 @@ const Auth = (() => {
 
     // ----- profile / tree persistence -----
     async saveProfile(profile) {
-      _user = { ..._user, profile };
+      _user = syncSelf({ ..._user, profile });
       persist(_user);
       return profile;
     },
