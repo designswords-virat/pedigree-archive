@@ -9,7 +9,12 @@
 // must never appear in client code.
 // ============================================================
 
+// To re-enable the multi-user product, paste the project URL + anon key
+// here and re-deploy. The previous live values were:
+//   SUPABASE_URL:      'https://gnxqhhtzweiqpwpvsqqn.supabase.co'
+//   SUPABASE_ANON_KEY: 'sb_publishable_azCGx6ttYXdAz_kindNp5g_4pWZguLw'
+
 window.CONFIG = {
-  SUPABASE_URL:      'https://gnxqhhtzweiqpwpvsqqn.supabase.co',
-  SUPABASE_ANON_KEY: 'sb_publishable_azCGx6ttYXdAz_kindNp5g_4pWZguLw',
+  SUPABASE_URL:      '',
+  SUPABASE_ANON_KEY: '',
 };

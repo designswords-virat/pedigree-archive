@@ -13,19 +13,11 @@
   if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY ||
       cfg.SUPABASE_URL.startsWith('PASTE_') ||
       cfg.SUPABASE_ANON_KEY.startsWith('PASTE_')) {
-    // Render a clear error so the developer knows what to fix.
-    document.addEventListener('DOMContentLoaded', () => {
-      const banner = document.createElement('div');
-      banner.style.cssText =
-        'position:fixed;top:0;left:0;right:0;z-index:99999;' +
-        'background:#5a0e1a;color:#f8d2d2;padding:14px 22px;' +
-        'font-family:system-ui,sans-serif;font-size:14px;text-align:center;' +
-        'border-bottom:2px solid #cba656;';
-      banner.innerHTML =
-        '⚠ Supabase is not configured. Open <code>js/config.js</code> ' +
-        'and paste your project URL + anon key.';
-      document.body.appendChild(banner);
-    });
+    // Silently disable — the public landing page works without Supabase
+    // (it uses a hardcoded demo for the hero). User-account pages will
+    // throw "Supabase not configured" if reached directly, which is fine
+    // since they're not linked from the landing in coming-soon mode.
+    console.info('[supa] Supabase not configured — multi-user features disabled.');
     window.supabaseClient = null;
     return;
   }
