@@ -22,6 +22,8 @@
       <h1>Open a new book</h1>
       <p class="lead">Begin a family record of your own. One key, one keeper.</p>
 
+      <div class="auth-status" id="statusTop" style="margin-bottom:14px;"></div>
+
       <form id="signupFormEl">
         <div class="field-group">
           <label for="signupEmail">Email</label>
@@ -47,6 +49,8 @@
     <section class="auth-form" id="loginFormSec" style="display:none;">
       <h1>Return to your book</h1>
       <p class="lead">Enter the keys you set when you opened it.</p>
+
+      <div class="auth-status" id="statusTopLogin" style="margin-bottom:14px;"></div>
 
       <form id="loginFormEl">
         <div class="field-group">
@@ -87,14 +91,24 @@
   const $ = (s) => document.querySelector(s);
 
   function setStatus(msg, kind) {
-    const el = $('#status');
-    el.textContent = msg;
-    el.className = 'auth-status ' + (kind || '');
+    // Mirror message into both bottom (#status) and top (#statusTop / #statusTopLogin)
+    // status divs so the user always sees feedback regardless of where their
+    // attention is on the form.
+    const tops = ['#statusTop', '#statusTopLogin'].map(s => $(s)).filter(Boolean);
+    const bot  = $('#status');
+    const all  = bot ? [bot, ...tops] : tops;
+    all.forEach(el => {
+      el.textContent = msg;
+      el.className = 'auth-status ' + (kind || '');
+    });
+    if (msg) {
+      // scroll the top one into view so it's unmissable
+      const visibleTop = tops.find(el => el.offsetParent !== null);
+      if (visibleTop) visibleTop.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      console.log('[signup] ' + (kind || 'info') + ': ' + msg);
+    }
   }
-  function clearStatus() {
-    $('#status').className = 'auth-status';
-    $('#status').textContent = '';
-  }
+  function clearStatus() { setStatus('', ''); }
 
   function setMode(mode) {
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
@@ -124,34 +138,46 @@
   // ===== signup =====
   $('#signupFormEl').addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log('[signup] submit fired');
     const email = $('#signupEmail').value.trim();
     const pw  = $('#signupPass').value;
     const pw2 = $('#signupPass2').value;
-    if (pw !== pw2) { setStatus('The two passwords do not match.', 'error'); return; }
+    if (!email) { setStatus('⚠ Please enter your email.', 'error'); return; }
+    if (pw.length < 6) { setStatus('⚠ Password must be at least 6 characters.', 'error'); return; }
+    if (pw !== pw2) { setStatus('⚠ The two passwords do not match.', 'error'); return; }
+    setStatus('Creating your account…', '');
     try {
       const result = await Auth.signup(email, pw);
+      console.log('[signup] result:', result);
       if (result.requiresEmailConfirmation) {
-        setStatus('Almost there — we’ve sent a confirmation link to ' + email + '. Click it, then come back and sign in.', 'success');
+        setStatus('✓ Almost there — we sent a confirmation link to ' + email + '. Click it, then come back and sign in.', 'success');
       } else {
-        setStatus('Welcome — opening your basic information page…', 'success');
-        setTimeout(() => { location.href = 'profile.html'; }, 700);
+        setStatus('✓ Welcome — opening your basic information page…', 'success');
+        setTimeout(() => { location.href = 'profile.html'; }, 900);
       }
     } catch (err) {
-      setStatus(err.message, 'error');
+      console.error('[signup] failed:', err);
+      setStatus('⚠ ' + (err.message || err), 'error');
     }
   });
 
   // ===== login =====
   $('#loginFormEl').addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log('[login] submit fired');
     const email = $('#loginEmail').value.trim();
     const pw    = $('#loginPass').value;
+    if (!email) { setStatus('⚠ Please enter your email.', 'error'); return; }
+    if (!pw)    { setStatus('⚠ Please enter your password.', 'error'); return; }
+    setStatus('Signing in…', '');
     try {
       const u = await Auth.login(email, pw);
-      setStatus('Welcome back — opening your book…', 'success');
-      setTimeout(() => { location.href = (u && u.profile) ? 'dashboard.html' : 'profile.html'; }, 600);
+      console.log('[login] success, user:', u);
+      setStatus('✓ Welcome back — opening your book…', 'success');
+      setTimeout(() => { location.href = (u && u.profile) ? 'dashboard.html' : 'profile.html'; }, 700);
     } catch (err) {
-      setStatus(err.message, 'error');
+      console.error('[login] failed:', err);
+      setStatus('⚠ ' + (err.message || err), 'error');
     }
   });
 
@@ -162,12 +188,16 @@
     if (!email) return;
     try {
       await Auth.resetPassword(email);
-      setStatus('A password-reset link has been sent to ' + email + '. Check your inbox.', 'success');
+      setStatus('✓ A password-reset link has been sent to ' + email + '. Check your inbox.', 'success');
     } catch (err) {
-      setStatus(err.message, 'error');
+      console.error('[forgot] failed:', err);
+      setStatus('⚠ ' + (err.message || err), 'error');
     }
   });
-})();
+})().catch(err => {
+  console.error('[signup] FATAL init error:', err);
+  alert('Page failed to initialise: ' + (err.message || err) + '\n\nOpen the browser console (F12) for details.');
+});
 </script>
 </body>
 </html>
