@@ -7,6 +7,7 @@
 
 const Pedigree = (() => {
   const NS = 'http://www.w3.org/2000/svg';
+  console.log('[pedigree] loaded build v5 — COUPLE_GAP=90, SIBLING_GAP=90');
   const NODE_W = 100;            // oval width  (bigger portraits)
   const NODE_H = 128;            // oval height (portrait proportion preserved)
   const COUPLE_GAP = 90;         // gap between mating partners
