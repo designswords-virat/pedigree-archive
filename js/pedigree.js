@@ -9,7 +9,7 @@ const Pedigree = (() => {
   const NS = 'http://www.w3.org/2000/svg';
   const NODE_W = 100;            // oval width  (bigger portraits)
   const NODE_H = 128;            // oval height (portrait proportion preserved)
-  const COUPLE_GAP = 30;         // gap between mating partners
+  const COUPLE_GAP = 60;         // gap between mating partners
   const SIBLING_GAP = 70;        // gap between siblings — wide enough to read
   const GEN_HEIGHT = 480;        // vertical gap from one generation to the next
                                  // (large enough to hold wrapped sub-rows + grandkids)
@@ -336,16 +336,13 @@ const Pedigree = (() => {
         yt.textContent = years.join(' – ');
       }
     } else {
-      // HORIZONTAL (desktop): cartouche + label + years stacked below the oval.
+      // HORIZONTAL (desktop): label + years stacked below the oval.
+      // (The boxed cartouche behind the name was removed — names sit free
+      // on the parchment, which reads cleaner and avoids touching plates
+      // when partners are drawn close together.)
       const cartTop = NODE_H + CART_PAD_TOP;
       const cartW = NODE_W + 28;
       const cartH = nameLines.length * CART_HEIGHT + 6;
-      const cartX = (NODE_W - cartW) / 2;
-
-      el('rect', {
-        x: cartX, y: cartTop, width: cartW, height: cartH,
-        rx: 1, class: 'label-cartouche'
-      }, group);
 
       const label = el('text', {
         x: NODE_W / 2, y: cartTop + 12,
