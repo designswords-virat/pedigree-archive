@@ -22,6 +22,43 @@ const Auth = (() => {
         if (parsed && typeof parsed === 'object') return parsed;
       }
     } catch (e) { /* fall through */ }
+
+    // One-time migration: earlier in this project's life there was a
+    // multi-user localStorage version that wrote to `pa_users_v1`
+    // (and a sci-fi steward console that wrote to `genosys_family_tree_v2`).
+    // If either of those still has data and our current key is empty,
+    // recover it so previously-entered family data isn't stranded.
+    try {
+      const multi = localStorage.getItem('pa_users_v1');
+      if (multi) {
+        const parsed = JSON.parse(multi);
+        const u = parsed && Array.isArray(parsed.users) && parsed.users[0];
+        if (u && (u.profile || (u.people && u.people.length))) {
+          const recovered = {
+            profile:  u.profile  || null,
+            extended: u.extended || null,
+            people:   Array.isArray(u.people) ? u.people : [],
+          };
+          localStorage.setItem(KEY, JSON.stringify(recovered));
+          console.info('[auth] recovered profile + ' + recovered.people.length + ' people from pa_users_v1');
+          return recovered;
+        }
+      }
+    } catch (e) { /* keep going */ }
+
+    try {
+      const old = localStorage.getItem('genosys_family_tree_v2');
+      if (old) {
+        const parsed = JSON.parse(old);
+        if (parsed && Array.isArray(parsed.people) && parsed.people.length) {
+          const recovered = { profile: null, extended: null, people: parsed.people };
+          localStorage.setItem(KEY, JSON.stringify(recovered));
+          console.info('[auth] recovered ' + recovered.people.length + ' people from genosys_family_tree_v2');
+          return recovered;
+        }
+      }
+    } catch (e) { /* keep going */ }
+
     return { profile: null, extended: null, people: [] };
   }
   function persist(data) {
