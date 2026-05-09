@@ -31,3 +31,6 @@ References/
 
 # Source spreadsheet — tracked but ignore lock files
 ~$*.xlsx
+
+# Local Netlify folder
+.netlify
