@@ -62,18 +62,18 @@ const Auth = (() => {
     return { profile: null, extended: null, people: [] };
   }
 
-  // The details form saves into `profile` but the tree renderer reads from
-  // `people`. Without bridging the two the tree shows nothing after the user
-  // fills in their basics. This makes sure a person flagged `isSelf` exists
-  // in the people array and stays in sync with whatever's in profile.
-  function syncSelf(state) {
-    const prof = state && state.profile;
-    if (!prof || !prof.fullName) return state;
-    const yearOf = (d) => d ? parseInt(String(d).slice(0, 4), 10) : null;
-    const people = Array.isArray(state.people) ? state.people.slice() : [];
-    const selfIdx = people.findIndex(p => p && p.isSelf);
-    const fields = {
-      name:       prof.fullName,
+  // Profile lives in `state.profile`; the tree renderer reads from `state.people`.
+  // We bridge them so the user appears as a node — but we DON'T re-sync on every
+  // load (that would clobber edits made via the tree's edit-person form). Instead:
+  //   - seedSelfIfMissing: one-shot bootstrap when no isSelf person exists
+  //   - profileToSelf:    write-through after a profile save
+  //   - selfToProfile:    write-through after a tree save (keeps profile current
+  //                       so the dashboard/landing reflect the latest name etc.)
+  const yearOf = (d) => d ? parseInt(String(d).slice(0, 4), 10) : null;
+
+  function profileFields(prof) {
+    return {
+      name:       prof.fullName || '',
       nickname:   prof.nickname || '',
       gender:     ['male','female','unknown'].includes(prof.gender) ? prof.gender : 'unknown',
       birthDate:  prof.birthDate || null,
@@ -86,19 +86,50 @@ const Auth = (() => {
       photo:      prof.photo || '',
       notes:      prof.notes || '',
     };
-    if (selfIdx === -1) {
-      const id = 'p_self_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-      people.unshift({
-        id, ...fields,
-        parentIds: [], parentMeta: {},
-        partnerIds: [], partnerMeta: {},
-        affected: false, carrier: false,
-        isSelf: true,
-      });
-    } else {
-      people[selfIdx] = { ...people[selfIdx], ...fields, isSelf: true };
-    }
+  }
+
+  function seedSelfIfMissing(state) {
+    const prof = state && state.profile;
+    if (!prof || !prof.fullName) return state;
+    const people = Array.isArray(state.people) ? state.people.slice() : [];
+    if (people.some(p => p && p.isSelf)) return state;
+    const id = 'p_self_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    people.unshift({
+      id, ...profileFields(prof),
+      parentIds: [], parentMeta: {},
+      partnerIds: [], partnerMeta: {},
+      affected: false, carrier: false,
+      isSelf: true,
+    });
     return { ...state, people };
+  }
+
+  function profileToSelf(state) {
+    const prof = state && state.profile;
+    if (!prof || !prof.fullName) return state;
+    const people = Array.isArray(state.people) ? state.people.slice() : [];
+    const selfIdx = people.findIndex(p => p && p.isSelf);
+    if (selfIdx === -1) return seedSelfIfMissing(state);
+    people[selfIdx] = { ...people[selfIdx], ...profileFields(prof), isSelf: true };
+    return { ...state, people };
+  }
+
+  function selfToProfile(state) {
+    if (!state || !Array.isArray(state.people)) return state;
+    const self = state.people.find(p => p && p.isSelf);
+    if (!self) return state;
+    const profile = { ...(state.profile || {}) };
+    profile.fullName   = self.name || '';
+    profile.nickname   = self.nickname || '';
+    profile.gender     = self.gender || 'unknown';
+    profile.birthDate  = self.birthDate || null;
+    profile.birthPlace = self.birthPlace || '';
+    profile.status     = self.deceased ? 'deceased' : 'alive';
+    profile.deathDate  = self.deathDate || null;
+    profile.deathPlace = self.deathPlace || '';
+    profile.photo      = self.photo || '';
+    profile.notes      = self.notes || '';
+    return { ...state, profile };
   }
 
   function persist(data) {
@@ -115,7 +146,7 @@ const Auth = (() => {
     // ----- session (no-ops in single-user mode) -----
     async init() {
       _user = load();
-      const synced = syncSelf(_user);
+      const synced = seedSelfIfMissing(_user);
       if (synced !== _user) {
         _user = synced;
         try { persist(_user); } catch (e) { /* surfaced elsewhere */ }
@@ -141,7 +172,7 @@ const Auth = (() => {
 
     // ----- profile / tree persistence -----
     async saveProfile(profile) {
-      _user = syncSelf({ ..._user, profile });
+      _user = profileToSelf({ ..._user, profile });
       persist(_user);
       return profile;
     },
@@ -150,7 +181,7 @@ const Auth = (() => {
       persist(_user);
     },
     async saveTree(people) {
-      _user = { ..._user, people: Array.isArray(people) ? people : [] };
+      _user = selfToProfile({ ..._user, people: Array.isArray(people) ? people : [] });
       persist(_user);
     },
 
