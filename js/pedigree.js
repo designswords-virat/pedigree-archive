@@ -9,8 +9,8 @@ const Pedigree = (() => {
   const NS = 'http://www.w3.org/2000/svg';
   const NODE_W = 100;            // oval width  (bigger portraits)
   const NODE_H = 128;            // oval height (portrait proportion preserved)
-  const COUPLE_GAP = 60;         // gap between mating partners
-  const SIBLING_GAP = 70;        // gap between siblings — wide enough to read
+  const COUPLE_GAP = 90;         // gap between mating partners
+  const SIBLING_GAP = 90;        // gap between siblings — wide enough to read
   const GEN_HEIGHT = 480;        // vertical gap from one generation to the next
                                  // (large enough to hold wrapped sub-rows + grandkids)
   const MARGIN = 100;
