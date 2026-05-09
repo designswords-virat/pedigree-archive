@@ -2,11 +2,291 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta http-equiv="refresh" content="0;url=details.html" />
-<title>Redirecting…</title>
-<script>location.replace('details.html');</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Your Particulars — Pedigree Archive</title>
+<link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<p>Redirecting to <a href="details.html">the details form</a>…</p>
+
+<main class="auth-shell wide">
+  <article class="auth-card wide">
+
+    <header class="profile-head">
+      <div class="profile-step">Step 1 of 2</div>
+      <h1>Your Particulars</h1>
+      <p class="lead">Inscribe yourself first — the page from which the lineage will branch.</p>
+    </header>
+
+    <form id="profileForm" class="profile-form">
+
+      <div class="auth-status" id="status" style="margin-bottom:14px;"></div>
+
+      <fieldset class="profile-section">
+        <legend>Identity</legend>
+
+        <div class="profile-grid">
+          <div class="field-group">
+            <label for="fullName">Full name <em>required</em></label>
+            <input type="text" id="fullName" required maxlength="100" />
+          </div>
+          <div class="field-group">
+            <label for="nickname">Nickname / common name</label>
+            <input type="text" id="nickname" maxlength="60" />
+          </div>
+
+          <div class="field-group">
+            <label>Sex</label>
+            <div class="tag-picker" id="genderPicker">
+              <div class="tag-pick" data-val="male">♂ Man</div>
+              <div class="tag-pick" data-val="female">♀ Woman</div>
+              <div class="tag-pick" data-val="unknown">✦ Other / unrecorded</div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="photoFile">Likeness</label>
+            <div class="photo-upload-row">
+              <div class="photo-upload-preview" id="photoPreview">
+                <span class="ph">No likeness</span>
+              </div>
+              <div class="photo-upload-controls">
+                <input type="file" id="photoFile" accept="image/*" />
+                <button type="button" class="btn" id="btnPhotoClear" style="margin-top:8px;">Clear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="profile-section">
+        <legend>Birth</legend>
+
+        <div class="profile-grid">
+          <div class="field-group">
+            <label for="birthDate">Date of birth</label>
+            <input type="date" id="birthDate" />
+          </div>
+          <div class="field-group">
+            <label for="birthPlace">Place of birth</label>
+            <input type="text" id="birthPlace" maxlength="120" placeholder="Town, region, country" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="profile-section">
+        <legend>Estate</legend>
+
+        <div class="profile-grid">
+          <div class="field-group full">
+            <label>Current status</label>
+            <div class="tag-picker" id="statusPicker">
+              <div class="tag-pick active" data-val="alive">✦ Living</div>
+              <div class="tag-pick" data-val="deceased">† Departed</div>
+            </div>
+          </div>
+
+          <div class="field-group death-only" style="display:none;">
+            <label for="deathDate">Date of death</label>
+            <input type="date" id="deathDate" />
+          </div>
+          <div class="field-group death-only" style="display:none;">
+            <label for="deathPlace">Place of death</label>
+            <input type="text" id="deathPlace" maxlength="120" placeholder="Town, region, country" />
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="profile-actions">
+        <button type="submit" class="btn primary">⏵ Save &amp; continue</button>
+        <button type="button" class="btn" id="btnSignout">Sign out</button>
+      </div>
+
+      <div class="auth-status" id="status"></div>
+    </form>
+
+  </article>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supa.js"></script>
+<script src="js/auth.js"></script>
+<script>
+(async function () {
+  const $  = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+  await Auth.init();
+
+  // gate: must be logged in
+  if (!Auth.isLoggedIn()) { location.href = 'signup.html'; return; }
+  const user = Auth.currentUser();
+  if (!user) { await Auth.logout(); location.href = 'signup.html'; return; }
+
+  function setStatus(msg, kind) {
+    const el = $('#status');
+    if (!el) { alert(msg); return; }
+    el.textContent = msg;
+    el.className = 'auth-status ' + (kind || '');
+    if (msg) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      console.log('[profile] ' + (kind || 'info') + ': ' + msg);
+    }
+  }
+
+  // gender picker
+  $$('#genderPicker .tag-pick').forEach(t => t.addEventListener('click', () => {
+    $$('#genderPicker .tag-pick').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+  }));
+  function getGender() {
+    const a = $('#genderPicker .tag-pick.active');
+    return a ? a.dataset.val : 'unknown';
+  }
+  function setGender(val) {
+    $$('#genderPicker .tag-pick').forEach(x => x.classList.toggle('active', x.dataset.val === val));
+  }
+
+  // status picker
+  $$('#statusPicker .tag-pick').forEach(t => t.addEventListener('click', () => {
+    $$('#statusPicker .tag-pick').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    toggleDeathFields(t.dataset.val === 'deceased');
+  }));
+  function getStatus() {
+    const a = $('#statusPicker .tag-pick.active');
+    return a ? a.dataset.val : 'alive';
+  }
+  function setStatusVal(val) {
+    $$('#statusPicker .tag-pick').forEach(x => x.classList.toggle('active', x.dataset.val === val));
+    toggleDeathFields(val === 'deceased');
+  }
+  function toggleDeathFields(show) {
+    document.querySelectorAll('.death-only').forEach(el => el.style.display = show ? '' : 'none');
+  }
+
+  // photo upload — uploads to Supabase Storage immediately, stores URL.
+  let photoData = '';     // a URL string (or empty)
+  function renderPhoto() {
+    const p = $('#photoPreview');
+    if (photoData) {
+      p.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = photoData;
+      p.appendChild(img);
+    } else {
+      p.innerHTML = '<span class="ph">No likeness</span>';
+    }
+  }
+  $('#photoFile').addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    console.log('[profile] file selected:', f && f.name, f && f.size);
+    if (!f) return;
+    if (f.size > 8 * 1024 * 1024) { setStatus('Image too large (max 8 MB before resizing).', 'error'); e.target.value = ''; return; }
+    setStatus('Uploading photo…', '');
+    try {
+      photoData = await Photos.upload(f);
+      console.log('[profile] photo uploaded:', photoData);
+      renderPhoto();
+      setStatus('Photo ready ✓', 'success');
+      setTimeout(() => setStatus('', ''), 1500);
+    } catch (err) {
+      console.error('[profile] photo upload failed:', err);
+      setStatus('Upload failed: ' + (err.message || err), 'error');
+      e.target.value = '';
+    }
+  });
+  $('#btnPhotoClear').addEventListener('click', () => {
+    if (photoData) Photos.deleteByUrl(photoData);
+    photoData = '';
+    $('#photoFile').value = '';
+    renderPhoto();
+  });
+
+  // prefill if user already filled out their profile (re-edit)
+  if (user.profile) {
+    const p = user.profile;
+    $('#fullName').value   = p.fullName   || '';
+    $('#nickname').value   = p.nickname   || '';
+    $('#birthDate').value  = p.birthDate  || '';
+    $('#birthPlace').value = p.birthPlace || '';
+    $('#deathDate').value  = p.deathDate  || '';
+    $('#deathPlace').value = p.deathPlace || '';
+    setGender(p.gender || 'unknown');
+    setStatusVal(p.status || 'alive');
+    photoData = p.photo || '';
+    renderPhoto();
+  }
+
+  // sign out
+  $('#btnSignout').addEventListener('click', async () => {
+    if (!confirm('Sign out and return to the signup page?')) return;
+    await Auth.logout();
+    location.href = 'signup.html';
+  });
+
+  // submit
+  $('#profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    console.log('[profile] submit fired');
+    const profile = {
+      fullName:   $('#fullName').value.trim(),
+      nickname:   $('#nickname').value.trim(),
+      gender:     getGender(),
+      birthDate:  $('#birthDate').value || null,
+      birthPlace: $('#birthPlace').value.trim(),
+      status:     getStatus(),
+      deathDate:  getStatus() === 'deceased' ? ($('#deathDate').value || null) : null,
+      deathPlace: getStatus() === 'deceased' ? $('#deathPlace').value.trim() : '',
+      photo:      photoData,
+    };
+    console.log('[profile] gathered:', profile);
+    if (!profile.fullName) {
+      setStatus('⚠ Please enter your full name in the Identity section above.', 'error');
+      const nameInput = $('#fullName');
+      if (nameInput) { nameInput.focus(); nameInput.scrollIntoView({behavior:'smooth', block:'center'}); }
+      return;
+    }
+    setStatus('Saving…', '');
+    try {
+      await Auth.saveProfile(profile);
+
+      // Seed the family tree with the user as the founding entry — only if
+      // the tree is currently empty.
+      const u = Auth.currentUser();
+      if (u && (!u.people || u.people.length === 0)) {
+        await Auth.saveTree([{
+          id: 'p_self',
+          name: profile.fullName,
+          nickname: profile.nickname,
+          gender: profile.gender,
+          birthDate: profile.birthDate,
+          birthPlace: profile.birthPlace,
+          deceased: profile.status === 'deceased',
+          deathDate: profile.deathDate,
+          deathPlace: profile.deathPlace,
+          photo: profile.photo,
+          notes: '',
+          parentIds: [], partnerIds: [],
+          birthYear: profile.birthDate ? parseInt(profile.birthDate.slice(0,4), 10) : null,
+          deathYear: profile.deathDate ? parseInt(profile.deathDate.slice(0,4), 10) : null,
+          affected: false, carrier: false,
+          isSelf: true,
+        }]);
+      }
+
+      console.log('[profile] saved successfully, redirecting');
+      setStatus('Saved. Opening your dashboard…', 'success');
+      setTimeout(() => { location.href = 'dashboard.html'; }, 700);
+    } catch (err) {
+      console.error('[profile] save failed:', err);
+      setStatus('Save failed: ' + (err.message || err), 'error');
+    }
+  });
+})().catch(err => {
+  console.error('[profile] FATAL:', err);
+  alert('Page failed to initialise: ' + (err.message || err) + '\n\nOpen the browser console (F12) for details.');
+});
+</script>
 </body>
 </html>
