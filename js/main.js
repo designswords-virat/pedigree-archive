@@ -117,8 +117,28 @@
   });
 
   // ---- INIT ----
-  function init() {
-    demoData = Data.demo();
+  // Pick the data to show in the hero. If this browser has the user's
+  // own family tree saved (via Auth), use it as the hero background so
+  // the spotlight cycles through real members. Otherwise fall back to
+  // the bundled demo lineage so first-time visitors see something rich.
+  async function chooseHeroData() {
+    if (typeof Auth === 'undefined') return Data.demo();
+    try {
+      await Auth.init();
+      const u = Auth.currentUser();
+      const myPeople = u && Array.isArray(u.people) ? u.people : [];
+      if (myPeople.length >= 2) {
+        const title = (u.profile && u.profile.fullName)
+          ? (u.profile.fullName + '’s lineage')
+          : 'Your lineage';
+        return { people: myPeople, meta: { title } };
+      }
+    } catch (_) { /* fall through to demo */ }
+    return Data.demo();
+  }
+
+  async function init() {
+    demoData = await chooseHeroData();
 
     const svg = $('#pedigreeSvg');
     Pedigree.init(svg, { interactive: false });
