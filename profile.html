@@ -19,6 +19,8 @@
 
     <form id="profileForm" class="profile-form">
 
+      <div class="auth-status" id="status" style="margin-bottom:14px;"></div>
+
       <fieldset class="profile-section">
         <legend>Identity</legend>
 
@@ -123,8 +125,13 @@
 
   function setStatus(msg, kind) {
     const el = $('#status');
+    if (!el) { alert(msg); return; }
     el.textContent = msg;
     el.className = 'auth-status ' + (kind || '');
+    if (msg) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      console.log('[profile] ' + (kind || 'info') + ': ' + msg);
+    }
   }
 
   // gender picker
@@ -173,15 +180,19 @@
   }
   $('#photoFile').addEventListener('change', async (e) => {
     const f = e.target.files && e.target.files[0];
+    console.log('[profile] file selected:', f && f.name, f && f.size);
     if (!f) return;
     if (f.size > 8 * 1024 * 1024) { setStatus('Image too large (max 8 MB before resizing).', 'error'); e.target.value = ''; return; }
     setStatus('Uploading photo…', '');
     try {
       photoData = await Photos.upload(f);
+      console.log('[profile] photo uploaded:', photoData);
       renderPhoto();
-      setStatus('', '');
+      setStatus('Photo ready ✓', 'success');
+      setTimeout(() => setStatus('', ''), 1500);
     } catch (err) {
-      setStatus('Upload failed: ' + err.message, 'error');
+      console.error('[profile] photo upload failed:', err);
+      setStatus('Upload failed: ' + (err.message || err), 'error');
       e.target.value = '';
     }
   });
@@ -217,6 +228,7 @@
   // submit
   $('#profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log('[profile] submit fired');
     const profile = {
       fullName:   $('#fullName').value.trim(),
       nickname:   $('#nickname').value.trim(),
@@ -228,7 +240,14 @@
       deathPlace: getStatus() === 'deceased' ? $('#deathPlace').value.trim() : '',
       photo:      photoData,
     };
-    if (!profile.fullName) { setStatus('Please enter your full name.', 'error'); return; }
+    console.log('[profile] gathered:', profile);
+    if (!profile.fullName) {
+      setStatus('⚠ Please enter your full name in the Identity section above.', 'error');
+      const nameInput = $('#fullName');
+      if (nameInput) { nameInput.focus(); nameInput.scrollIntoView({behavior:'smooth', block:'center'}); }
+      return;
+    }
+    setStatus('Saving…', '');
     try {
       await Auth.saveProfile(profile);
 
@@ -256,13 +275,18 @@
         }]);
       }
 
+      console.log('[profile] saved successfully, redirecting');
       setStatus('Saved. Opening your dashboard…', 'success');
       setTimeout(() => { location.href = 'dashboard.html'; }, 700);
     } catch (err) {
-      setStatus(err.message, 'error');
+      console.error('[profile] save failed:', err);
+      setStatus('Save failed: ' + (err.message || err), 'error');
     }
   });
-})();
+})().catch(err => {
+  console.error('[profile] FATAL:', err);
+  alert('Page failed to initialise: ' + (err.message || err) + '\n\nOpen the browser console (F12) for details.');
+});
 </script>
 </body>
 </html>
