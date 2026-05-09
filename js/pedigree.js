@@ -648,15 +648,14 @@ const Pedigree = (() => {
   // transform="translate(x,y)" attribute that positions it within the layout;
   // a CSS transform would override that and stack every portrait at the origin.
   const EXPORT_CSS = `
-    .frame-back { fill: #1c1812; stroke: #8b6f1f; stroke-width: 1; }
-    .frame-ring { fill: none; stroke: #cba656; stroke-width: 2.4; }
-    .frame-ring-inner { fill: none; stroke: #f1d68a; stroke-width: 0.8; opacity: 0.7; }
-    .label-cartouche { fill: #1c1812; stroke: #8b6f1f; stroke-width: 0.8; }
-    .node-label { fill: #f1d68a; font-family: 'Cinzel', 'Trajan Pro', Georgia, serif; font-weight: 600; font-size: 14px; letter-spacing: 0.15em; }
-    .node-years { fill: #a0906a; font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-style: italic; font-size: 14px; }
-    .mating-line   { stroke: #cba656; stroke-width: 1.8; opacity: 0.85; fill: none; stroke-linecap: round; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important; }
-    .parent-branch { stroke: #cba656; stroke-width: 1.6; opacity: 0.85; fill: none; stroke-linecap: round; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important; }
-    .junction-rose { fill: #9c2330; stroke: #f1d68a; stroke-width: 0.8; opacity: 1 !important; animation: none !important; }
+    .frame-back { fill: #efe8d6; stroke: #8a6d20; stroke-width: 1; }
+    .frame-ring { fill: none; stroke: #b8932c; stroke-width: 2.4; }
+    .frame-ring-inner { fill: none; stroke: #8a6d20; stroke-width: 0.8; opacity: 0.55; }
+    .node-label { fill: #1a2540; font-family: 'Cinzel', 'Trajan Pro', Georgia, serif; font-weight: 500; font-size: 14px; letter-spacing: 0.18em; }
+    .node-years { fill: #6b7184; font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-style: italic; font-size: 14px; }
+    .mating-line   { stroke: #b8932c; stroke-width: 1.8; opacity: 0.85; fill: none; stroke-linecap: round; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important; }
+    .parent-branch { stroke: #b8932c; stroke-width: 1.6; opacity: 0.85; fill: none; stroke-linecap: round; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important; }
+    .junction-rose { fill: #6b1226; stroke: #b8932c; stroke-width: 0.8; opacity: 1 !important; animation: none !important; }
     .node-group { opacity: 1 !important; animation: none !important; }
     .node-photo { opacity: 1 !important; animation: none !important; }
     .node-add-btn, .node-id { display: none !important; }
@@ -665,7 +664,7 @@ const Pedigree = (() => {
   function exportImage(opts = {}) {
     const filename = opts.filename || 'family-tree.jpg';
     const scale    = opts.scale    || 2;       // 2× pixel density for print
-    const bgColor  = opts.bgColor  || '#0a0805';
+    const bgColor  = opts.bgColor  || '#fbf8f1';
     const format   = opts.format   || 'image/jpeg';
     const quality  = opts.quality !== undefined ? opts.quality : 0.92;
     const maxPx    = opts.maxPixels || 16000;  // cap on either side
