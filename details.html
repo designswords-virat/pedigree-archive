@@ -233,7 +233,7 @@
 
 <div class="toast-stack" id="toasts"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="js/config.js"></script>
 <script src="js/supa.js"></script>
 <script src="js/auth.js"></script>
@@ -243,10 +243,9 @@
   const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
   await Auth.init();
-
-  if (!Auth.isLoggedIn()) { location.href = 'signup.html'; return; }
+  // No auth gate — single-browser mode. Auth.currentUser() always returns
+  // a valid (possibly empty) record.
   const sessionUser = Auth.currentUser();
-  if (!sessionUser) { await Auth.logout(); location.href = 'signup.html'; return; }
 
   // --- determine source ---
   const params = new URLSearchParams(location.search);
@@ -269,8 +268,10 @@
   } else {
     target = sessionUser.profile || {};
     backHref = 'dashboard.html';
-    headName = (sessionUser.profile && sessionUser.profile.fullName) || sessionUser.email;
-    headEyebrow = 'Your extended details';
+    headName = (sessionUser.profile && sessionUser.profile.fullName) || 'Your Particulars';
+    headEyebrow = (sessionUser.profile && sessionUser.profile.fullName)
+                    ? 'Your extended details'
+                    : 'Tell us about yourself';
   }
 
   $('#dHeadName').textContent = headName;

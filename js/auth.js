@@ -1,196 +1,87 @@
 // ============================================================
-// AUTH — Supabase backend.
+// AUTH — localStorage-only, no signup or login.
 //
-// Same API surface as the old localStorage version so the rest of
-// the app doesn't change much. The one new thing every page must do
-// is call `await Auth.init()` once at boot, which fetches the
-// current session and the matching profiles row and caches them.
-// After that, the synchronous getters (currentUser / isLoggedIn /
-// isAdmin) work as before.
+// Each browser is its own world. The site is open to anyone who
+// arrives — they go straight from landing → details → dashboard
+// without registering. All their data (profile, extended details,
+// family tree) lives in this one localStorage key.
+//
+// Same public API as the previous Supabase-backed version, so the
+// rest of the app didn't have to change. Auth.init() is a no-op,
+// every call returns immediately, and isLoggedIn() is always true.
 // ============================================================
 
 const Auth = (() => {
-  let _user = null;            // cached profile row (incl. user_id, email, profile, extended, people, is_admin)
-  let _initPromise = null;
-  let _authSubscription = null;
+  const KEY = 'pa_local_v1';
 
-  function supa() { return window.supabaseClient; }
-
-  function friendly(err) {
-    const msg = (err && err.message) || String(err || '');
-    if (/already registered|already exists/i.test(msg)) return 'An account with that email already exists.';
-    if (/Invalid login/i.test(msg)) return 'Incorrect email or password.';
-    if (/Email not confirmed/i.test(msg)) return 'Please confirm your email before signing in (check your inbox).';
-    if (/Password should be at least/i.test(msg)) return 'Password must be at least 6 characters.';
-    if (/rate limit/i.test(msg)) return 'Too many attempts — please wait a minute and try again.';
-    return msg;
-  }
-
-  // Re-fetches the profile row for the current authed user. Returns null if signed out.
-  async function loadCurrent() {
-    const s = supa();
-    if (!s) return null;
-    const { data: { user }, error: uErr } = await s.auth.getUser();
-    if (uErr || !user) return null;
-
-    const { data, error } = await s
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .maybeSingle();
-    if (error) {
-      console.error('profiles fetch failed', error);
-      return null;
-    }
-    if (data) return data;
-
-    // Fallback: trigger should have created the row, but if it didn't (e.g.
-    // schema not applied yet), make a best-effort insert.
-    const { data: inserted } = await s
-      .from('profiles')
-      .insert({ user_id: user.id, email: user.email })
-      .select()
-      .maybeSingle();
-    return inserted || { user_id: user.id, email: user.email, people: [] };
-  }
-
-  function bindAuthListener() {
-    if (_authSubscription) return;
-    const s = supa();
-    if (!s) return;
-    _authSubscription = s.auth.onAuthStateChange(async (event /* , session */) => {
-      if (event === 'SIGNED_OUT') { _user = null; return; }
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-        _user = await loadCurrent();
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return parsed;
       }
-    });
+    } catch (e) { /* fall through */ }
+    return { profile: null, extended: null, people: [] };
   }
+  function persist(data) {
+    try { localStorage.setItem(KEY, JSON.stringify(data)); }
+    catch (e) {
+      // Most likely QuotaExceededError from too many big base64 photos.
+      throw new Error('Browser storage is full — please remove some uploaded photos.');
+    }
+  }
+
+  let _user = load();
 
   return {
-    /** Call once on every page load before any sync getters. Idempotent. */
-    async init() {
-      if (_initPromise) return _initPromise;
-      _initPromise = (async () => {
-        bindAuthListener();
-        _user = await loadCurrent();
-        return _user;
-      })();
-      return _initPromise;
-    },
-
-    // ----- session getters (sync, use after init()) -----
-    isLoggedIn:    () => !!_user,
+    // ----- session (no-ops in single-user mode) -----
+    async init() { _user = load(); return _user; },
+    isLoggedIn:    () => true,
     currentUser:   () => _user,
-    currentEmail:  () => _user && _user.email,
-    isAdmin:       () => !!(_user && _user.is_admin),
-    // legacy alias used by some pages
-    isAdminLoggedIn: function () { return this.isAdmin(); },
+    currentEmail:  () => '',
+    isAdmin:       () => true,
+    isAdminLoggedIn() { return true; },
 
-    // ----- signup / login / logout -----
-    async signup(email, password) {
-      const s = supa();
-      if (!s) throw new Error('Supabase not configured');
-      email = String(email || '').trim().toLowerCase();
-      const { data, error } = await s.auth.signUp({ email, password });
-      if (error) throw new Error(friendly(error));
-
-      // The trigger creates the profile row; reload our cached state.
-      _initPromise = null;
-      _user = await loadCurrent();
-
-      // If email confirmation is required, the user object exists but no
-      // session yet. Surface that so the UI can tell the user to check inbox.
-      const sessionExists = !!(data && data.session);
-      return { user: _user, requiresEmailConfirmation: !sessionExists };
-    },
-
-    async login(email, password) {
-      const s = supa();
-      if (!s) throw new Error('Supabase not configured');
-      email = String(email || '').trim().toLowerCase();
-      const { error } = await s.auth.signInWithPassword({ email, password });
-      if (error) throw new Error(friendly(error));
-      _initPromise = null;
-      _user = await loadCurrent();
-      return _user;
-    },
-
+    // ----- signup / login / logout — kept as harmless no-ops so any
+    //       leftover call sites don't crash -----
+    async signup() { return { user: _user, requiresEmailConfirmation: false }; },
+    async login()  { return _user; },
     async logout() {
-      const s = supa();
-      if (s) await s.auth.signOut();
-      _user = null;
-      _initPromise = null;
+      if (!confirm('Clear all of your data from this browser? This cannot be undone.')) return;
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      _user = { profile: null, extended: null, people: [] };
     },
-
-    async resetPassword(email) {
-      const s = supa();
-      if (!s) throw new Error('Supabase not configured');
-      email = String(email || '').trim().toLowerCase();
-      const redirectTo = location.origin + '/signup.html?mode=login';
-      const { error } = await s.auth.resetPasswordForEmail(email, { redirectTo });
-      if (error) throw new Error(friendly(error));
-    },
+    async resetPassword() { /* no-op */ },
 
     // ----- profile / tree persistence -----
     async saveProfile(profile) {
-      const s = supa();
-      if (!_user) throw new Error('Not signed in');
-      const updates = {
-        profile,
-        updated_at: new Date().toISOString(),
-      };
-      const { error } = await s.from('profiles').update(updates).eq('user_id', _user.user_id);
-      if (error) throw error;
-      _user = { ..._user, ...updates };
+      _user = { ..._user, profile };
+      persist(_user);
       return profile;
     },
-
     async saveExtended(extended) {
-      const s = supa();
-      if (!_user) throw new Error('Not signed in');
-      const updates = {
-        extended,
-        updated_at: new Date().toISOString(),
-      };
-      const { error } = await s.from('profiles').update(updates).eq('user_id', _user.user_id);
-      if (error) throw error;
-      _user = { ..._user, ...updates };
+      _user = { ..._user, extended };
+      persist(_user);
     },
-
     async saveTree(people) {
-      const s = supa();
-      if (!_user) throw new Error('Not signed in');
-      const updates = {
-        people: Array.isArray(people) ? people : [],
-        updated_at: new Date().toISOString(),
-      };
-      const { error } = await s.from('profiles').update(updates).eq('user_id', _user.user_id);
-      if (error) throw error;
-      _user = { ..._user, ...updates };
+      _user = { ..._user, people: Array.isArray(people) ? people : [] };
+      persist(_user);
     },
 
-    // ----- admin (anyone with profiles.is_admin = true) -----
-    async listAllUsers() {
-      const s = supa();
-      const { data, error } = await s.from('profiles').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
-
-    /**
-     * Delete a user's profile row. The corresponding auth.users entry needs
-     * to be removed via the Supabase dashboard (or a server-side Edge
-     * Function with the service-role key) — we can only remove what RLS
-     * policies allow with the anon key.
-     */
-    async deleteUser(userId) {
-      const s = supa();
-      const { error } = await s.from('profiles').delete().eq('user_id', userId);
-      if (error) throw error;
-    },
-
-    // legacy stubs used by old admin code — admin is now a flag, not a key
-    async adminLogin() { return this.isAdmin(); },
-    adminLogout() { /* no-op; signing out clears it */ },
+    // ----- legacy admin stubs (single-user mode has no admin needs) -----
+    async listAllUsers() { return [{
+      user_id: 'local',
+      email: '',
+      profile: _user.profile,
+      extended: _user.extended,
+      people: _user.people,
+      created_at: null,
+      is_admin: true,
+    }]; },
+    async deleteUser() { return this.logout(); },
+    async adminLogin() { return true; },
+    adminLogout() { /* no-op */ },
+    async setAdminPassword() { /* no-op */ },
   };
 })();

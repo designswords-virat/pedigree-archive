@@ -8,10 +8,9 @@
 
   await Auth.init();
 
-  if (!Auth.isLoggedIn()) { location.href = 'signup.html'; return; }
+  // No auth gate. If they haven't filled the form yet, route them through it.
   const sessionUser = Auth.currentUser();
-  if (!sessionUser) { await Auth.logout(); location.href = 'signup.html'; return; }
-  if (!sessionUser.profile) { location.href = 'profile.html'; return; }
+  if (!sessionUser || !sessionUser.profile) { location.href = 'details.html'; return; }
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));

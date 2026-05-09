@@ -12,11 +12,10 @@
 
   await Auth.init();
 
-  // ---- gate ----
-  if (!Auth.isLoggedIn()) { location.href = 'signup.html'; return; }
+  // No auth gate. If the user hasn't filled in their basics yet, send
+  // them to the details form first so the tree has a starting node.
   const sessionUser = Auth.currentUser();
-  if (!sessionUser) { await Auth.logout(); location.href = 'signup.html'; return; }
-  if (!sessionUser.profile) { location.href = 'profile.html'; return; }
+  if (!sessionUser || !sessionUser.profile) { location.href = 'details.html'; return; }
 
   // ---- helpers ----
   function newId() {
@@ -221,8 +220,10 @@
         btn.textContent = original;
       }
     });
-    $('#btnSignout').addEventListener('click', async () => {
-      if (!confirm('Sign out?')) return;
+    // "Sign out" was renamed to "Reset" in single-browser mode — and
+    // its old handler is gone. The button isn't in the new toolbar.
+    const sout = $('#btnSignout');
+    if (sout) sout.addEventListener('click', async () => {
       await Auth.logout();
       location.href = 'index.html';
     });

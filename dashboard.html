@@ -22,7 +22,7 @@
     <div class="toolbar">
       <a class="btn" href="index.html" title="Public landing">⌂ Landing</a>
       <a class="btn" href="details.html?source=self" id="btnDetails">✎ Edit Details</a>
-      <button class="btn danger" id="btnSignout">⏻ Sign out</button>
+      <button class="btn danger" id="btnReset" title="Clear all data from this browser">⟲ Reset</button>
     </div>
   </header>
 
@@ -70,7 +70,7 @@
   </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="js/config.js"></script>
 <script src="js/supa.js"></script>
 <script src="js/auth.js"></script>
@@ -80,16 +80,16 @@
 
   await Auth.init();
 
-  if (!Auth.isLoggedIn()) { location.href = 'signup.html'; return; }
+  // No auth gate. If the user hasn't filled in their details yet, send them
+  // to the form. (No accounts, no signup — this is single-browser mode.)
   const user = Auth.currentUser();
-  if (!user) { await Auth.logout(); location.href = 'signup.html'; return; }
-  if (!user.profile) { location.href = 'profile.html'; return; }
+  if (!user || !user.profile) { location.href = 'details.html'; return; }
 
   const p = user.profile;
 
   // header
   $('#brandTitle').textContent    = (p.fullName || 'Your Family') + '’s Book';
-  $('#brandSubtitle').textContent = 'Signed in as ' + user.email;
+  $('#brandSubtitle').textContent = 'Welcome back';
 
   // portrait
   const frame = $('#psFrame');
@@ -120,10 +120,9 @@
     $('#psDeathPlace').textContent = p.deathPlace || '—';
   }
 
-  // actions — Edit Details is now an <a> link, no JS needed
-  $('#btnSignout').addEventListener('click', async () => {
-    if (!confirm('Sign out?')) return;
-    await Auth.logout();
+  // Reset wipes all the data this browser has stored.
+  $('#btnReset').addEventListener('click', async () => {
+    await Auth.logout();   // (in single-user mode, logout = clear local data)
     location.href = 'index.html';
   });
 })();

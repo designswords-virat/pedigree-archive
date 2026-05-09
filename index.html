@@ -45,8 +45,8 @@
       joined by the threads of generation. An heirloom for your house —
       built in a quiet hour.
     </p>
-    <a class="hero-cta" href="mailto:designs.words@gmail.com?subject=Pedigree%20Archive%20%E2%80%94%20notify%20me&body=I%27d%20like%20to%20know%20when%20Pedigree%20Archive%20opens.%20Here%27s%20my%20email%3A">Notify Me When It Opens</a>
-    <span class="hero-sub-link" style="cursor:default;">— launching soon</span>
+    <a class="hero-cta" href="details.html" id="ctaMain">Develop Your Family Tree</a>
+    <a class="hero-sub-link" href="dashboard.html" id="ctaSub" style="display:none;">— or open your existing book</a>
   </section>
 
   <!-- floating caption (positioned by main.js to follow the spotlight) -->
@@ -61,5 +61,30 @@
 <script src="js/sounds.js"></script>
 <script src="js/pedigree.js"></script>
 <script src="js/main.js"></script>
+<script>
+// Smart CTA — if this browser already has saved tree data, swap the
+// primary CTA to "Open Your Book" → dashboard, and reveal the small
+// secondary link to start fresh from the form. Visitors with no data
+// see the original "Develop Your Family Tree" → details flow.
+(function () {
+  try {
+    const raw = localStorage.getItem('pa_local_v1');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (!data || !data.profile || !data.profile.fullName) return;
+    const cta = document.getElementById('ctaMain');
+    const sub = document.getElementById('ctaSub');
+    if (cta) {
+      cta.textContent = 'Open Your Book';
+      cta.href = 'dashboard.html';
+    }
+    if (sub) {
+      sub.textContent = '— or start a fresh one';
+      sub.href = 'details.html';
+      sub.style.display = '';
+    }
+  } catch (e) { /* keep default CTA */ }
+})();
+</script>
 </body>
 </html>
