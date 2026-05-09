@@ -351,9 +351,17 @@ const Pedigree = (() => {
         x: NODE_W / 2, y: cartTop + 12,
         class: 'node-label', 'text-anchor': 'middle'
       }, group);
+      // Cinzel small-caps with letter-spacing renders wider than a naive
+      // char-count would suggest, so any line that would overflow the
+      // cartouche gets squeezed to fit via SVG's textLength.
+      const maxLineW = cartW - 12;
       nameLines.forEach((ln, i) => {
         const ts = el('tspan', { x: NODE_W / 2, dy: i === 0 ? 0 : CART_HEIGHT }, label);
         ts.textContent = ln.toUpperCase();
+        if (ln.length * 13 > maxLineW) {
+          ts.setAttribute('textLength', String(maxLineW));
+          ts.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+        }
       });
 
       if (years.length) {
