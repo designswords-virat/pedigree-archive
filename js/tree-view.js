@@ -194,6 +194,14 @@
       if (Pedigree.setScrollMode)   Pedigree.setScrollMode(!isFull);
       if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(!isFull);
       $('#stage').scrollTo({ top: 0 });
+      // Defensive re-fit: render schedules its own fitToView at 50ms,
+      // but on small trees the SVG hasn't always reflowed by then so
+      // the bounding box ends up offset. A second fit at 300ms lands
+      // on the settled layout. Idempotent for already-centred trees.
+      if (!isFull) return;
+      if (Pedigree.fitToView) {
+        setTimeout(() => { try { Pedigree.fitToView(); } catch (_) {} }, 300);
+      }
     }
     $('#btnLayoutWrap').addEventListener('click', () => applyLayout('wrap'));
     $('#btnLayoutFull').addEventListener('click', () => applyLayout('full'));
