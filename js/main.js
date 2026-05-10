@@ -180,10 +180,10 @@
 
     const svg = $('#pedigreeSvg');
     Pedigree.init(svg, { interactive: false });
-    // Render the hero tree the same way tree-view.html does: full
-    // chart layout (every generation on one horizontal line, no
-    // wrapped sub-rows). No scroll-mode — the SVG fits the viewport.
-    if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
+    // Render the hero tree the same way tree-view.html does in its
+    // default "Compact" mode: wrapped sibling sub-rows, fitted to the
+    // viewport (scrollMode off so the hero stays one-screen).
+    if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(true);
     if (Pedigree.setScrollMode)   Pedigree.setScrollMode(false);
 
     // chooseHeroData() always returns *some* tree (saved or placeholder),
