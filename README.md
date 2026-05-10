@@ -48,7 +48,6 @@ js/sounds.js         Soft chime SFX (synthesised in-browser)
 js/click-sound.js    Plays Sound.click() on every clickable element
 js/supa.js           Photo upload (resizes to 480x600 JPEG, base64)
 js/config.js         Empty config stub (kept so older callers don't crash)
-js/data.js           The bundled demo lineage shown on the public landing
 
 netlify.toml         Netlify deploy config (publish=root, no build)
 .gitignore
