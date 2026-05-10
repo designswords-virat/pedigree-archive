@@ -2703,6 +2703,21 @@ body:has(.landing) .spotlight-caption { display: none; }
   border-color: var(--gold);
 }
 
+/* dashboard empty-state card (book has no profile yet) */
+.ps-empty {
+  text-align: center;
+  padding: 36px 24px 28px;
+}
+.ps-empty h2 { margin-bottom: 10px; }
+.ps-empty .lead {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--parchment-dim);
+  margin: 0 0 24px;
+}
+.ps-empty .btn { padding: 12px 22px; }
+
 .auth-foot {
   text-align: center;
   margin-top: 22px;
