@@ -34,6 +34,7 @@ const Pedigree = (() => {
   let editMode = false;       // when true, draws a '+' add button on each node
   let scrollMode = false;     // when true, SVG flows naturally and grows on scroll
   let wrapSiblings = true;    // when true, wide sibling rows wrap into stacked sub-rows
+  let branchStyle = 'curve';  // 'curve' (default) | 'angular' (right-angle bracket)
   let scrollObserver = null;
 
   let isVertical = false;
@@ -445,15 +446,25 @@ const Pedigree = (() => {
   // sweeping out to the child, straight again at the child top. xy() flips the
   // axes for vertical (mobile) mode automatically.
   function drawCurve(lx1, ly1, lx2, ly2, parent, cls) {
-    const ldy = ly2 - ly1;
-    const lc1y = ly1 + ldy * 0.5;
-    const lc2y = ly2 - ldy * 0.5;
-    const [x1, y1]   = xy(lx1, ly1);
-    const [c1x, c1y] = xy(lx1, lc1y);
-    const [c2x, c2y] = xy(lx2, lc2y);
-    const [x2, y2]   = xy(lx2, ly2);
+    const [x1, y1] = xy(lx1, ly1);
+    const [x2, y2] = xy(lx2, ly2);
+    let d;
+    if (branchStyle === 'angular') {
+      // orthogonal: drop straight from parent, run horizontally to the
+      // child's column, then drop straight to the child. Reads as a
+      // classic genealogy-chart bracket.
+      const midY = (y1 + y2) / 2;
+      d = `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+    } else {
+      const ldy = ly2 - ly1;
+      const lc1y = ly1 + ldy * 0.5;
+      const lc2y = ly2 - ldy * 0.5;
+      const [c1x, c1y] = xy(lx1, lc1y);
+      const [c2x, c2y] = xy(lx2, lc2y);
+      d = `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
+    }
     return el('path', {
-      d: `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`,
+      d,
       pathLength: 1,
       fill: 'none',
       class: cls
@@ -996,6 +1007,13 @@ const Pedigree = (() => {
     // drawn on a single horizontal row (the "full tree" view).
     setWrapSiblings(bool) {
       wrapSiblings = bool !== false;
+      if (currentData) this.render(currentData);
+    },
+
+    // Switch how parent-to-child lines are drawn between curved Bezier
+    // ('curve', default) and right-angle orthogonal ('angular').
+    setBranchStyle(style) {
+      branchStyle = (style === 'angular') ? 'angular' : 'curve';
       if (currentData) this.render(currentData);
     },
 

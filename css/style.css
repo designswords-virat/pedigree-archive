@@ -3746,6 +3746,10 @@ input[type="date"]:focus {
   overflow-y: auto;
   overflow-x: hidden;
   display: block;
+  /* bottom padding so the last portrait clears the bottom bar and is
+     fully scrollable into view (rather than hugging the viewport edge) */
+  scroll-padding-bottom: 120px;
+  padding-bottom: 120px;
 }
 .stage.scroll-mode svg {
   width: 100%;

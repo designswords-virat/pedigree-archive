@@ -150,6 +150,15 @@
       scrollMode: true,                                // tall scrollable tree
       onSelect: (person) => openInspector(person.id),
     });
+    // restore the persisted branch-style choice before first render
+    const savedBranch = (() => {
+      try { return localStorage.getItem('pa_branch_style'); } catch (_) { return null; }
+    })();
+    if (savedBranch === 'angular' && Pedigree.setBranchStyle) {
+      Pedigree.setBranchStyle('angular');
+      $$('#btnBranchCurve, #btnBranchAngular').forEach(b =>
+        b.classList.toggle('active', b.dataset.branch === 'angular'));
+    }
     Pedigree.render({ people, meta: { title: 'Your Tree' } });
 
     $('#statCount').textContent = String(people.length).padStart(2, '0');
@@ -205,6 +214,15 @@
     }
     $('#btnLayoutWrap').addEventListener('click', () => applyLayout('wrap'));
     $('#btnLayoutFull').addEventListener('click', () => applyLayout('full'));
+
+    function applyBranchStyle(style) {
+      $$('#btnBranchCurve, #btnBranchAngular').forEach(b =>
+        b.classList.toggle('active', b.dataset.branch === style));
+      if (Pedigree.setBranchStyle) Pedigree.setBranchStyle(style);
+      try { localStorage.setItem('pa_branch_style', style); } catch (_) {}
+    }
+    $('#btnBranchCurve')  .addEventListener('click', () => applyBranchStyle('curve'));
+    $('#btnBranchAngular').addEventListener('click', () => applyBranchStyle('angular'));
 
     $('#btnDownload').addEventListener('click', async () => {
       const btn = $('#btnDownload');

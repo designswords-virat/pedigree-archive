@@ -334,6 +334,13 @@
       onSelect: (person) => openInspector(person.id),
       onAdd:    (person) => openKinPanel(person.id),
     });
+    // honour the branch style chosen on tree-view, if any
+    try {
+      const savedBranch = localStorage.getItem('pa_branch_style');
+      if (savedBranch === 'angular' && Pedigree.setBranchStyle) {
+        Pedigree.setBranchStyle('angular');
+      }
+    } catch (_) {}
     loadTree();
     renderTree();
 
