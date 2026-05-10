@@ -6,10 +6,14 @@
 // ============================================================
 (function () {
   const SEEN_KEY = 'pa_demo_seen';
-  // skip if already shown OR if a query string forces it off (?nodemo=1)
+  // skip if already shown, or query string forces it off (?nodemo=1),
+  // or this browser already has credentials set up / a saved tree
+  // (returning users don't need a tour).
   try {
     if (location.search.indexOf('nodemo') !== -1) return;
     if (localStorage.getItem(SEEN_KEY)) return;
+    if (localStorage.getItem('pa_gate'))    return;   // credentials exist
+    if (localStorage.getItem('pa_local_v1')) return;  // some saved data
   } catch (_) {}
 
   // ---------- DOM ----------
