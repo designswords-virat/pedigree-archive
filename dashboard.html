@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Your Book — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=31" />
+<link rel="stylesheet" href="css/style.css?v=32" />
 </head>
 <body>
 
@@ -23,6 +23,9 @@
     <div class="toolbar">
       <a class="btn" href="index.html" title="Public landing">⌂ Landing</a>
       <a class="btn" href="details.html?source=self" id="btnDetails">✎ Edit Details</a>
+      <button class="btn" id="btnExport" title="Download your book as a JSON file (carry to another device)">⤓ Export</button>
+      <button class="btn" id="btnImport" title="Restore from a JSON file you exported earlier">⤒ Import</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden />
       <button class="btn" id="btnLogout" title="Lock this browser">⊙ Logout</button>
       <button class="btn danger" id="btnReset" title="Clear all data from this browser">⟲ Reset</button>
     </div>
@@ -73,14 +76,14 @@
 </div>
 
 
-<script src="js/config.js?v=31"></script>
-<script src="js/supa.js?v=31"></script>
-<script src="js/gate.js?v=31"></script>
+<script src="js/config.js?v=32"></script>
+<script src="js/supa.js?v=32"></script>
+<script src="js/gate.js?v=32"></script>
 <script>Gate.require();</script>
-<script src="js/auth.js?v=31"></script>
-<script src="js/sounds.js?v=31"></script>
-<script src="js/click-sound.js?v=31"></script>
-<script src="js/theme.js?v=31"></script>
+<script src="js/auth.js?v=32"></script>
+<script src="js/sounds.js?v=32"></script>
+<script src="js/click-sound.js?v=32"></script>
+<script src="js/theme.js?v=32"></script>
 <script>
 (async function () {
   const $ = (s) => document.querySelector(s);
@@ -139,6 +142,76 @@
     Gate.logout();
     location.href = 'login.html';
   });
+
+  // ----- Export: download the whole book (profile + tree + credentials
+  //               + theme) as a single JSON file. Carry the file to
+  //               another device, run Import, log in with the same
+  //               username + password — your tree appears.
+  $('#btnExport').addEventListener('click', () => {
+    try {
+      const payload = {
+        version:    1,
+        product:    'pedigree-archive',
+        exportedAt: new Date().toISOString(),
+        gate:       safeRead('pa_gate'),
+        user:       safeRead('pa_local_v1'),
+        theme:      localStorage.getItem('pa_theme') || null,
+      };
+      const stem = (p.fullName || 'family-tree')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const date = new Date().toISOString().slice(0, 10);
+      const filename = `pedigree-${stem}-${date}.json`;
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    } catch (err) {
+      alert('Export failed: ' + (err.message || err));
+    }
+  });
+
+  // ----- Import: restore from a JSON file. Asks before overwriting.
+  $('#btnImport').addEventListener('click', () => $('#importFile').click());
+
+  $('#importFile').addEventListener('change', async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data || data.product !== 'pedigree-archive') {
+        throw new Error('That file is not a Pedigree Archive export.');
+      }
+      const peopleCount = (data.user && Array.isArray(data.user.people))
+        ? data.user.people.length : 0;
+      const haveCreds   = !!(data.gate && data.gate.id && data.gate.hash);
+      const msg = `Import this book? It will REPLACE everything currently saved on this device:\n`
+        + `  • profile + ${peopleCount} ${peopleCount === 1 ? 'person' : 'people'}\n`
+        + (haveCreds ? `  • the username + password from the file\n` : '')
+        + (data.theme ? `  • theme: ${data.theme}\n` : '')
+        + `\nThis cannot be undone. Continue?`;
+      if (!confirm(msg)) return;
+
+      if (data.user)  localStorage.setItem('pa_local_v1', JSON.stringify(data.user));
+      if (data.gate)  localStorage.setItem('pa_gate',     JSON.stringify(data.gate));
+      if (data.theme) localStorage.setItem('pa_theme',    data.theme);
+
+      alert('Import complete. The page will reload.');
+      location.reload();
+    } catch (err) {
+      alert('Import failed: ' + (err.message || err));
+    }
+  });
+
+  function safeRead(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) { return null; }
+  }
 })();
 </script>
 </body>
