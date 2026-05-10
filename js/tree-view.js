@@ -181,10 +181,16 @@
     //   Full tree = fit-to-canvas + every generation on one line (chart view)
     // Flipping both modes together makes the change unmistakable even for
     // tiny trees where wrap/no-wrap alone would render identically.
+    //
+    // The .scroll-mode class on .stage governs the OUTER scroll container
+    // (overflow-y:auto and SVG height:auto). Without toggling it, switching
+    // to Full Tree still left the stage scrollable, so the chart appeared
+    // squashed into a scrollable strip instead of fitting the viewport.
     function applyLayout(mode) {
       const isFull = (mode === 'full');
       document.querySelectorAll('.vt-btn').forEach(b =>
         b.classList.toggle('active', b.dataset.layout === mode));
+      $('#stage').classList.toggle('scroll-mode', !isFull);
       if (Pedigree.setScrollMode)   Pedigree.setScrollMode(!isFull);
       if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(!isFull);
       $('#stage').scrollTo({ top: 0 });
