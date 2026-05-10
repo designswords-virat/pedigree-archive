@@ -112,9 +112,29 @@
   window.addEventListener('pedigree-orient-change', () => {
     if (!demoData) return;
     Pedigree.render(demoData);
+    sprinkleHeroGlow();
     // rendering wipes the spotlight; restart on a delay so the tree settles
     setTimeout(() => { if (lastSubjectId) showSpotlight(lastSubjectId); }, 350);
   });
+
+  // Apply a random `--glow-delay` CSS variable to each branch / rose /
+  // portrait in the hero tree so the CSS pulse animations stagger.
+  function sprinkleHeroGlow() {
+    const lines = document.querySelectorAll(
+      '.landing .lines-layer .parent-branch, .landing .lines-layer .mating-line'
+    );
+    lines.forEach(el => {
+      el.style.setProperty('--glow-delay', (Math.random() * 7).toFixed(2) + 's');
+    });
+    const roses = document.querySelectorAll('.landing .junction-rose-group .junction-rose');
+    roses.forEach(el => {
+      el.style.setProperty('--glow-delay', (Math.random() * 9).toFixed(2) + 's');
+    });
+    const nodes = document.querySelectorAll('.landing .nodes-layer .node-group');
+    nodes.forEach(el => {
+      el.style.setProperty('--glow-delay', (Math.random() * 10).toFixed(2) + 's');
+    });
+  }
 
   // ---- INIT ----
   // Pick the data to show in the hero. If this browser has the user's
@@ -147,6 +167,11 @@
     // wrapped sub-rows. Must be called before render.
     if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
     Pedigree.render(demoData);
+
+    // Sprinkle randomised animation-delays across every branch, junction
+    // and portrait so the hero glow breathes asynchronously rather than
+    // pulsing in unison. CSS handles the actual animation.
+    sprinkleHeroGlow();
 
     // small entrance sound — soft chime on load (will be silent until the
     // visitor interacts, due to browser autoplay policy; that's fine)
