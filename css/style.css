@@ -1569,37 +1569,46 @@ input[type="checkbox"]:checked::after {
 
 /* Each branch gently pulses a warm gold glow on a long, randomised
    cycle. main.js sets --glow-delay per element so the lines breathe
-   independently rather than blinking in unison. */
+   independently rather than blinking in unison.
+
+   IMPORTANT: the base style sets stroke-dasharray:1 / stroke-dashoffset:1
+   with a one-shot drawLine animation using `forwards`. When we override
+   `animation` here the `forwards` no longer holds dashoffset at 0, so we
+   must reset dasharray/dashoffset explicitly to keep the lines visible. */
 .landing .lines-layer .parent-branch,
 .landing .lines-layer .mating-line {
   stroke: var(--gold);
-  opacity: 0.18;
-  animation: heroBranchPulse 7s ease-in-out infinite;
+  stroke-dasharray: none !important;
+  stroke-dashoffset: 0 !important;
+  opacity: 0.25;
+  filter: none;
+  animation: heroBranchPulse 6s ease-in-out infinite;
   animation-delay: var(--glow-delay, 0s);
   will-change: opacity, filter;
 }
 .landing .junction-rose-group .junction-rose {
-  animation: heroRosePulse 9s ease-in-out infinite;
+  opacity: 0.4;
+  animation: heroRosePulse 8s ease-in-out infinite;
   animation-delay: var(--glow-delay, 0s);
 }
 
 @keyframes heroBranchPulse {
-  0%, 100% { opacity: 0.14; filter: none; }
-  50%      { opacity: 0.55; filter: drop-shadow(0 0 5px rgba(184, 147, 44, 0.65)); }
+  0%, 100% { opacity: 0.20; filter: drop-shadow(0 0 1px rgba(184, 147, 44, 0.30)); }
+  50%      { opacity: 0.85; filter: drop-shadow(0 0 10px rgba(184, 147, 44, 0.85)); }
 }
 @keyframes heroRosePulse {
-  0%, 100% { opacity: 0.25; }
-  50%      { opacity: 0.85; filter: drop-shadow(0 0 4px rgba(184, 147, 44, 0.55)); }
+  0%, 100% { opacity: 0.35; filter: none; }
+  50%      { opacity: 1;    filter: drop-shadow(0 0 8px rgba(184, 147, 44, 0.85)); }
 }
 
 /* Subtle ambient glow on each portrait, also randomised. */
 .landing .nodes-layer .node-group .frame-ring {
-  animation: heroNodeBreathe 10s ease-in-out infinite;
+  animation: heroNodeBreathe 9s ease-in-out infinite;
   animation-delay: var(--glow-delay, 0s);
 }
 @keyframes heroNodeBreathe {
   0%, 100% { filter: drop-shadow(0 1px 2px rgba(26, 37, 64, 0.18)); }
-  50%      { filter: drop-shadow(0 0 6px rgba(184, 147, 44, 0.55)); }
+  50%      { filter: drop-shadow(0 0 12px rgba(184, 147, 44, 0.75)); }
 }
 
 /* spotlight ring — slight emphasis, no overpowering halo */
