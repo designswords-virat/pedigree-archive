@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Extended Details — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=28" />
+<link rel="stylesheet" href="css/style.css?v=29" />
 </head>
 <body>
 
@@ -235,14 +235,14 @@
 <div class="toast-stack" id="toasts"></div>
 
 
-<script src="js/config.js?v=28"></script>
-<script src="js/supa.js?v=28"></script>
-<script src="js/gate.js?v=28"></script>
+<script src="js/config.js?v=29"></script>
+<script src="js/supa.js?v=29"></script>
+<script src="js/gate.js?v=29"></script>
 <script>Gate.require();</script>
-<script src="js/auth.js?v=28"></script>
-<script src="js/sounds.js?v=28"></script>
-<script src="js/click-sound.js?v=28"></script>
-<script src="js/theme.js?v=28"></script>
+<script src="js/auth.js?v=29"></script>
+<script src="js/sounds.js?v=29"></script>
+<script src="js/click-sound.js?v=29"></script>
+<script src="js/theme.js?v=29"></script>
 <script>
 (async function () {
   const $  = (s, root = document) => root.querySelector(s);
@@ -273,7 +273,13 @@
     headEyebrow = 'Details for';
   } else {
     target = sessionUser.profile || {};
-    backHref = 'dashboard.html';
+    // If a profile already exists, Back goes to the dashboard (the
+    // user is editing existing details). If no profile exists yet,
+    // dashboard would just bounce them back here in a loop, so Back
+    // goes to the landing instead.
+    backHref = (sessionUser.profile && sessionUser.profile.fullName)
+                 ? 'dashboard.html'
+                 : 'index.html';
     headName = (sessionUser.profile && sessionUser.profile.fullName) || 'Your Particulars';
     headEyebrow = (sessionUser.profile && sessionUser.profile.fullName)
                     ? 'Your extended details'
