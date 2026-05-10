@@ -34,3 +34,4 @@ References/
 
 # Local Netlify folder
 .netlify
+.vercel

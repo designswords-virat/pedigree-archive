@@ -159,26 +159,13 @@
   }
 
   async function init() {
-    demoData = await chooseHeroData();
+    demoData = null;
 
+    // Hero tree disabled — landing shows the headline / CTA over a
+    // solid theme background only. (Previously rendered the user's
+    // saved tree or, before that, the bundled demo lineage.)
     const svg = $('#pedigreeSvg');
-    Pedigree.init(svg, { interactive: false });
-    // Use the FULL chart layout (no sibling-row wrapping) so the hero
-    // tree spreads horizontally across the viewport instead of stacking
-    // wrapped sub-rows. Must be called before render.
-    if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
-
-    if (demoData) {
-      Pedigree.render(demoData);
-      // Sprinkle randomised animation-delays across every branch,
-      // junction and portrait so the hero glow breathes asynchronously
-      // rather than pulsing in unison. CSS handles the animation.
-      sprinkleHeroGlow();
-    } else {
-      // no saved tree — leave the hero canvas blank so only the
-      // headline / CTA appear over a solid background.
-      svg.innerHTML = '';
-    }
+    if (svg) svg.style.display = 'none';
 
     // small entrance sound — soft chime on load (will be silent until the
     // visitor interacts, due to browser autoplay policy; that's fine)
@@ -195,7 +182,8 @@
       try { Sound.click(); } catch (_) {}
     });
 
-    startAutoplay();
+    // spotlight autoplay disabled — nothing to spotlight when the
+    // hero tree is hidden.
   }
 
   window.addEventListener('DOMContentLoaded', init);
