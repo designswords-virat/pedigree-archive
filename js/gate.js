@@ -79,14 +79,17 @@
 
   function require() {
     // call from protected pages. If no credentials exist OR the session
-    // is closed, kick to login.html. login.html itself does NOT call this.
+    // is closed, kick to the LANDING (index.html) -- not directly to
+    // login -- so the user sees the public hero + headline first and
+    // then clicks the smart-CTA to log in. login.html and index.html
+    // are themselves never gated.
     const s = read();
     const here = location.pathname.split('/').pop().toLowerCase();
-    if (here === 'login.html') return;       // never gate the login page
+    if (here === 'login.html' || here === 'index.html' || here === '') return;
     if (!s.id || !s.hash || !s.open) {
       // preserve where the user wanted to go so we can return after login
       try { sessionStorage.setItem('pa_gate_returnTo', location.href); } catch (_) {}
-      location.replace('login.html');
+      location.replace('index.html');
     }
   }
 
