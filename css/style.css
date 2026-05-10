@@ -163,14 +163,14 @@
 
 .theme-picker {
   position: fixed;
-  top: 12px; right: 14px;
+  bottom: 14px; right: 14px;     /* away from toolbars on tree pages */
   z-index: 1500;
   display: flex; gap: 6px;
   padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: var(--ink-1);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -191,7 +191,7 @@
     0 0 0 3.5px var(--gold);
 }
 @media (max-width: 720px) {
-  .theme-picker { top: 8px; right: 8px; padding: 4px 6px; gap: 4px; }
+  .theme-picker { bottom: 8px; right: 8px; padding: 4px 6px; gap: 4px; }
   .theme-sw { width: 16px; height: 16px; }
 }
 
@@ -410,7 +410,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  background: linear-gradient(180deg, #ffffff, var(--ink-1));
+  background: var(--ink-1);
   border: none;
   color: var(--parchment-dim);
   padding: 9px 14px;
@@ -421,7 +421,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
 .vt-btn:hover { color: var(--ivory); background: var(--ink-2); }
 .vt-btn.active {
   background: linear-gradient(180deg, var(--gold) 0%, var(--gold-deep) 100%);
-  color: #ffffff;
+  color: var(--ink-0);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
 }
 .vt-btn + .vt-btn { border-left: 1px solid var(--gold-dim); }
@@ -429,10 +429,15 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   .vt-btn { font-size: 10px; padding: 7px 10px; letter-spacing: 0.12em; }
 }
 
-/* =================== BUTTONS =================== */
+/* =================== BUTTONS ===================
+   All button surfaces use theme tokens so they read correctly on
+   every theme (Ivoire, Bleu nuit, Vert profond, Bordeaux, Or vieilli).
+   - default .btn:    page surface (--ink-1) with strong text (--ivory)
+   - .btn.primary:    inverted -- strong (--ivory) bg, page (--ink-0) text
+   - .btn.danger:     burgundy text on default surface, fills on hover */
 .btn {
   font-family: var(--font-display);
-  background: #ffffff;
+  background: var(--ink-1);
   color: var(--ivory);
   border: 1px solid var(--border);
   padding: 9px 16px;
@@ -442,28 +447,28 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   cursor: pointer;
   transition: all 0.18s ease;
   border-radius: 1px;
-  box-shadow: 0 1px 2px rgba(26, 37, 64, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
 }
 .btn:hover {
-  background: var(--ink-1);
-  color: var(--rose);
-  border-color: var(--gold-deep);
-  box-shadow: 0 1px 3px rgba(26, 37, 64, 0.10);
+  background: var(--ink-2);
+  color: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
-.btn:active { transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(26, 37, 64, 0.10); }
-.btn.danger { color: var(--rose); border-color: rgba(107, 18, 38, 0.40); background: #ffffff; }
-.btn.danger:hover { background: var(--rose); color: #ffffff; border-color: var(--rose-deep); box-shadow: 0 1px 3px rgba(107, 18, 38, 0.25); }
+.btn:active { transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15); }
+.btn.danger { color: var(--rose); border-color: var(--rose); background: var(--ink-1); }
+.btn.danger:hover { background: var(--rose); color: var(--ink-0); border-color: var(--rose-deep); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
 .btn.primary {
-  background: var(--ivory);            /* navy */
-  color: #ffffff;
+  background: var(--ivory);
+  color: var(--ink-0);
   border-color: var(--ivory);
   text-shadow: none;
 }
 .btn.primary:hover {
-  background: var(--rose);             /* burgundy on hover */
-  color: #ffffff;
-  border-color: var(--rose-deep);
-  box-shadow: 0 2px 6px rgba(107, 18, 38, 0.20);
+  background: var(--gold);
+  color: var(--ink-0);
+  border-color: var(--gold-deep);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.20);
 }
 .btn-icon { padding: 9px 11px; min-width: 38px; }
 
@@ -822,7 +827,7 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
 .inspector .notes {
   margin-top: 12px;
   padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--ink-1);
   border-left: 2px solid var(--gold);
   font-family: var(--font-body);
   font-size: 14px;
@@ -1088,7 +1093,7 @@ label {
   text-transform: uppercase;
 }
 input[type="text"], input[type="number"], input[type="password"], select, textarea {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--ink-1);
   border: 1px solid var(--gold-dim);
   color: var(--ivory);
   padding: 10px 12px;
@@ -1099,9 +1104,9 @@ input[type="text"], input[type="number"], input[type="password"], select, textar
   border-radius: 1px;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: var(--ivory);
-  box-shadow: 0 0 0 3px rgba(26, 37, 64, 0.10);
-  background: #ffffff;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-faint);
+  background: var(--ink-0);
   outline: none;
 }
 textarea {
@@ -1130,7 +1135,7 @@ input[type="checkbox"] {
   appearance: none;
   width: 18px; height: 18px;
   border: 1px solid var(--gold);
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--ink-1);
   cursor: pointer;
   position: relative;
   border-radius: 1px;
@@ -1178,7 +1183,7 @@ input[type="checkbox"]:checked::after {
 .photo-row input[type="file"] {
   font-family: var(--font-body); font-size: 13px;
   color: var(--parchment-dim);
-  background: rgba(255, 255, 255, 0.80);
+  background: var(--ink-1);
   border: 1px solid var(--gold-soft);
   padding: 7px;
   flex: 1; min-width: 200px;
@@ -1454,7 +1459,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .fc-notes {
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--ink-1);
   border-left: 3px solid var(--gold);
   padding: 14px 18px;
   font-family: var(--font-body);
@@ -1578,7 +1583,7 @@ input[type="checkbox"]:checked::after {
 
 /* =================== SCROLLBAR =================== */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.80); }
+::-webkit-scrollbar-track { background: var(--ink-1); }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--gold-deep), var(--gold-dim));
   border: 1px solid var(--gold-dim);
@@ -2165,7 +2170,7 @@ body:has(.landing) .spotlight-caption { display: none; }
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--parchment-dim);
-  background: rgba(255, 255, 255, 0.80);
+  background: var(--ink-1);
   border: 1px dashed var(--gold-soft);
   padding: 12px;
   width: 100%;
@@ -2392,7 +2397,7 @@ body:has(.landing) .spotlight-caption { display: none; }
 }
 
 input[type="date"] {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--ink-1);
   border: 1px solid var(--gold-dim);
   color: var(--ivory);
   padding: 10px 12px;
@@ -2401,13 +2406,13 @@ input[type="date"] {
   outline: none;
   transition: all 0.15s;
   border-radius: 1px;
-  /* light theme: native picker on white surface */
-  color-scheme: light;
+  /* picker chrome inherits from the active theme */
+  color-scheme: light dark;
 }
 input[type="date"]:focus {
-  border-color: var(--ivory);
-  box-shadow: 0 0 0 3px rgba(26, 37, 64, 0.10);
-  background: #ffffff;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-faint);
+  background: var(--ink-0);
   outline: none;
 }
 
@@ -2444,7 +2449,7 @@ input[type="date"]:focus {
 .photo-upload-controls input[type="file"] {
   font-family: var(--font-body); font-size: 13px;
   color: var(--parchment-dim);
-  background: rgba(255, 255, 255, 0.80);
+  background: var(--ink-1);
   border: 1px solid var(--gold-soft);
   padding: 7px;
 }
@@ -3175,7 +3180,7 @@ input[type="date"]:focus {
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--parchment-dim);
-  background: rgba(255, 255, 255, 0.80);
+  background: var(--ink-1);
   border: 1px dashed var(--gold-soft);
   padding: 10px;
   width: 100%;
