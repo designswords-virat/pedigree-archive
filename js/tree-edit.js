@@ -445,6 +445,8 @@
     $('#kpStepType').classList.toggle('hidden', step !== 'type');
     $('#kpStepQualifier').classList.toggle('hidden', step !== 'qualifier');
     $('#kpStepForm').classList.toggle('hidden', step !== 'form');
+    const ex = $('#kpStepExisting');
+    if (ex) ex.classList.toggle('hidden', step !== 'existing');
   }
 
   // Enable/disable relation buttons based on what's possible given anchor's existing kin.
@@ -506,6 +508,19 @@
       if (activeRel === 'grandparent' || activeRel === 'cousin') showKpStep('qualifier');
       else { showKpStep('type'); activeRel = null; }
       activeQualifier = null;
+    });
+
+    // "Pick existing person" toggle — swaps the new-person form for a
+    // list of people already in the tree, so a relationship can be set
+    // between two existing portraits without re-creating one.
+    $('#kpPickExisting').addEventListener('click', () => {
+      Sound.click();
+      renderExistingPicker();
+      showKpStep('existing');
+    });
+    $('#kpExistingBack').addEventListener('click', () => {
+      Sound.click();
+      showKpStep('form');
     });
 
     // gender / status pickers
@@ -702,6 +717,103 @@
     closeKinPanel();
     renderTree();
     setTimeout(() => Pedigree.panToNode(newPerson.id), 380);
+  }
+
+  // ---- "pick existing" picker ---------------------------------------
+  // Builds a list of people already in the tree, filtered for the
+  // currently-selected relation, and lets the user click one to
+  // attach instead of creating a new person.
+  function candidatesForRelation(rel) {
+    const a = anchorPerson;
+    return people.filter(p => {
+      if (p.id === a.id) return false;        // never self
+      switch (rel) {
+        case 'father': {
+          if (fatherOf(a)) return false;        // already has father
+          return p.gender !== 'female';         // males or unknown
+        }
+        case 'mother': {
+          if (motherOf(a)) return false;        // already has mother
+          return p.gender !== 'male';
+        }
+        case 'spouse': {
+          return !(a.partnerIds || []).includes(p.id);
+        }
+        case 'child': {
+          // can't already be the child of anchor
+          return !((p.parentIds || []).includes(a.id));
+        }
+        case 'sibling': {
+          if ((a.parentIds || []).length === 0) return false;
+          // exclude anchor's own parents from being shown as siblings
+          return !((a.parentIds || []).includes(p.id));
+        }
+        case 'grandparent': {
+          const parent = byId[activeQualifier];
+          if (!parent) return false;
+          if ((parent.parentIds || []).includes(p.id)) return false;
+          // don't let anchor's descendant become anchor's grandparent
+          return p.id !== a.id;
+        }
+        case 'cousin': {
+          const au = byId[activeQualifier];
+          if (!au) return false;
+          return !((p.parentIds || []).includes(au.id));
+        }
+        default: return false;
+      }
+    });
+  }
+
+  function renderExistingPicker() {
+    const list = $('#kpExistingList');
+    if (!list) return;
+    const items = candidatesForRelation(activeRel);
+    if (!items.length) {
+      list.innerHTML = `
+        <div class="kp-existing-empty">
+          No suitable existing people to link as a ${activeRel}.
+          Use the form above to create one instead.
+        </div>`;
+      return;
+    }
+    list.innerHTML = items.map(p => `
+      <button type="button" class="kp-existing-row-item" data-id="${p.id}">
+        <span class="kp-ex-photo">${p.photo
+          ? '<img src="' + p.photo + '" alt="" />'
+          : '<span class="ph">?</span>'}</span>
+        <span class="kp-ex-meta">
+          <span class="kp-ex-name">${escapeHtml(p.name || 'Unnamed')}</span>
+          ${p.birthYear ? '<span class="kp-ex-year">b. ' + p.birthYear + '</span>' : ''}
+        </span>
+      </button>
+    `).join('');
+    // delegate click
+    list.querySelectorAll('.kp-existing-row-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const target = byId[id];
+        if (!target) {
+          $('#kpExistingStatus').className = 'auth-status error';
+          $('#kpExistingStatus').textContent = 'That person is no longer in the tree.';
+          return;
+        }
+        try {
+          attachKinship(target, activeRel, activeQualifier);
+        } catch (err) {
+          $('#kpExistingStatus').className = 'auth-status error';
+          $('#kpExistingStatus').textContent = err.message || String(err);
+          return;
+        }
+        reconcile();
+        persist();
+        Sound.success();
+        toast('Linked — ' + target.name, 'success');
+        closeKinPanel();
+        renderTree();
+        setTimeout(() => Pedigree.panToNode(target.id), 380);
+      });
+    });
   }
 
   // Wire the new person into the graph based on the chosen relation.

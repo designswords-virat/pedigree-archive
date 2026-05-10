@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Edit Your Tree — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=49" />
+<link rel="stylesheet" href="css/style.css?v=50" />
 </head>
 <body>
 
@@ -86,6 +86,12 @@
       <!-- step 3: person form -->
       <div class="kp-step hidden" id="kpStepForm">
         <div class="kp-section-h" id="kpFormHead">Particulars</div>
+
+        <!-- "or link existing" entry — toggles the picker below -->
+        <div class="kp-existing-row">
+          <button type="button" class="link-btn" id="kpPickExisting">↓ Or link someone already in your tree</button>
+        </div>
+
         <form id="kpForm" class="kp-form">
 
           <!-- relationship type (only for parents/grandparents) -->
@@ -179,6 +185,17 @@
 
           <div class="auth-status" id="kpStatus"></div>
         </form>
+      </div>
+
+      <!-- step 3b: existing-person picker — shown when user clicks
+           "Or link someone already in your tree" -->
+      <div class="kp-step hidden" id="kpStepExisting">
+        <div class="kp-section-h">Pick someone already in your tree</div>
+        <div class="kp-existing-list" id="kpExistingList"></div>
+        <div class="kp-actions">
+          <button type="button" class="btn" id="kpExistingBack">← Back to form</button>
+        </div>
+        <div class="auth-status" id="kpExistingStatus"></div>
       </div>
     </aside>
 
@@ -308,15 +325,15 @@
 <div class="toast-stack" id="toasts"></div>
 
 
-<script src="js/config.js?v=49"></script>
-<script src="js/supa.js?v=49"></script>
-<script src="js/gate.js?v=49"></script>
+<script src="js/config.js?v=50"></script>
+<script src="js/supa.js?v=50"></script>
+<script src="js/gate.js?v=50"></script>
 <script>Gate.require();</script>
-<script src="js/auth.js?v=49"></script>
-<script src="js/sounds.js?v=49"></script>
-<script src="js/click-sound.js?v=49"></script>
-<script src="js/theme.js?v=49"></script>
-<script src="js/pedigree.js?v=49"></script>
-<script src="js/tree-edit.js?v=49"></script>
+<script src="js/auth.js?v=50"></script>
+<script src="js/sounds.js?v=50"></script>
+<script src="js/click-sound.js?v=50"></script>
+<script src="js/theme.js?v=50"></script>
+<script src="js/pedigree.js?v=50"></script>
+<script src="js/tree-edit.js?v=50"></script>
 </body>
 </html>
