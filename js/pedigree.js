@@ -252,7 +252,16 @@ const Pedigree = (() => {
       }
     });
 
-    let cursorX = MARGIN;
+    // Total natural width before centring (mirrors what the viewBox
+    // would be without the 600/400 minimum applied later in render()).
+    const totalRootsWidth = rootEntries.reduce((s, r) => s + widths[r.id], 0)
+                          + Math.max(0, rootEntries.length - 1) * SIBLING_GAP * 2;
+    const naturalW = totalRootsWidth + MARGIN * 2;
+    // Same minimum render() uses — kept in sync to avoid drift.
+    const MIN_VBW = 600;
+    const centreOffset = Math.max(0, (MIN_VBW - naturalW) / 2);
+
+    let cursorX = MARGIN + centreOffset;
     rootEntries.forEach(r => {
       position(r.id, cursorX, 0);
       cursorX += widths[r.id] + SIBLING_GAP * 2;
