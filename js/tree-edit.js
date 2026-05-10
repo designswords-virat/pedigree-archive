@@ -188,6 +188,142 @@
     if (Pedigree.fitToView) {
       setTimeout(() => { try { Pedigree.fitToView(); } catch (_) {} }, 250);
     }
+
+    // Re-attach drag-to-reorder listeners — Pedigree.render rebuilds
+    // every node-group element, so handlers added previously are gone.
+    setupDragSort();
+  }
+
+  // ----------------------------------------------------------------
+  // DRAG-TO-REORDER siblings in the horizontal layout.
+  // Click on a portrait still opens the inspector; only when the
+  // cursor moves past a small threshold do we treat it as a drag and
+  // suppress the click. On drop, the dragged person is spliced into
+  // a new position in the people array among its siblings, then the
+  // tree re-renders.
+  // ----------------------------------------------------------------
+  const DRAG_THRESHOLD_PX = 30;
+  let drag = null;
+
+  function setupDragSort() {
+    const groups = svgEl.querySelectorAll('.node-group');
+    groups.forEach(g => {
+      g.style.cursor = 'grab';
+      g.addEventListener('pointerdown', onDragStart);
+    });
+  }
+
+  function onDragStart(ev) {
+    if (ev.button !== undefined && ev.button !== 0) return;     // left button only
+    // ignore if the pointerdown landed on the "+" badge — that's the
+    // kinship-add affordance, not a drag handle.
+    if (ev.target.closest('.node-add-btn')) return;
+    const id = this.dataset.id;
+    const person = byId[id];
+    if (!person) return;
+
+    drag = {
+      id,
+      element: this,
+      startX: ev.clientX,
+      startY: ev.clientY,
+      moved: false,
+    };
+    document.addEventListener('pointermove', onDragMove);
+    document.addEventListener('pointerup',   onDragEnd);
+  }
+
+  function onDragMove(ev) {
+    if (!drag) return;
+    const dx = ev.clientX - drag.startX;
+    const dy = ev.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(dx, dy) > DRAG_THRESHOLD_PX) {
+      drag.moved = true;
+      drag.element.style.cursor = 'grabbing';
+      drag.element.style.opacity = '0.55';
+      // tell the stage we're dragging so other handlers can ignore
+      $('#stage').classList.add('is-dragging');
+    }
+  }
+
+  function onDragEnd(ev) {
+    document.removeEventListener('pointermove', onDragMove);
+    document.removeEventListener('pointerup',   onDragEnd);
+    if (!drag) return;
+    const finishedDrag = drag.moved;
+    const draggedId = drag.id;
+    const dropX = ev.clientX;
+    drag.element.style.cursor = 'grab';
+    drag.element.style.opacity = '';
+    $('#stage').classList.remove('is-dragging');
+    drag = null;
+    if (!finishedDrag) return;     // treated as a click, let inspector open
+
+    // Suppress the click event that follows a pointerup so the inspector
+    // doesn't pop open immediately after a reorder gesture.
+    const stop = (e) => { e.stopPropagation(); e.preventDefault(); };
+    document.addEventListener('click', stop, { capture: true, once: true });
+
+    // Locate the dragged person and their siblings.
+    const dragged = byId[draggedId];
+    if (!dragged) return;
+    const siblings = siblingScope(dragged);
+    if (siblings.length < 2) return;       // nothing to reorder against
+
+    // Determine the target slot from the drop X coordinate.
+    const positions = siblings
+      .filter(s => s.id !== draggedId)
+      .map(s => {
+        const el = svgEl.querySelector('.node-group[data-id="' + s.id + '"]');
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { person: s, centerX: r.left + r.width / 2 };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.centerX - b.centerX);
+
+    // newSlot = how many siblings the drop point passed
+    let newSlot = 0;
+    positions.forEach(p => { if (dropX > p.centerX) newSlot++; });
+
+    reorderInPeople(dragged, positions.map(p => p.person), newSlot);
+    persist();
+    renderTree();
+    Sound.click();
+  }
+
+  // Returns the people that share parents with `p` (its sibship), or
+  // all roots if `p` has no parents in the tree.
+  function siblingScope(p) {
+    const parents = (p.parentIds || []).filter(id => byId[id]);
+    if (parents.length === 0) {
+      return people.filter(x =>
+        !x.parentIds || x.parentIds.length === 0
+        || !x.parentIds.some(id => byId[id])
+      );
+    }
+    return people.filter(x =>
+      x === p
+      || (x.parentIds || []).some(id => parents.includes(id))
+    );
+  }
+
+  // Splice `dragged` out of `people` and reinsert so that, among the
+  // ordered list of `remainingSibs`, it appears at `newSlot`.
+  function reorderInPeople(dragged, remainingSibs, newSlot) {
+    const fromIdx = people.indexOf(dragged);
+    if (fromIdx === -1) return;
+    people.splice(fromIdx, 1);
+    let insertAt;
+    if (newSlot >= remainingSibs.length) {
+      // after the last remaining sibling
+      const last = remainingSibs[remainingSibs.length - 1];
+      insertAt = people.indexOf(last) + 1;
+    } else {
+      insertAt = people.indexOf(remainingSibs[newSlot]);
+    }
+    if (insertAt < 0) insertAt = people.length;
+    people.splice(insertAt, 0, dragged);
   }
 
   function init() {

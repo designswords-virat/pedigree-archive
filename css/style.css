@@ -162,6 +162,11 @@
   --photo-filter-hover: sepia(0.20) saturate(1.00) brightness(1.02) contrast(1.06);
 }
 
+/* edit canvas: while a portrait is being dragged for sibling reorder,
+   give the stage a grabbing cursor and let the dragged portrait's
+   inline opacity:0.55 communicate the active drag. */
+.stage.is-dragging { cursor: grabbing; }
+
 /* ============================================================
    THEME PICKER — fixed top-right swatch row, visible on every page.
    ============================================================ */
