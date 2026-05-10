@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Login — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=19" />
+<link rel="stylesheet" href="css/style.css?v=20" />
 </head>
 <body>
 
@@ -23,7 +23,7 @@
       <div class="auth-status" id="loginStatus"></div>
 
       <div class="field-group">
-        <label for="loginId">ID</label>
+        <label for="loginId">Username</label>
         <input type="text" id="loginId" required maxlength="60" autocomplete="username" />
       </div>
 
@@ -48,10 +48,10 @@
 </main>
 
 
-<script src="js/gate.js?v=19"></script>
-<script src="js/sounds.js?v=19"></script>
-<script src="js/click-sound.js?v=19"></script>
-<script src="js/theme.js?v=19"></script>
+<script src="js/gate.js?v=20"></script>
+<script src="js/sounds.js?v=20"></script>
+<script src="js/click-sound.js?v=20"></script>
+<script src="js/theme.js?v=20"></script>
 <script>
 (function () {
   const $ = (s) => document.querySelector(s);
@@ -62,7 +62,7 @@
   if (firstRun) {
     $('#loginEyebrow').textContent = 'Set up your access';
     $('#loginTitle').textContent   = 'Create your book';
-    $('#loginSubtitle').textContent = 'Choose an ID and password — they protect everything you record here.';
+    $('#loginSubtitle').textContent = 'Choose a username and password — they protect everything you record here.';
     $('#confirmGroup').style.display = '';
     $('#loginSubmit').textContent = '⏵ Create access';
     $('#loginHint').textContent = 'These credentials live only in this browser. There is no password recovery — write them down.';
@@ -92,7 +92,7 @@
     const id = $('#loginId').value.trim();
     const pw = $('#loginPw').value;
 
-    if (!id) { setStatus('Please enter an ID.', 'error'); return; }
+    if (!id) { setStatus('Please enter a username.', 'error'); return; }
     if (!pw || pw.length < 4) { setStatus('Password must be at least 4 characters.', 'error'); return; }
 
     try {

@@ -42,7 +42,7 @@
   }
 
   async function create(id, pw) {
-    if (!id || !pw) throw new Error('ID and password are required.');
+    if (!id || !pw) throw new Error('Username and password are required.');
     const cur = read();
     if (cur.id && cur.hash) throw new Error('Access has already been set up. Use Login instead.');
     const hash = await sha256(pw);
@@ -55,7 +55,7 @@
     if (!cur.id || !cur.hash) throw new Error('No access has been set up yet.');
     const hash = await sha256(pw);
     if (String(id).trim() !== cur.id || hash !== cur.hash) {
-      throw new Error('Wrong ID or password.');
+      throw new Error('Wrong username or password.');
     }
     write({ ...cur, open: true });
     return true;
