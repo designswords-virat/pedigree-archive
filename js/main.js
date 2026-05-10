@@ -137,24 +137,25 @@
   }
 
   // ---- INIT ----
-  // Pick the data to show in the hero. If this browser has the user's
-  // own family tree saved (via Auth), use it as the hero background so
-  // the spotlight cycles through real members. Otherwise fall back to
-  // the bundled demo lineage so first-time visitors see something rich.
+  // Hero shows ONLY the user's saved tree (the same data tree-view.html
+  // displays). No fallback to the bundled demo — if there is no saved
+  // tree on this browser, the hero stays empty and only the headline
+  // copy appears. This keeps the Bhiva-Ram demo lineage out of the
+  // public landing.
   async function chooseHeroData() {
-    if (typeof Auth === 'undefined') return Data.demo();
+    if (typeof Auth === 'undefined') return null;
     try {
       await Auth.init();
       const u = Auth.currentUser();
       const myPeople = u && Array.isArray(u.people) ? u.people : [];
-      if (myPeople.length >= 2) {
+      if (myPeople.length >= 1) {
         const title = (u.profile && u.profile.fullName)
           ? (u.profile.fullName + '’s lineage')
           : 'Your lineage';
         return { people: myPeople, meta: { title } };
       }
-    } catch (_) { /* fall through to demo */ }
-    return Data.demo();
+    } catch (_) {}
+    return null;
   }
 
   async function init() {
@@ -166,12 +167,18 @@
     // tree spreads horizontally across the viewport instead of stacking
     // wrapped sub-rows. Must be called before render.
     if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
-    Pedigree.render(demoData);
 
-    // Sprinkle randomised animation-delays across every branch, junction
-    // and portrait so the hero glow breathes asynchronously rather than
-    // pulsing in unison. CSS handles the actual animation.
-    sprinkleHeroGlow();
+    if (demoData) {
+      Pedigree.render(demoData);
+      // Sprinkle randomised animation-delays across every branch,
+      // junction and portrait so the hero glow breathes asynchronously
+      // rather than pulsing in unison. CSS handles the animation.
+      sprinkleHeroGlow();
+    } else {
+      // no saved tree — leave the hero canvas blank so only the
+      // headline / CTA appear over a solid background.
+      svg.innerHTML = '';
+    }
 
     // small entrance sound — soft chime on load (will be silent until the
     // visitor interacts, due to browser autoplay policy; that's fine)
