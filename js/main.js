@@ -136,14 +136,31 @@
     });
   }
 
+  // Generic placeholder tree shown on the hero when no saved book
+  // exists on this browser (logged-out visitor or fresh device). No
+  // personal names, no specific family — just enough to convey what
+  // the product builds.
+  const PLACEHOLDER_TREE = {
+    meta: { title: 'A book of kindred' },
+    people: [
+      { id: 'g_m', name: 'Grandfather', gender: 'male',   deceased: false, birthYear: null, parentIds: [],          partnerIds: ['g_f'],         affected: false, carrier: false },
+      { id: 'g_f', name: 'Grandmother', gender: 'female', deceased: false, birthYear: null, parentIds: [],          partnerIds: ['g_m'],         affected: false, carrier: false },
+      { id: 'p_m', name: 'Father',      gender: 'male',   deceased: false, birthYear: null, parentIds: ['g_m','g_f'], partnerIds: ['p_f'],         affected: false, carrier: false },
+      { id: 'p_f', name: 'Mother',      gender: 'female', deceased: false, birthYear: null, parentIds: [],          partnerIds: ['p_m'],         affected: false, carrier: false },
+      { id: 'c_a', name: 'Sibling',     gender: 'female', deceased: false, birthYear: null, parentIds: ['p_m','p_f'], partnerIds: [],              affected: false, carrier: false },
+      { id: 'c_b', name: 'You',         gender: 'unknown',deceased: false, birthYear: null, parentIds: ['p_m','p_f'], partnerIds: [],              affected: false, carrier: false },
+      { id: 'c_c', name: 'Sibling',     gender: 'male',   deceased: false, birthYear: null, parentIds: ['p_m','p_f'], partnerIds: [],              affected: false, carrier: false },
+    ],
+  };
+
   // ---- INIT ----
-  // Hero shows ONLY the user's saved tree (the same data tree-view.html
-  // displays). No fallback to the bundled demo — if there is no saved
-  // tree on this browser, the hero stays empty and only the headline
-  // copy appears. This keeps the Bhiva-Ram demo lineage out of the
-  // public landing.
+  // Hero shows the user's saved tree if one exists on this browser
+  // (same data tree-view.html displays). Otherwise falls back to a
+  // generic placeholder tree — labels only ("Father", "Mother", "You")
+  // so visitors see what the product builds without exposing any
+  // specific family.
   async function chooseHeroData() {
-    if (typeof Auth === 'undefined') return null;
+    if (typeof Auth === 'undefined') return PLACEHOLDER_TREE;
     try {
       await Auth.init();
       const u = Auth.currentUser();
@@ -155,7 +172,7 @@
         return { people: myPeople, meta: { title } };
       }
     } catch (_) {}
-    return null;
+    return PLACEHOLDER_TREE;
   }
 
   async function init() {
@@ -169,17 +186,11 @@
     if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
     if (Pedigree.setScrollMode)   Pedigree.setScrollMode(false);
 
-    if (demoData) {
-      svg.style.display = '';
-      Pedigree.render(demoData);
-      // Stagger animation delays so branches/portraits breathe
-      // asynchronously rather than blinking in unison.
-      sprinkleHeroGlow();
-    } else {
-      // No saved tree (logged-out visitor or fresh browser) — leave
-      // the canvas blank so only the headline / CTA show.
-      svg.style.display = 'none';
-    }
+    // chooseHeroData() always returns *some* tree (saved or placeholder),
+    // so we always render. Glow staggers branches asynchronously.
+    svg.style.display = '';
+    Pedigree.render(demoData);
+    sprinkleHeroGlow();
 
     // small entrance sound — soft chime on load (will be silent until the
     // visitor interacts, due to browser autoplay policy; that's fine)
