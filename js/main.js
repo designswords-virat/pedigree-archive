@@ -148,6 +148,17 @@
     // visitor interacts, due to browser autoplay policy; that's fine)
     try { Sound.boot(); } catch (_) {}
 
+    // unlock audio on first user gesture so subsequent clicks chime
+    const unlock = () => { try { Sound.unlock(); } catch (_) {} document.removeEventListener('pointerdown', unlock); };
+    document.addEventListener('pointerdown', unlock);
+
+    // soft click chime on any actionable element
+    document.addEventListener('click', (e) => {
+      const t = e.target.closest('a, button, .btn, .hero-cta, .hero-sub-link');
+      if (!t) return;
+      try { Sound.click(); } catch (_) {}
+    });
+
     startAutoplay();
   }
 
