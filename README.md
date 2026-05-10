@@ -148,21 +148,24 @@ password (https://github.com/settings/tokens, scope `repo`).
 
 ## Cross-device sync (Export / Import)
 
-Because everything is in `localStorage`, your tree lives only on **this
+Because everything is in `localStorage`, your data lives only on **this
 browser, on this device**. To carry it elsewhere:
 
-1. **Dashboard → ⤓ Export** — downloads a single `.json` file containing
-   your profile, family tree, theme choice, and credentials hash.
+1. **Dashboard → ⤓ Export** — downloads a single `.json` file containing:
+   - your active book (profile + family tree + photos)
+   - **every other book in your library** (each with its own profile + tree)
+   - theme choice
+   - credentials hash
 2. Move the file to the other device (email, USB, cloud drive — any way).
 3. On the second device, open the site → **Create access** with any
    placeholder credentials so you can reach the dashboard.
 4. **Dashboard → ⤒ Import** → pick the file. Confirm the overwrite. The
-   page reloads with the same profile, the same family tree, the same
-   username + password from device one.
+   page reloads with the same active book, the same library of saved
+   books, the same username + password from device one.
 
 Files are pure JSON; no encryption. **Don't share them publicly** —
-anyone with the file can read your profile and load it as their own
-book on their device.
+anyone with the file can read every book in your library and load them
+as their own.
 
 ---
 

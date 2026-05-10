@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Your Book — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=33" />
+<link rel="stylesheet" href="css/style.css?v=34" />
 </head>
 <body>
 
@@ -86,15 +86,15 @@
 </div>
 
 
-<script src="js/config.js?v=33"></script>
-<script src="js/supa.js?v=33"></script>
-<script src="js/gate.js?v=33"></script>
+<script src="js/config.js?v=34"></script>
+<script src="js/supa.js?v=34"></script>
+<script src="js/gate.js?v=34"></script>
 <script>Gate.require();</script>
-<script src="js/auth.js?v=33"></script>
-<script src="js/books.js?v=33"></script>
-<script src="js/sounds.js?v=33"></script>
-<script src="js/click-sound.js?v=33"></script>
-<script src="js/theme.js?v=33"></script>
+<script src="js/auth.js?v=34"></script>
+<script src="js/books.js?v=34"></script>
+<script src="js/sounds.js?v=34"></script>
+<script src="js/click-sound.js?v=34"></script>
+<script src="js/theme.js?v=34"></script>
 <script>
 (async function () {
   const $ = (s) => document.querySelector(s);
@@ -160,13 +160,26 @@
   //               username + password — your tree appears.
   $('#btnExport').addEventListener('click', () => {
     try {
+      // Pull every saved book in the library too, not just the active one,
+      // so the file is a complete portable copy of this browser's data.
+      const indexObj = safeRead('pa_books_index') || { active: null, books: [] };
+      const snapshots = {};
+      (indexObj.books || []).forEach(b => {
+        const data = safeRead('pa_book_' + b.id);
+        if (data) snapshots[b.id] = data;
+      });
+
       const payload = {
-        version:    1,
+        version:    2,                          // bumped from 1 -> 2 (library added)
         product:    'pedigree-archive',
         exportedAt: new Date().toISOString(),
         gate:       safeRead('pa_gate'),
-        user:       safeRead('pa_local_v1'),
+        user:       safeRead('pa_local_v1'),    // active book (kept for v1 compat)
         theme:      localStorage.getItem('pa_theme') || null,
+        library:    {                           // v2: every other book in the library
+          index:     indexObj,
+          snapshots: snapshots,
+        },
       };
       const stem = (p.fullName || 'family-tree')
         .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -199,16 +212,44 @@
       const peopleCount = (data.user && Array.isArray(data.user.people))
         ? data.user.people.length : 0;
       const haveCreds   = !!(data.gate && data.gate.id && data.gate.hash);
-      const msg = `Import this book? It will REPLACE everything currently saved on this device:\n`
-        + `  • profile + ${peopleCount} ${peopleCount === 1 ? 'person' : 'people'}\n`
-        + (haveCreds ? `  • the username + password from the file\n` : '')
-        + (data.theme ? `  • theme: ${data.theme}\n` : '')
-        + `\nThis cannot be undone. Continue?`;
-      if (!confirm(msg)) return;
+      const lib = data.library;
+      const haveLibrary = !!(lib && lib.index && Array.isArray(lib.index.books));
+      const otherBookCount = haveLibrary
+        ? lib.index.books.filter(b => b.id !== lib.index.active).length
+        : 0;
+
+      const lines = [
+        'Import this archive? It will REPLACE everything currently saved on this device:',
+        `  • active book — profile + ${peopleCount} ${peopleCount === 1 ? 'person' : 'people'}`,
+      ];
+      if (otherBookCount > 0) {
+        lines.push(`  • ${otherBookCount} other book${otherBookCount === 1 ? '' : 's'} in your library`);
+      }
+      if (haveCreds) lines.push('  • the username + password from the file');
+      if (data.theme) lines.push('  • theme: ' + data.theme);
+      lines.push('', 'This cannot be undone. Continue?');
+      if (!confirm(lines.join('\n'))) return;
+
+      // Wipe any existing library snapshots first so deleted books on
+      // the source device don't linger here.
+      try {
+        const oldIdx = JSON.parse(localStorage.getItem('pa_books_index') || 'null');
+        if (oldIdx && Array.isArray(oldIdx.books)) {
+          oldIdx.books.forEach(b => { try { localStorage.removeItem('pa_book_' + b.id); } catch (_) {} });
+        }
+        localStorage.removeItem('pa_books_index');
+      } catch (_) {}
 
       if (data.user)  localStorage.setItem('pa_local_v1', JSON.stringify(data.user));
       if (data.gate)  localStorage.setItem('pa_gate',     JSON.stringify(data.gate));
       if (data.theme) localStorage.setItem('pa_theme',    data.theme);
+
+      if (haveLibrary) {
+        Object.entries(lib.snapshots || {}).forEach(([id, book]) => {
+          try { localStorage.setItem('pa_book_' + id, JSON.stringify(book)); } catch (_) {}
+        });
+        try { localStorage.setItem('pa_books_index', JSON.stringify(lib.index)); } catch (_) {}
+      }
 
       alert('Import complete. The page will reload.');
       location.reload();
