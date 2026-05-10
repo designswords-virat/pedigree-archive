@@ -178,6 +178,16 @@
 
     // empty banner
     $('#canvasEmpty').classList.toggle('hidden', people.length > 0);
+
+    // Force a delayed re-centre. Pedigree.render schedules its own
+    // fitToView at 50ms, but on the edit canvas a single-person tree
+    // can land off-screen-right because the SVG's measured size hasn't
+    // settled by then. Re-running fitToView at 250ms guarantees the
+    // bounding box is centred to the viewport — idempotent for larger
+    // trees so no visible change for them.
+    if (Pedigree.fitToView) {
+      setTimeout(() => { try { Pedigree.fitToView(); } catch (_) {} }, 250);
+    }
   }
 
   function init() {
