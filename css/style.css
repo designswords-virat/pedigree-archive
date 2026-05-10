@@ -1725,15 +1725,15 @@ input[type="checkbox"]:checked::after {
 }
 
 /* tree dimming — individual layers, NOT the parent (so spotlight can override) */
-/* The hero tree sits well behind the headline copy. Quieter opacities,
-   no spotlight glow that would compete with the navy title. */
+/* The hero tree is fully opaque — the radial mask on .landing-canvas
+   handles the centre fade. Portraits at the edges read crisply. */
 .landing .nodes-layer .node-group {
-  opacity: 0.32;
+  opacity: 1;
   transition: opacity 0.7s ease;
 }
-.landing .nodes-layer .node-group.spotlight { opacity: 0.85; }
+.landing .nodes-layer .node-group.spotlight { opacity: 1; }
 .landing .lines-layer { opacity: 1; transition: opacity 0.7s ease; }
-.landing .junction-rose-group { opacity: 0.30; transition: opacity 0.7s ease; }
+.landing .junction-rose-group { opacity: 1; transition: opacity 0.7s ease; }
 
 /* Each branch gently pulses a warm gold glow on a long, randomised
    cycle. main.js sets --glow-delay per element so the lines breathe
@@ -1761,12 +1761,12 @@ input[type="checkbox"]:checked::after {
 }
 
 @keyframes heroBranchPulse {
-  0%, 100% { opacity: 0.20; filter: drop-shadow(0 0 1px rgba(184, 147, 44, 0.30)); }
-  50%      { opacity: 0.85; filter: drop-shadow(0 0 10px rgba(184, 147, 44, 0.85)); }
+  0%, 100% { opacity: 0.55; filter: drop-shadow(0 0 1px rgba(184, 147, 44, 0.30)); }
+  50%      { opacity: 1;    filter: drop-shadow(0 0 10px rgba(184, 147, 44, 0.85)); }
 }
 @keyframes heroRosePulse {
-  0%, 100% { opacity: 0.35; filter: none; }
-  50%      { opacity: 1;    filter: drop-shadow(0 0 8px rgba(184, 147, 44, 0.85)); }
+  0%, 100% { opacity: 0.6; filter: none; }
+  50%      { opacity: 1;   filter: drop-shadow(0 0 8px rgba(184, 147, 44, 0.85)); }
 }
 
 /* Subtle ambient glow on each portrait, also randomised. */
@@ -1787,8 +1787,13 @@ input[type="checkbox"]:checked::after {
   animation: spotlightPulse 3s ease-in-out infinite;
 }
 .landing .node-group.spotlight .node-photo {
+  /* photoIn animation uses `forwards` to hold opacity at 1; when our
+     spotlightPhoto animation overrides `animation`, that hold no longer
+     applies and the photo reverts to its base opacity:0. Pin it. */
+  opacity: 1 !important;
   filter: var(--photo-filter-hover) brightness(1.08);
   animation: spotlightPhoto 3s ease-in-out infinite;
+  transform-origin: 50% 50%;
 }
 @keyframes spotlightPulse {
   0%, 100% { stroke-width: 3.6; }
