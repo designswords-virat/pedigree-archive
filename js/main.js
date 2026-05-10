@@ -188,11 +188,17 @@
   }
 
   async function chooseHeroData() {
+    // The hero has a radial mask cutting a hole around the headline.
+    // A 1- or 2-person tree falls entirely inside that hole and looks
+    // invisible. So only use the user's data if it has at least as
+    // many people as the bundled hero demo — otherwise the bundled
+    // 22-person tree fills the canvas properly.
+    const demoCount = (PLACEHOLDER_TREE.people || []).length;
     if (typeof Auth === 'undefined') return PLACEHOLDER_TREE;
     try {
       await Auth.init();
       const pick = pickLargestBook();
-      if (pick) {
+      if (pick && pick.people.length >= demoCount) {
         const fullName = pick.book.profile && pick.book.profile.fullName;
         const title = fullName ? (fullName + '’s lineage') : 'Your lineage';
         return { people: pick.people, meta: { title } };
