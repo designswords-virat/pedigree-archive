@@ -154,22 +154,45 @@
   };
 
   // ---- INIT ----
-  // Hero shows the user's saved tree if one exists on this browser
-  // (same data tree-view.html displays). Otherwise falls back to a
-  // generic placeholder tree — labels only ("Father", "Mother", "You")
-  // so visitors see what the product builds without exposing any
-  // specific family.
+  // Hero shows the LARGEST book from the user's library on this browser
+  // (active book or any saved snapshot). This way a brand-new "+ New
+  // project" empty active book doesn't hide a richer tree the user
+  // built earlier. Falls back to a generic placeholder if the whole
+  // library is empty.
+  function safeRead(key) {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
+    catch (_) { return null; }
+  }
+
+  function pickLargestBook() {
+    const candidates = [];
+    const active = safeRead('pa_local_v1');
+    if (active && Array.isArray(active.people) && active.people.length) {
+      candidates.push({ book: active, people: active.people });
+    }
+    const idx = safeRead('pa_books_index');
+    if (idx && Array.isArray(idx.books)) {
+      idx.books.forEach(b => {
+        const snap = safeRead('pa_book_' + b.id);
+        if (snap && Array.isArray(snap.people) && snap.people.length) {
+          candidates.push({ book: snap, people: snap.people });
+        }
+      });
+    }
+    if (!candidates.length) return null;
+    candidates.sort((a, b) => b.people.length - a.people.length);
+    return candidates[0];
+  }
+
   async function chooseHeroData() {
     if (typeof Auth === 'undefined') return PLACEHOLDER_TREE;
     try {
       await Auth.init();
-      const u = Auth.currentUser();
-      const myPeople = u && Array.isArray(u.people) ? u.people : [];
-      if (myPeople.length >= 1) {
-        const title = (u.profile && u.profile.fullName)
-          ? (u.profile.fullName + '’s lineage')
-          : 'Your lineage';
-        return { people: myPeople, meta: { title } };
+      const pick = pickLargestBook();
+      if (pick) {
+        const fullName = pick.book.profile && pick.book.profile.fullName;
+        const title = fullName ? (fullName + '’s lineage') : 'Your lineage';
+        return { people: pick.people, meta: { title } };
       }
     } catch (_) {}
     return PLACEHOLDER_TREE;
