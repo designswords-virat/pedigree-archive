@@ -208,7 +208,7 @@
         await Pedigree.exportImage({
           filename: stem + '-tree.jpg',
           scale: 2,
-          bgColor: '#fbf8f1',
+          // bgColor omitted -> defaults to current theme's --ink-0
           format: 'image/jpeg',
           quality: 0.92,
         });

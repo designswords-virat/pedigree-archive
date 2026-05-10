@@ -644,6 +644,31 @@ const Pedigree = (() => {
       .forEach(el => scrollObserver.observe(el));
   }
 
+  // Read the active theme's tokens from <html> so the exported JPG
+  // inherits whichever palette the user picked (Bordeaux, Bleu nuit,
+  // Vert profond, Or vieilli or Ivoire). Falls back to Bordeaux defaults
+  // if the document isn't ready (very unlikely at export time).
+  function readThemeTokens() {
+    const cs = (typeof window !== 'undefined' && document.documentElement)
+      ? getComputedStyle(document.documentElement)
+      : null;
+    const T = (name, fb) => {
+      if (!cs) return fb;
+      const v = cs.getPropertyValue(name).trim();
+      return v || fb;
+    };
+    return {
+      ink0:        T('--ink-0',        '#490c1e'),
+      ink2:        T('--ink-2',        '#631c33'),
+      gold:        T('--gold',         '#bfa06a'),
+      goldDeep:    T('--gold-deep',    '#8a7a4a'),
+      ivory:       T('--ivory',        '#f0e6c2'),
+      parchment:   T('--parchment',    '#e8d8a8'),
+      parchDim:    T('--parchment-dim','#c79c9e'),
+      rose:        T('--rose',         '#f0a8b5'),
+    };
+  }
+
   // Inline CSS baked into the exported SVG so the rasterised JPG keeps
   // the right colours / fonts / line weights without depending on the page's
   // stylesheet (image rasterisers don't load <link rel="stylesheet">).
@@ -651,24 +676,30 @@ const Pedigree = (() => {
   // CRITICAL: do NOT set CSS `transform` here. Each node-group has an SVG
   // transform="translate(x,y)" attribute that positions it within the layout;
   // a CSS transform would override that and stack every portrait at the origin.
-  const EXPORT_CSS = `
-    .frame-back { fill: #efe8d6; stroke: #8a6d20; stroke-width: 1; }
-    .frame-ring { fill: none; stroke: #b8932c; stroke-width: 2.4; }
-    .frame-ring-inner { fill: none; stroke: #8a6d20; stroke-width: 0.8; opacity: 0.55; }
-    .node-label { fill: #1a2540; font-family: 'Cinzel', 'Trajan Pro', Georgia, serif; font-weight: 500; font-size: 14px; letter-spacing: 0.18em; }
-    .node-years { fill: #6b7184; font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-style: italic; font-size: 14px; }
-    .mating-line   { stroke: #b8932c; stroke-width: 1.8; opacity: 0.85; fill: none; stroke-linecap: round; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important; }
-    .parent-branch { stroke: #b8932c; stroke-width: 1.6; opacity: 0.85; fill: none; stroke-linecap: round; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important; }
-    .junction-rose { fill: #6b1226; stroke: #b8932c; stroke-width: 0.8; opacity: 1 !important; animation: none !important; }
-    .node-group { opacity: 1 !important; animation: none !important; }
-    .node-photo { opacity: 1 !important; animation: none !important; }
-    .node-add-btn, .node-id { display: none !important; }
-  `;
+  function buildExportCss() {
+    const t = readThemeTokens();
+    return `
+      .frame-back { fill: ${t.ink2}; stroke: ${t.goldDeep}; stroke-width: 1; }
+      .frame-ring { fill: none; stroke: ${t.gold}; stroke-width: 2.4; }
+      .frame-ring-inner { fill: none; stroke: ${t.goldDeep}; stroke-width: 0.8; opacity: 0.55; }
+      .node-label { fill: ${t.ivory}; font-family: 'Cinzel', 'Trajan Pro', Georgia, serif; font-weight: 500; font-size: 14px; letter-spacing: 0.18em; }
+      .node-years { fill: ${t.parchDim}; font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-style: italic; font-size: 14px; }
+      .mating-line   { stroke: ${t.gold}; stroke-width: 1.8; opacity: 0.85; fill: none; stroke-linecap: round; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important; }
+      .parent-branch { stroke: ${t.gold}; stroke-width: 1.6; opacity: 0.85; fill: none; stroke-linecap: round; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important; }
+      .junction-rose { fill: ${t.rose}; stroke: ${t.gold}; stroke-width: 0.8; opacity: 1 !important; animation: none !important; }
+      .node-group { opacity: 1 !important; animation: none !important; }
+      .node-photo { opacity: 1 !important; animation: none !important; }
+      .node-add-btn, .node-id { display: none !important; }
+    `;
+  }
 
   function exportImage(opts = {}) {
     const filename = opts.filename || 'family-tree.jpg';
     const scale    = opts.scale    || 2;       // 2× pixel density for print
-    const bgColor  = opts.bgColor  || '#fbf8f1';
+    // Default bgColor = the active theme's page surface so the export
+    // matches whichever palette the user picked.
+    const themeTokens = readThemeTokens();
+    const bgColor  = opts.bgColor  || themeTokens.ink0;
     const format   = opts.format   || 'image/jpeg';
     const quality  = opts.quality !== undefined ? opts.quality : 0.92;
     const maxPx    = opts.maxPixels || 16000;  // cap on either side
@@ -749,7 +780,7 @@ const Pedigree = (() => {
     // rasteriser supports it — inline styles above provide guaranteed
     // visibility, this provides guaranteed *appearance*.
     const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-    styleEl.textContent = EXPORT_CSS;
+    styleEl.textContent = buildExportCss();
     clone.insertBefore(styleEl, clone.firstChild);
 
     const xml = new XMLSerializer().serializeToString(clone);

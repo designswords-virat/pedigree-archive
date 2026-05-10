@@ -176,13 +176,17 @@
       $('#stage').scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Layout toggle: Compact (wrapped sub-rows, default) vs Full tree
-    // (every generation on its own horizontal line — like a classic chart).
+    // Layout toggle:
+    //   Compact   = scrollMode + wrapped sub-rows (tall scrollable tree)
+    //   Full tree = fit-to-canvas + every generation on one line (chart view)
+    // Flipping both modes together makes the change unmistakable even for
+    // tiny trees where wrap/no-wrap alone would render identically.
     function applyLayout(mode) {
       const isFull = (mode === 'full');
       document.querySelectorAll('.vt-btn').forEach(b =>
         b.classList.toggle('active', b.dataset.layout === mode));
-      Pedigree.setWrapSiblings(!isFull);
+      if (Pedigree.setScrollMode)   Pedigree.setScrollMode(!isFull);
+      if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(!isFull);
       $('#stage').scrollTo({ top: 0 });
     }
     $('#btnLayoutWrap').addEventListener('click', () => applyLayout('wrap'));
@@ -201,7 +205,8 @@
         await Pedigree.exportImage({
           filename: stem + '-tree.jpg',
           scale: 2,
-          bgColor: '#fbf8f1',
+          // bgColor omitted -- exportImage reads the active theme's
+          // --ink-0 token so the JPG inherits whichever palette is on.
           format: 'image/jpeg',
           quality: 0.92,
         });
