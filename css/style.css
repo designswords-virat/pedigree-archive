@@ -6,48 +6,76 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&display=swap');
 
 :root {
-  /* DEFAULT THEME — Ivoire doux (light, warm parchment). The variable
-     NAMES come from the prior dark theme and are kept to avoid touching
-     thousands of references; their VALUES describe whatever the active
-     theme should look like. Other themes below override these.
+  /* DEFAULT THEME — Bordeaux. The variable NAMES come from the prior
+     dark theme and are kept to avoid touching thousands of references;
+     their VALUES describe whatever the active theme should look like.
+     Other themes below override these.
 
        ink-*               = page surfaces (lightest → slightly tinted)
        ivory / parchment*  = text scale (strongest → faintest) */
-  --ink-0:        #f0e6c2;     /* page background (warm ivoire doux) */
-  --ink-1:        #ebe0b4;     /* card background */
-  --ink-2:        #e3d6a0;     /* panel / inset background */
-  --ink-3:        #d8c98c;     /* tinted divider surface */
+  --ink-0:        #490c1e;     /* page background (Bordeaux) */
+  --ink-1:        #561328;     /* card background */
+  --ink-2:        #631c33;     /* panel / inset background */
+  --ink-3:        #72253f;     /* tinted divider surface */
 
   /* antique gold accents — Or vieilli */
   --gold:         #bfa06a;
   --gold-bright:  #d4b87f;
   --gold-deep:    #8a7a4a;
   --gold-dim:     #5e5230;
-  --gold-faint:   rgba(191, 160, 106, 0.20);
-  --gold-soft:    rgba(191, 160, 106, 0.50);
+  --gold-faint:   rgba(191, 160, 106, 0.22);
+  --gold-soft:    rgba(191, 160, 106, 0.45);
 
-  /* navy text scale — Bleu nuit */
-  --ivory:        #1b2e49;     /* strongest body text */
-  --parchment:    #2a3d5c;     /* default body text */
-  --parchment-dim:#6b7184;     /* secondary / labels */
-  --parchment-faint: #9da4b6;  /* tertiary / hints */
+  /* ivory text scale on Bordeaux ground */
+  --ivory:        #f0e6c2;
+  --parchment:    #e8d8a8;
+  --parchment-dim:#c79c9e;
+  --parchment-faint: #8a6b71;
 
   /* heraldic accents */
-  --rose:         #490c1e;     /* Bordeaux */
-  --rose-deep:    #320614;
-  --ivy:          #07312a;     /* Vert profond — used for "living" */
-  --crimson:      #490c1e;
+  --rose:         #f0a8b5;
+  --rose-deep:    #c97a8a;
+  --ivy:          #8fbf7e;
+  --crimson:      #f0a8b5;
   --royal-blue:   #1b2e49;
 
-  --border:       rgba(27, 46, 73, 0.20);
-  --border-soft:  rgba(27, 46, 73, 0.10);
-  --panel:        rgba(235, 224, 180, 0.96);
+  --border:       rgba(240, 230, 194, 0.22);
+  --border-soft:  rgba(240, 230, 194, 0.12);
+  --panel:        rgba(86, 19, 40, 0.96);
 
   --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
   --font-body:    'Cormorant Garamond', 'EB Garamond', Georgia, serif;
   --font-script:  'Pinyon Script', 'Cormorant Garamond', cursive;
 
-  /* Photo treatment: subtle sepia for the warm ivoire ground. */
+  /* Photo treatment for the Bordeaux ground. */
+  --photo-filter:       sepia(0.20) saturate(0.88) brightness(1.00) contrast(1.03);
+  --photo-filter-hover: sepia(0.10) saturate(1.00) brightness(1.05) contrast(1.06);
+}
+
+/* Ivoire doux — the previous default, now opt-in. */
+[data-theme="ivoire"] {
+  --ink-0: #f0e6c2;
+  --ink-1: #ebe0b4;
+  --ink-2: #e3d6a0;
+  --ink-3: #d8c98c;
+  --gold: #bfa06a;
+  --gold-bright: #d4b87f;
+  --gold-deep: #8a7a4a;
+  --gold-dim: #5e5230;
+  --gold-faint: rgba(191, 160, 106, 0.20);
+  --gold-soft:  rgba(191, 160, 106, 0.50);
+  --ivory:        #1b2e49;
+  --parchment:    #2a3d5c;
+  --parchment-dim:#6b7184;
+  --parchment-faint: #9da4b6;
+  --rose:         #490c1e;
+  --rose-deep:    #320614;
+  --ivy:          #07312a;
+  --crimson:      #490c1e;
+  --royal-blue:   #1b2e49;
+  --border:       rgba(27, 46, 73, 0.20);
+  --border-soft:  rgba(27, 46, 73, 0.10);
+  --panel:        rgba(235, 224, 180, 0.96);
   --photo-filter:       sepia(0.30) saturate(0.88) brightness(0.98) contrast(1.04);
   --photo-filter-hover: sepia(0.18) saturate(1.00) brightness(1.02) contrast(1.06);
 }
@@ -107,30 +135,7 @@
   --photo-filter-hover: sepia(0.08) saturate(1.00) brightness(1.05) contrast(1.06);
 }
 
-[data-theme="bordeaux"] {
-  --ink-0: #490c1e;
-  --ink-1: #561328;
-  --ink-2: #631c33;
-  --ink-3: #72253f;
-  --gold: #bfa06a;
-  --gold-bright: #d4b87f;
-  --gold-deep: #8a7a4a;
-  --gold-dim: #5e5230;
-  --gold-faint: rgba(191, 160, 106, 0.22);
-  --gold-soft:  rgba(191, 160, 106, 0.45);
-  --ivory:        #f0e6c2;
-  --parchment:    #e8d8a8;
-  --parchment-dim:#c79c9e;
-  --parchment-faint: #8a6b71;
-  --rose:         #f0a8b5;       /* lighter pink as the danger accent */
-  --rose-deep:    #c97a8a;
-  --ivy:          #8fbf7e;
-  --border:       rgba(240, 230, 194, 0.22);
-  --border-soft:  rgba(240, 230, 194, 0.12);
-  --panel:        rgba(86, 19, 40, 0.96);
-  --photo-filter:       sepia(0.20) saturate(0.88) brightness(1.00) contrast(1.03);
-  --photo-filter-hover: sepia(0.10) saturate(1.00) brightness(1.05) contrast(1.06);
-}
+/* [data-theme="bordeaux"] is the default — defined in :root above. */
 
 [data-theme="or-vieilli"] {
   --ink-0: #d4b780;
@@ -163,14 +168,14 @@
 
 .theme-picker {
   position: fixed;
-  bottom: 14px; right: 14px;     /* away from toolbars on tree pages */
+  bottom: 60px; right: 14px;     /* clears the bottombar legend on tree pages */
   z-index: 1500;
   display: flex; gap: 6px;
   padding: 6px 8px;
-  background: var(--ink-1);
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.92);   /* neutral so it reads on every theme */
+  border: 1px solid rgba(0, 0, 0, 0.18);
   border-radius: 24px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.30);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -191,7 +196,7 @@
     0 0 0 3.5px var(--gold);
 }
 @media (max-width: 720px) {
-  .theme-picker { bottom: 8px; right: 8px; padding: 4px 6px; gap: 4px; }
+  .theme-picker { bottom: 56px; right: 8px; padding: 4px 6px; gap: 4px; }
   .theme-sw { width: 16px; height: 16px; }
 }
 
@@ -1792,13 +1797,14 @@ input[type="checkbox"]:checked::after {
   animation: spotlightPulse 3s ease-in-out infinite;
 }
 .landing .node-group.spotlight .node-photo {
-  /* photoIn animation uses `forwards` to hold opacity at 1; when our
-     spotlightPhoto animation overrides `animation`, that hold no longer
-     applies and the photo reverts to its base opacity:0. Pin it. */
+  /* photoIn animation uses `forwards` to hold opacity at 1; when this
+     rule overrides `animation`, the hold no longer applies, so the
+     photo reverts to its base opacity:0. Pin it. The previous scale
+     pulse was removed -- it broke the SVG clip-path alignment and let
+     the photo bleed past the gold frame. */
   opacity: 1 !important;
   filter: var(--photo-filter-hover) brightness(1.08);
-  animation: spotlightPhoto 3s ease-in-out infinite;
-  transform-origin: 50% 50%;
+  animation: none;
 }
 @keyframes spotlightPulse {
   0%, 100% { stroke-width: 3.6; }

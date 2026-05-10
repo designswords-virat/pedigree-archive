@@ -290,11 +290,15 @@ const Pedigree = (() => {
       class: 'frame-back'
     }, group);
 
-    // photo clipped to oval
+    // photo clipped to oval — inset 2px on every side so the photo sits
+    // comfortably inside the gold ring even when the spotlight scale
+    // animation grows it slightly. Without the inset, sub-pixel rounding
+    // (and the 1.02x spotlight scale) lets the photo bleed past the frame.
     const photoUrl = resolvePhoto(person);
     if (photoUrl) {
+      const PAD = 2;
       const img = el('image', {
-        x: 0, y: 0, width: NODE_W, height: NODE_H,
+        x: PAD, y: PAD, width: NODE_W - PAD * 2, height: NODE_H - PAD * 2,
         preserveAspectRatio: 'xMidYMid slice',
         class: 'node-photo',
         'clip-path': 'url(#cp-oval)'

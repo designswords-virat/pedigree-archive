@@ -15,13 +15,13 @@
 // ============================================================
 (function () {
   const KEY = 'pa_theme';
-  const DEFAULT = 'ivoire';
+  const DEFAULT = 'bordeaux';        // matches :root in style.css
 
   const THEMES = [
+    { id: 'bordeaux',     name: 'Bordeaux',     color: '#490c1e' },
     { id: 'ivoire',       name: 'Ivoire doux',  color: '#f0e6c2' },
     { id: 'bleu-nuit',    name: 'Bleu nuit',    color: '#1b2e49' },
     { id: 'vert-profond', name: 'Vert profond', color: '#07312a' },
-    { id: 'bordeaux',     name: 'Bordeaux',     color: '#490c1e' },
     { id: 'or-vieilli',   name: 'Or vieilli',   color: '#bfa06a' },
   ];
 
@@ -29,8 +29,8 @@
     try { return localStorage.getItem(KEY) || DEFAULT; } catch (e) { return DEFAULT; }
   }
   function set(id) {
-    if (id === 'ivoire') document.documentElement.removeAttribute('data-theme');
-    else                 document.documentElement.setAttribute('data-theme', id);
+    if (id === DEFAULT) document.documentElement.removeAttribute('data-theme');
+    else                document.documentElement.setAttribute('data-theme', id);
     try { localStorage.setItem(KEY, id); } catch (e) {}
     refreshActive();
     try { if (typeof Sound !== 'undefined') Sound.click(); } catch (e) {}
