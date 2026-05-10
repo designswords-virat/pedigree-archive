@@ -6,49 +6,193 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&display=swap');
 
 :root {
-  /* IVORY & NAVY — formal heritage palette.
-     Variable names below kept from the prior dark theme to avoid touching
-     thousands of references; their VALUES now describe the light theme.
-     ink-*  = ivory page surfaces (lightest → slightly tinted)
-     ivory / parchment* = navy text scale (strongest → faintest) */
-  --ink-0:        #fbf8f1;     /* page background (warm ivory) */
-  --ink-1:        #f5efe2;     /* card background */
-  --ink-2:        #efe8d6;     /* panel / inset background */
-  --ink-3:        #e7decb;     /* tinted divider surface */
+  /* DEFAULT THEME — Ivoire doux (light, warm parchment). The variable
+     NAMES come from the prior dark theme and are kept to avoid touching
+     thousands of references; their VALUES describe whatever the active
+     theme should look like. Other themes below override these.
 
-  /* antique gold accents — muted leaf, not bright modern brass */
-  --gold:         #b8932c;
-  --gold-bright:  #d4b04a;
-  --gold-deep:    #8a6d20;
-  --gold-dim:     #6b5418;
-  --gold-faint:   rgba(184, 147, 44, 0.20);
-  --gold-soft:    rgba(184, 147, 44, 0.50);
+       ink-*               = page surfaces (lightest → slightly tinted)
+       ivory / parchment*  = text scale (strongest → faintest) */
+  --ink-0:        #f0e6c2;     /* page background (warm ivoire doux) */
+  --ink-1:        #ebe0b4;     /* card background */
+  --ink-2:        #e3d6a0;     /* panel / inset background */
+  --ink-3:        #d8c98c;     /* tinted divider surface */
 
-  /* navy text scale — strong, mid, dim, faint */
-  --ivory:        #1a2540;     /* strongest body text */
-  --parchment:    #2a3654;     /* default body text */
+  /* antique gold accents — Or vieilli */
+  --gold:         #bfa06a;
+  --gold-bright:  #d4b87f;
+  --gold-deep:    #8a7a4a;
+  --gold-dim:     #5e5230;
+  --gold-faint:   rgba(191, 160, 106, 0.20);
+  --gold-soft:    rgba(191, 160, 106, 0.50);
+
+  /* navy text scale — Bleu nuit */
+  --ivory:        #1b2e49;     /* strongest body text */
+  --parchment:    #2a3d5c;     /* default body text */
   --parchment-dim:#6b7184;     /* secondary / labels */
   --parchment-faint: #9da4b6;  /* tertiary / hints */
 
   /* heraldic accents */
-  --rose:         #6b1226;     /* burgundy (formal accent) */
-  --rose-deep:    #4d0a1a;
-  --ivy:          #3f6b3d;     /* living */
-  --crimson:      #6b1226;     /* in memoriam */
-  --royal-blue:   #1f3a6e;
+  --rose:         #490c1e;     /* Bordeaux */
+  --rose-deep:    #320614;
+  --ivy:          #07312a;     /* Vert profond — used for "living" */
+  --crimson:      #490c1e;
+  --royal-blue:   #1b2e49;
 
-  --border:       rgba(26, 37, 64, 0.20);
-  --border-soft:  rgba(26, 37, 64, 0.10);
-  --panel:        rgba(245, 239, 226, 0.96);
+  --border:       rgba(27, 46, 73, 0.20);
+  --border-soft:  rgba(27, 46, 73, 0.10);
+  --panel:        rgba(235, 224, 180, 0.96);
 
   --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
   --font-body:    'Cormorant Garamond', 'EB Garamond', Georgia, serif;
   --font-script:  'Pinyon Script', 'Cormorant Garamond', cursive;
 
-  /* Photo treatment for the light theme: a softer sepia + slight desaturation
-     so colour photos read as antique prints on the ivory ground. */
+  /* Photo treatment: subtle sepia for the warm ivoire ground. */
   --photo-filter:       sepia(0.30) saturate(0.88) brightness(0.98) contrast(1.04);
   --photo-filter-hover: sepia(0.18) saturate(1.00) brightness(1.02) contrast(1.06);
+}
+
+/* ============================================================
+   ALTERNATE THEMES — applied via [data-theme] on <html>.
+   Five palettes built from the same five colour family.
+   ============================================================ */
+
+[data-theme="bleu-nuit"] {
+  --ink-0: #1b2e49;
+  --ink-1: #243957;
+  --ink-2: #2c4264;
+  --ink-3: #364c70;
+  --gold: #bfa06a;
+  --gold-bright: #d4b87f;
+  --gold-deep: #8a7a4a;
+  --gold-dim: #5e5230;
+  --gold-faint: rgba(191, 160, 106, 0.20);
+  --gold-soft:  rgba(191, 160, 106, 0.45);
+  --ivory:        #f0e6c2;
+  --parchment:    #e0d5a8;
+  --parchment-dim:#9da4b6;
+  --parchment-faint: #6b7184;
+  --rose:         #c97a8a;
+  --rose-deep:    #8a4d5a;
+  --ivy:          #5e9054;
+  --border:       rgba(240, 230, 194, 0.22);
+  --border-soft:  rgba(240, 230, 194, 0.12);
+  --panel:        rgba(36, 57, 87, 0.96);
+  --photo-filter:       sepia(0.20) saturate(0.85) brightness(1.00) contrast(1.03);
+  --photo-filter-hover: sepia(0.10) saturate(1.00) brightness(1.05) contrast(1.06);
+}
+
+[data-theme="vert-profond"] {
+  --ink-0: #07312a;
+  --ink-1: #0d3e35;
+  --ink-2: #134a40;
+  --ink-3: #1a584c;
+  --gold: #bfa06a;
+  --gold-bright: #d4b87f;
+  --gold-deep: #8a7a4a;
+  --gold-dim: #5e5230;
+  --gold-faint: rgba(191, 160, 106, 0.22);
+  --gold-soft:  rgba(191, 160, 106, 0.45);
+  --ivory:        #f0e6c2;
+  --parchment:    #d4c89a;
+  --parchment-dim:#98ab9f;
+  --parchment-faint: #6b7e72;
+  --rose:         #c97a8a;
+  --rose-deep:    #8a4d5a;
+  --ivy:          #8fbf7e;
+  --border:       rgba(240, 230, 194, 0.22);
+  --border-soft:  rgba(240, 230, 194, 0.12);
+  --panel:        rgba(13, 62, 53, 0.96);
+  --photo-filter:       sepia(0.18) saturate(0.85) brightness(1.00) contrast(1.03);
+  --photo-filter-hover: sepia(0.08) saturate(1.00) brightness(1.05) contrast(1.06);
+}
+
+[data-theme="bordeaux"] {
+  --ink-0: #490c1e;
+  --ink-1: #561328;
+  --ink-2: #631c33;
+  --ink-3: #72253f;
+  --gold: #bfa06a;
+  --gold-bright: #d4b87f;
+  --gold-deep: #8a7a4a;
+  --gold-dim: #5e5230;
+  --gold-faint: rgba(191, 160, 106, 0.22);
+  --gold-soft:  rgba(191, 160, 106, 0.45);
+  --ivory:        #f0e6c2;
+  --parchment:    #e8d8a8;
+  --parchment-dim:#c79c9e;
+  --parchment-faint: #8a6b71;
+  --rose:         #f0a8b5;       /* lighter pink as the danger accent */
+  --rose-deep:    #c97a8a;
+  --ivy:          #8fbf7e;
+  --border:       rgba(240, 230, 194, 0.22);
+  --border-soft:  rgba(240, 230, 194, 0.12);
+  --panel:        rgba(86, 19, 40, 0.96);
+  --photo-filter:       sepia(0.20) saturate(0.88) brightness(1.00) contrast(1.03);
+  --photo-filter-hover: sepia(0.10) saturate(1.00) brightness(1.05) contrast(1.06);
+}
+
+[data-theme="or-vieilli"] {
+  --ink-0: #d4b780;
+  --ink-1: #dec295;
+  --ink-2: #e7cea7;
+  --ink-3: #efdbbd;
+  --gold: #6b5418;             /* darker gold reads on a gold bg */
+  --gold-bright: #8a6d20;
+  --gold-deep: #4a3a10;
+  --gold-dim: #2e2308;
+  --gold-faint: rgba(107, 84, 24, 0.18);
+  --gold-soft:  rgba(107, 84, 24, 0.45);
+  --ivory:        #1b2e49;
+  --parchment:    #2a3d5c;
+  --parchment-dim:#5a4d2e;
+  --parchment-faint: #7a6c4e;
+  --rose:         #490c1e;
+  --rose-deep:    #320614;
+  --ivy:          #07312a;
+  --border:       rgba(27, 46, 73, 0.25);
+  --border-soft:  rgba(27, 46, 73, 0.12);
+  --panel:        rgba(222, 194, 149, 0.96);
+  --photo-filter:       sepia(0.32) saturate(0.88) brightness(0.97) contrast(1.04);
+  --photo-filter-hover: sepia(0.20) saturate(1.00) brightness(1.02) contrast(1.06);
+}
+
+/* ============================================================
+   THEME PICKER — fixed top-right swatch row, visible on every page.
+   ============================================================ */
+
+.theme-picker {
+  position: fixed;
+  top: 12px; right: 14px;
+  z-index: 1500;
+  display: flex; gap: 6px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.theme-sw {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  background-clip: padding-box;
+}
+.theme-sw:hover { transform: scale(1.15); }
+.theme-sw.active {
+  transform: scale(1.20);
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 3.5px var(--gold);
+}
+@media (max-width: 720px) {
+  .theme-picker { top: 8px; right: 8px; padding: 4px 6px; gap: 4px; }
+  .theme-sw { width: 16px; height: 16px; }
 }
 
 * { box-sizing: border-box; }
