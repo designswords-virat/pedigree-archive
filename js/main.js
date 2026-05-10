@@ -136,22 +136,25 @@
     });
   }
 
-  // Generic placeholder tree shown on the hero when no saved book
-  // exists on this browser (logged-out visitor or fresh device). No
-  // personal names, no specific family — just enough to convey what
-  // the product builds.
-  const PLACEHOLDER_TREE = {
-    meta: { title: 'A book of kindred' },
-    people: [
-      { id: 'g_m', name: 'Grandfather', gender: 'male',   deceased: false, birthYear: null, parentIds: [],          partnerIds: ['g_f'],         affected: false, carrier: false },
-      { id: 'g_f', name: 'Grandmother', gender: 'female', deceased: false, birthYear: null, parentIds: [],          partnerIds: ['g_m'],         affected: false, carrier: false },
-      { id: 'p_m', name: 'Father',      gender: 'male',   deceased: false, birthYear: null, parentIds: ['g_m','g_f'], partnerIds: ['p_f'],         affected: false, carrier: false },
-      { id: 'p_f', name: 'Mother',      gender: 'female', deceased: false, birthYear: null, parentIds: [],          partnerIds: ['p_m'],         affected: false, carrier: false },
-      { id: 'c_a', name: 'Sibling',     gender: 'female', deceased: false, birthYear: null, parentIds: ['p_m','p_f'], partnerIds: [],              affected: false, carrier: false },
-      { id: 'c_b', name: 'You',         gender: 'unknown',deceased: false, birthYear: null, parentIds: ['p_m','p_f'], partnerIds: [],              affected: false, carrier: false },
-      { id: 'c_c', name: 'Sibling',     gender: 'male',   deceased: false, birthYear: null, parentIds: ['p_m','p_f'], partnerIds: [],              affected: false, carrier: false },
-    ],
-  };
+  // Bundled hero demo — a richly populated family tree (22 people with
+  // photos) loaded from js/hero-demo.js. Shown on the public landing
+  // for any visitor without a saved book of their own. If hero-demo.js
+  // somehow fails to load, fall back to a tiny generic placeholder so
+  // the hero still renders something.
+  const PLACEHOLDER_TREE = (typeof window.HeroDemo !== 'undefined' && window.HeroDemo)
+    ? window.HeroDemo
+    : {
+        meta: { title: 'A book of kindred' },
+        people: [
+          { id: 'g_m', name: 'Grandfather', gender: 'male',   parentIds: [],          partnerIds: ['g_f'] },
+          { id: 'g_f', name: 'Grandmother', gender: 'female', parentIds: [],          partnerIds: ['g_m'] },
+          { id: 'p_m', name: 'Father',      gender: 'male',   parentIds: ['g_m','g_f'], partnerIds: ['p_f'] },
+          { id: 'p_f', name: 'Mother',      gender: 'female', parentIds: [],          partnerIds: ['p_m'] },
+          { id: 'c_a', name: 'Sibling',     gender: 'female', parentIds: ['p_m','p_f'] },
+          { id: 'c_b', name: 'You',         gender: 'unknown',parentIds: ['p_m','p_f'] },
+          { id: 'c_c', name: 'Sibling',     gender: 'male',   parentIds: ['p_m','p_f'] },
+        ],
+      };
 
   // ---- INIT ----
   // Hero shows the LARGEST book from the user's library on this browser

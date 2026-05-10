@@ -35,3 +35,6 @@ References/
 # Local Netlify folder
 .netlify
 .vercel
+
+# Exported book JSONs (may contain credentials hash + private details)
+pedigree-*.json
