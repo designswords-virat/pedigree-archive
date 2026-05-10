@@ -231,19 +231,11 @@ body:has(.app) {
   user-select: none;
 }
 
-/* ivory page surface — laid-paper grain, no dark vignette */
+/* flat page surface — no gradient, just the active theme's bg colour */
 body::before {
   content: '';
   position: fixed; inset: 0;
-  background:
-    /* very faint warm wash from the top to suggest aged paper */
-    linear-gradient(180deg, rgba(184, 147, 44, 0.04) 0%, transparent 40%),
-    /* ultra-faint laid-paper texture */
-    repeating-linear-gradient(0deg,
-      rgba(26, 37, 64, 0.025) 0,
-      rgba(26, 37, 64, 0.025) 1px,
-      transparent 1px, transparent 6px),
-    var(--ink-0);
+  background: var(--ink-0);
   pointer-events: none;
   z-index: 0;
 }
@@ -1775,13 +1767,9 @@ input[type="checkbox"]:checked::after {
   50%      { transform: scale(1.02); }
 }
 
-/* soft ivory haze around the edges to keep focus centred */
+/* vignette removed — solid background reads cleaner across all themes */
 .landing-vignette {
-  position: absolute; inset: 0;
-  z-index: 2;
-  background:
-    radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(251, 248, 241, 0.55) 95%);
-  pointer-events: none;
+  display: none;
 }
 
 /* the hero copy — sits centre-screen on top of everything */
