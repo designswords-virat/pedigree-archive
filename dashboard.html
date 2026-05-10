@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Your Book — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=32" />
+<link rel="stylesheet" href="css/style.css?v=33" />
 </head>
 <body>
 
@@ -72,18 +72,29 @@
       </p>
     </section>
 
+    <!-- Books library — multiple family trees on the same login -->
+    <section class="dash-card books-card">
+      <div class="books-head">
+        <h2>Your books</h2>
+        <button class="btn primary" id="btnNewBook" title="Start a fresh family tree (your current one is auto-saved)">＋ New project</button>
+      </div>
+      <p class="lead">Every book is a separate family tree. Switch between them any time — the active book is the one you edit and view from the dashboard.</p>
+      <ul class="books-list" id="booksList"></ul>
+    </section>
+
   </main>
 </div>
 
 
-<script src="js/config.js?v=32"></script>
-<script src="js/supa.js?v=32"></script>
-<script src="js/gate.js?v=32"></script>
+<script src="js/config.js?v=33"></script>
+<script src="js/supa.js?v=33"></script>
+<script src="js/gate.js?v=33"></script>
 <script>Gate.require();</script>
-<script src="js/auth.js?v=32"></script>
-<script src="js/sounds.js?v=32"></script>
-<script src="js/click-sound.js?v=32"></script>
-<script src="js/theme.js?v=32"></script>
+<script src="js/auth.js?v=33"></script>
+<script src="js/books.js?v=33"></script>
+<script src="js/sounds.js?v=33"></script>
+<script src="js/click-sound.js?v=33"></script>
+<script src="js/theme.js?v=33"></script>
 <script>
 (async function () {
   const $ = (s) => document.querySelector(s);
@@ -212,6 +223,66 @@
       return raw ? JSON.parse(raw) : null;
     } catch (_) { return null; }
   }
+
+  // ----- BOOKS LIBRARY -----
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  function renderBooks() {
+    if (typeof Books === 'undefined') return;
+    const ul = $('#booksList');
+    if (!ul) return;
+    const items = Books.list();
+    ul.innerHTML = items.map(b => `
+      <li class="book-row${b.isActive ? ' active' : ''}" data-id="${b.id || ''}">
+        <div class="book-meta">
+          <div class="book-name">${escHtml(b.name)}${b.isUnsaved ? ' <span class="book-tag">unsaved</span>' : ''}</div>
+          <div class="book-sub">${b.count} ${b.count === 1 ? 'person' : 'people'}${b.savedAt ? ' · saved ' + b.savedAt.slice(0, 10) : ''}</div>
+        </div>
+        <div class="book-actions">
+          ${b.isActive
+              ? '<span class="book-tag active-tag">Open</span>'
+              : `<button class="btn" data-action="switch">Switch</button>
+                 <button class="btn danger" data-action="delete">Delete</button>`}
+        </div>
+      </li>
+    `).join('');
+  }
+  renderBooks();
+
+  $('#btnNewBook').addEventListener('click', () => {
+    if (typeof Books === 'undefined') return;
+    if (!confirm('Start a new family tree?\n\nYour current tree will be auto-saved into your books library so you can switch back any time.')) return;
+    try {
+      Books.createNew();
+      alert('Fresh book created. The page will reload so you can fill in your particulars.');
+      location.href = 'details.html';
+    } catch (err) {
+      alert('Could not start a new book: ' + (err.message || err));
+    }
+  });
+
+  // event-delegation for switch / delete buttons inside the books list
+  $('#booksList').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const li = e.target.closest('.book-row');
+    const id = li && li.dataset.id;
+    if (!id) return;
+    if (btn.dataset.action === 'switch') {
+      try {
+        Books.switchTo(id);
+        location.reload();
+      } catch (err) {
+        alert('Could not switch: ' + (err.message || err));
+      }
+    } else if (btn.dataset.action === 'delete') {
+      if (!confirm('Delete this book? This cannot be undone.')) return;
+      Books.remove(id);
+      renderBooks();
+    }
+  });
 })();
 </script>
 </body>

@@ -2628,6 +2628,80 @@ body:has(.landing) .spotlight-caption { display: none; }
   margin: 14px 0 0;
   line-height: 1.5;
 }
+.login-foot {
+  text-align: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4px 8px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.18s;
+}
+.link-btn:hover { color: var(--ivory); }
+
+/* ============== BOOKS LIBRARY (dashboard) ============== */
+.books-card { margin-top: 18px; }
+.books-head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; margin-bottom: 6px;
+}
+.books-head h2 { margin: 0; }
+.books-list {
+  list-style: none; padding: 0; margin: 16px 0 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.book-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--ink-1);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.book-row.active {
+  border-color: var(--gold);
+  background: var(--ink-2);
+}
+.book-meta { min-width: 0; flex: 1; }
+.book-name {
+  font-family: var(--font-display);
+  font-size: 14px; letter-spacing: 0.10em;
+  color: var(--ivory);
+  text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.book-sub {
+  font-family: var(--font-body); font-style: italic;
+  font-size: 13px; color: var(--parchment-dim);
+  margin-top: 2px;
+}
+.book-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.book-actions .btn { padding: 7px 12px; font-size: 10px; }
+.book-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: var(--font-display); font-size: 9px; letter-spacing: 0.20em; text-transform: uppercase;
+  color: var(--parchment-dim);
+  border: 1px solid var(--parchment-faint);
+  border-radius: 999px;
+  margin-left: 6px;
+}
+.book-tag.active-tag {
+  color: var(--gold);
+  border-color: var(--gold);
+}
 
 .auth-foot {
   text-align: center;

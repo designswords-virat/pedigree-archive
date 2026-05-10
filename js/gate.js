@@ -66,6 +66,13 @@
     write({ ...cur, open: false });
   }
 
+  // Wipe the credentials (so the next login is treated as first-run
+  // setup). Tree data lives in a separate key (pa_local_v1) and is
+  // NOT touched here.
+  function resetCredentials() {
+    try { localStorage.removeItem(KEY); } catch (_) {}
+  }
+
   function isOpen()         { return !!read().open; }
   function hasCredentials() { const s = read(); return !!(s.id && s.hash); }
   function currentId()      { return read().id; }
@@ -85,6 +92,6 @@
 
   window.Gate = {
     isOpen, hasCredentials, currentId,
-    create, login, logout, require,
+    create, login, logout, resetCredentials, require,
   };
 })();

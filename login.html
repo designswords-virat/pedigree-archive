@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Login — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=32" />
+<link rel="stylesheet" href="css/style.css?v=33" />
 </head>
 <body>
 
@@ -42,16 +42,20 @@
       </div>
 
       <p class="login-hint" id="loginHint"></p>
+
+      <div class="login-foot" id="forgotRow" style="display:none;">
+        <button type="button" class="link-btn" id="forgotLink">Forgot password? Reset access</button>
+      </div>
     </form>
 
   </article>
 </main>
 
 
-<script src="js/gate.js?v=32"></script>
-<script src="js/sounds.js?v=32"></script>
-<script src="js/click-sound.js?v=32"></script>
-<script src="js/theme.js?v=32"></script>
+<script src="js/gate.js?v=33"></script>
+<script src="js/sounds.js?v=33"></script>
+<script src="js/click-sound.js?v=33"></script>
+<script src="js/theme.js?v=33"></script>
 <script>
 (function () {
   const $ = (s) => document.querySelector(s);
@@ -71,8 +75,28 @@
     $('#loginEyebrow').textContent = 'Pedigree Archive';
     $('#loginTitle').textContent   = 'Welcome back';
     $('#loginSubtitle').textContent = 'Enter your credentials to open your book.';
-    $('#loginHint').textContent = 'Forgot your password? There is no recovery — credentials are stored only in this browser. Clear browser data to start over.';
+    $('#loginHint').textContent = 'Credentials are stored only in this browser. If you have forgotten yours, use Reset access below — your family tree is preserved.';
+    $('#forgotRow').style.display = '';
   }
+
+  // ----- Forgot password / Reset access -----
+  // Wipes pa_gate (credentials) without touching pa_local_v1 (the tree).
+  // After reset, the page reloads into "Create your access" first-run mode.
+  $('#forgotLink').addEventListener('click', () => {
+    const msg =
+      'Reset your access?\n\n' +
+      'Because credentials are stored only in this browser, there is no email\n' +
+      'recovery. This will:\n\n' +
+      '  • erase your current username + password on this device\n' +
+      '  • PRESERVE your family tree, profile, photos and theme choice\n\n' +
+      'After reset you will be asked to choose a new username + password.\n' +
+      'Once you log in with the new credentials, your tree appears as before.\n\n' +
+      'Continue?';
+    if (!confirm(msg)) return;
+    Gate.resetCredentials();
+    alert('Access cleared. The page will reload — choose your new username + password.');
+    location.reload();
+  });
 
   // if a session is already open, skip straight through
   if (Gate.isOpen()) {
