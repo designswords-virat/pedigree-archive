@@ -844,6 +844,18 @@
         newPerson.partnerIds.push(a.id);
         if (!newPerson.partnerMeta) newPerson.partnerMeta = {};
         newPerson.partnerMeta[a.id] = { marriedDate: marriageDate, divorcedDate: divorceDate };
+        // Spouse-of-a-parent inference: if the anchor already has
+        // children, the new spouse automatically becomes their co-parent
+        // too. This matches the obvious reading of "Meera is Om's wife,
+        // and Dinesh is Om's son, so Meera is Dinesh's mother." For
+        // step-parents the user can later remove the parent link.
+        const aKids = childrenOf(a);
+        aKids.forEach(c => {
+          if (!c.parentIds) c.parentIds = [];
+          if (!c.parentIds.includes(newPerson.id)) c.parentIds.push(newPerson.id);
+          if (!c.parentMeta) c.parentMeta = {};
+          if (!c.parentMeta[newPerson.id]) c.parentMeta[newPerson.id] = { type: 'biological' };
+        });
         break;
       }
       case 'child': {
