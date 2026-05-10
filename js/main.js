@@ -142,6 +142,10 @@
 
     const svg = $('#pedigreeSvg');
     Pedigree.init(svg, { interactive: false });
+    // Use the FULL chart layout (no sibling-row wrapping) so the hero
+    // tree spreads horizontally across the viewport instead of stacking
+    // wrapped sub-rows. Must be called before render.
+    if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
     Pedigree.render(demoData);
 
     // small entrance sound — soft chime on load (will be silent until the

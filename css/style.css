@@ -532,19 +532,19 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
 }
 
 /* =================== INSPECTOR PANEL =================== */
-/* Inspector now opens as a centred modal on every viewport, with a soft
-   backdrop fade. Mobile-specific overrides are kept further down for the
-   smaller footprint and slightly different animation. */
+/* Inspector — centred modal on every viewport. Lives inside .stage so it
+   shares a stacking context with the backdrop (.stage::before below);
+   that prevents the backdrop from painting over the inspector. */
 .inspector {
   position: fixed;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: min(560px, calc(100vw - 32px));
+  width: min(780px, calc(100vw - 32px));
   max-height: 88vh; max-height: 88dvh;
   background: var(--ink-0);
   border: 1px solid var(--gold);
-  padding: 32px 32px 26px;
-  z-index: 1100;
+  padding: 32px 36px 28px;
+  z-index: 60;
   border-radius: 4px;
   box-shadow:
     0 24px 60px rgba(26, 37, 64, 0.22),
@@ -552,22 +552,23 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   animation: insOpen 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
   overflow-y: auto;
 }
-/* full-screen ivory backdrop behind the inspector */
-body:has(.inspector:not(.hidden))::after {
+/* shared backdrop on .stage so it stays in the same stacking context as
+   the inspector — keeps the modal sharp while everything beneath blurs. */
+.stage::before {
   content: '';
   position: fixed; inset: 0;
-  background: rgba(26, 37, 64, 0.28);
-  backdrop-filter: blur(2px);
-  z-index: 1099;
-  animation: backdropIn 0.3s ease-out;
+  background: rgba(26, 37, 64, 0.32);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
 }
+.stage.has-inspector::before { opacity: 1; pointer-events: auto; }
 @keyframes insOpen {
   from { transform: translate(-50%, -48%) scale(0.96); opacity: 0; }
   to   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
-}
-@keyframes backdropIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
 }
 /* gold double-frame inset */
 .inspector::before {
@@ -1490,25 +1491,11 @@ input[type="checkbox"]:checked::after {
 
   .login-box { width: calc(100vw - 32px); max-width: 420px; padding: 28px 22px; }
 
-  /* inspector on phone — centred modal with backdrop */
-  .stage::before {
-    content: '';
-    position: fixed; inset: 0;
-    background: rgba(8, 6, 4, 0.82);
-    backdrop-filter: blur(4px);
-    z-index: 9;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.25s;
-  }
-  .stage.has-inspector::before { opacity: 1; pointer-events: auto; }
+  /* inspector on phone — narrower modal, snappier animation; shared
+     backdrop styling lives in the desktop block above. */
   .inspector {
-    top: 50%; left: 50%;
-    right: auto; bottom: auto;
-    transform: translate(-50%, -50%);
     width: calc(100vw - 24px); max-width: 440px;
-    max-height: 80vh; max-height: 80dvh;
     padding: 22px 18px 16px;
-    z-index: 11;
     animation: insMobileIn 0.3s cubic-bezier(0.2,0.8,0.2,1);
   }
   @keyframes insMobileIn {
