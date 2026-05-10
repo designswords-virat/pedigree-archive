@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Your Book — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=18" />
+<link rel="stylesheet" href="css/style.css?v=19" />
 </head>
 <body>
 
@@ -23,6 +23,7 @@
     <div class="toolbar">
       <a class="btn" href="index.html" title="Public landing">⌂ Landing</a>
       <a class="btn" href="details.html?source=self" id="btnDetails">✎ Edit Details</a>
+      <button class="btn" id="btnLogout" title="Lock this browser">⊙ Logout</button>
       <button class="btn danger" id="btnReset" title="Clear all data from this browser">⟲ Reset</button>
     </div>
   </header>
@@ -72,12 +73,14 @@
 </div>
 
 
-<script src="js/config.js?v=18"></script>
-<script src="js/supa.js?v=18"></script>
-<script src="js/auth.js?v=18"></script>
-<script src="js/sounds.js?v=18"></script>
-<script src="js/click-sound.js?v=18"></script>
-<script src="js/theme.js?v=18"></script>
+<script src="js/config.js?v=19"></script>
+<script src="js/supa.js?v=19"></script>
+<script src="js/gate.js?v=19"></script>
+<script>Gate.require();</script>
+<script src="js/auth.js?v=19"></script>
+<script src="js/sounds.js?v=19"></script>
+<script src="js/click-sound.js?v=19"></script>
+<script src="js/theme.js?v=19"></script>
 <script>
 (async function () {
   const $ = (s) => document.querySelector(s);
@@ -128,6 +131,13 @@
   $('#btnReset').addEventListener('click', async () => {
     await Auth.logout();   // (in single-user mode, logout = clear local data)
     location.href = 'index.html';
+  });
+
+  // Logout closes the gate session (data is preserved; user must log in again).
+  $('#btnLogout').addEventListener('click', () => {
+    if (typeof Gate === 'undefined') return;
+    Gate.logout();
+    location.href = 'login.html';
   });
 })();
 </script>

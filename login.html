@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>try{var t=localStorage.getItem("pa_theme");if(t&&t!=="ivoire")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login — Pedigree Archive</title>
+<link rel="stylesheet" href="css/style.css?v=19" />
+</head>
+<body>
+
+<main class="auth-shell">
+  <article class="auth-card">
+
+    <header class="login-head">
+      <div class="login-eyebrow" id="loginEyebrow">Pedigree Archive</div>
+      <h1 id="loginTitle">Welcome back</h1>
+      <p class="lead" id="loginSubtitle">Enter your credentials to open your book.</p>
+    </header>
+
+    <form id="loginForm" class="login-form">
+
+      <div class="auth-status" id="loginStatus"></div>
+
+      <div class="field-group">
+        <label for="loginId">ID</label>
+        <input type="text" id="loginId" required maxlength="60" autocomplete="username" />
+      </div>
+
+      <div class="field-group">
+        <label for="loginPw">Password</label>
+        <input type="password" id="loginPw" required minlength="4" maxlength="120" autocomplete="current-password" />
+      </div>
+
+      <div class="field-group" id="confirmGroup" style="display:none;">
+        <label for="loginPw2">Confirm password</label>
+        <input type="password" id="loginPw2" minlength="4" maxlength="120" autocomplete="new-password" />
+      </div>
+
+      <div class="login-actions">
+        <button type="submit" class="btn primary" id="loginSubmit">⏵ Enter</button>
+      </div>
+
+      <p class="login-hint" id="loginHint"></p>
+    </form>
+
+  </article>
+</main>
+
+
+<script src="js/gate.js?v=19"></script>
+<script src="js/sounds.js?v=19"></script>
+<script src="js/click-sound.js?v=19"></script>
+<script src="js/theme.js?v=19"></script>
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+
+  const firstRun = !Gate.hasCredentials();
+
+  // shape the panel for first-run vs returning user
+  if (firstRun) {
+    $('#loginEyebrow').textContent = 'Set up your access';
+    $('#loginTitle').textContent   = 'Create your book';
+    $('#loginSubtitle').textContent = 'Choose an ID and password — they protect everything you record here.';
+    $('#confirmGroup').style.display = '';
+    $('#loginSubmit').textContent = '⏵ Create access';
+    $('#loginHint').textContent = 'These credentials live only in this browser. There is no password recovery — write them down.';
+    $('#loginPw').setAttribute('autocomplete', 'new-password');
+  } else {
+    $('#loginEyebrow').textContent = 'Pedigree Archive';
+    $('#loginTitle').textContent   = 'Welcome back';
+    $('#loginSubtitle').textContent = 'Enter your credentials to open your book.';
+    $('#loginHint').textContent = 'Forgot your password? There is no recovery — credentials are stored only in this browser. Clear browser data to start over.';
+  }
+
+  // if a session is already open, skip straight through
+  if (Gate.isOpen()) {
+    location.replace('dashboard.html');
+    return;
+  }
+
+  function setStatus(msg, kind) {
+    const el = $('#loginStatus');
+    el.textContent = msg || '';
+    el.className = 'auth-status ' + (kind || '');
+    if (msg) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  $('#loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = $('#loginId').value.trim();
+    const pw = $('#loginPw').value;
+
+    if (!id) { setStatus('Please enter an ID.', 'error'); return; }
+    if (!pw || pw.length < 4) { setStatus('Password must be at least 4 characters.', 'error'); return; }
+
+    try {
+      if (firstRun) {
+        const pw2 = $('#loginPw2').value;
+        if (pw !== pw2) { setStatus('Passwords do not match.', 'error'); return; }
+        await Gate.create(id, pw);
+        setStatus('Access created. Opening your book…', 'success');
+      } else {
+        await Gate.login(id, pw);
+        setStatus('Welcome back. Opening your book…', 'success');
+      }
+      // route back to wherever the user was trying to go (or dashboard)
+      let next = 'dashboard.html';
+      try {
+        const stored = sessionStorage.getItem('pa_gate_returnTo');
+        if (stored) {
+          sessionStorage.removeItem('pa_gate_returnTo');
+          // only honour same-origin URLs
+          const url = new URL(stored, location.origin);
+          if (url.origin === location.origin) next = url.pathname + url.search;
+        }
+      } catch (_) {}
+      setTimeout(() => location.replace(next), 500);
+    } catch (err) {
+      setStatus(err.message || String(err), 'error');
+    }
+  });
+})();
+</script>
+</body>
+</html>

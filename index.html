@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Pedigree Archive — A book of kindred</title>
 <meta name="description" content="Build your family tree as a hand-painted manuscript. Oval portraits, gold lineage lines, an heirloom for your house." />
-<link rel="stylesheet" href="css/style.css?v=18" />
+<link rel="stylesheet" href="css/style.css?v=19" />
 </head>
 <body>
 
@@ -58,34 +58,50 @@
 
 </div>
 
-<script src="js/data.js?v=18"></script>
-<script src="js/config.js?v=18"></script>
-<script src="js/supa.js?v=18"></script>
-<script src="js/auth.js?v=18"></script>
-<script src="js/sounds.js?v=18"></script>
-<script src="js/pedigree.js?v=18"></script>
-<script src="js/main.js?v=18"></script>
+<script src="js/data.js?v=19"></script>
+<script src="js/config.js?v=19"></script>
+<script src="js/supa.js?v=19"></script>
+<script src="js/auth.js?v=19"></script>
+<script src="js/sounds.js?v=19"></script>
+<script src="js/pedigree.js?v=19"></script>
+<script src="js/main.js?v=19"></script>
+<script src="js/gate.js?v=19"></script>
 <script>
-// Smart CTA — if this browser already has saved tree data, swap the
-// primary CTA to "Open Your Book" → dashboard, and reveal the small
-// secondary link to start fresh from the form. Visitors with no data
-// see the original "Develop Your Family Tree" → details flow.
+// Smart CTA — route based on the gate state and saved data.
+//   - no credentials yet            → "Create Your Book"   → login.html
+//   - credentials set, session shut → "Login to Your Book" → login.html
+//   - logged in, has data           → "Open Your Book"     → dashboard.html
+//   - logged in, no data yet        → keep default details.html
 (function () {
   try {
-    const raw = localStorage.getItem('pa_local_v1');
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    if (!data || !data.profile || !data.profile.fullName) return;
     const cta = document.getElementById('ctaMain');
     const sub = document.getElementById('ctaSub');
-    if (cta) {
+    if (!cta) return;
+    const hasCreds = Gate.hasCredentials();
+    const open     = Gate.isOpen();
+
+    if (!hasCreds) {
+      cta.textContent = 'Create Your Book';
+      cta.href = 'login.html';
+      return;
+    }
+    if (!open) {
+      cta.textContent = 'Login to Your Book';
+      cta.href = 'login.html';
+      return;
+    }
+
+    // logged in — does the user already have a profile?
+    const raw = localStorage.getItem('pa_local_v1');
+    const data = raw ? JSON.parse(raw) : null;
+    if (data && data.profile && data.profile.fullName) {
       cta.textContent = 'Open Your Book';
       cta.href = 'dashboard.html';
-    }
-    if (sub) {
-      sub.textContent = '— or start a fresh one';
-      sub.href = 'details.html';
-      sub.style.display = '';
+      if (sub) {
+        sub.textContent = '— or start a fresh one';
+        sub.href = 'details.html';
+        sub.style.display = '';
+      }
     }
   } catch (e) { /* keep default CTA */ }
 })();
