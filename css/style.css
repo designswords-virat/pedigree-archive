@@ -1686,10 +1686,42 @@ input[type="checkbox"]:checked::after {
 .landing-canvas {
   position: absolute; inset: 0;
   z-index: 1;
+  /* Radial mask: the centre of the canvas is transparent so portraits
+     and lines behind the headline copy fade out, while the tree stays
+     visible at the edges. The tree appears to wrap around the title. */
+  -webkit-mask-image:
+    radial-gradient(ellipse 38% 32% at 50% 50%,
+      transparent 0%,
+      transparent 35%,
+      rgba(0, 0, 0, 0.40) 60%,
+      #000 90%);
+  mask-image:
+    radial-gradient(ellipse 38% 32% at 50% 50%,
+      transparent 0%,
+      transparent 35%,
+      rgba(0, 0, 0, 0.40) 60%,
+      #000 90%);
 }
 .landing-canvas svg {
   width: 100%; height: 100%;
   display: block;
+}
+@media (max-width: 720px) {
+  /* phones: the headline takes more vertical room, so widen the hole */
+  .landing-canvas {
+    -webkit-mask-image:
+      radial-gradient(ellipse 70% 40% at 50% 50%,
+        transparent 0%,
+        transparent 40%,
+        rgba(0, 0, 0, 0.40) 65%,
+        #000 95%);
+    mask-image:
+      radial-gradient(ellipse 70% 40% at 50% 50%,
+        transparent 0%,
+        transparent 40%,
+        rgba(0, 0, 0, 0.40) 65%,
+        #000 95%);
+  }
 }
 
 /* tree dimming — individual layers, NOT the parent (so spotlight can override) */
