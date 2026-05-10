@@ -1,18 +1,13 @@
 // ============================================================
-// CONFIG — paste your Supabase project URL and anon key here.
-// Get them from: Supabase Dashboard → your project → Settings →
-// API → "Project URL" and "Project API keys → anon public".
+// CONFIG — kept as a harmless empty stub.
 //
-// The anon key is SAFE to ship in the browser. It only allows the
-// operations your row-level-security policies permit. The
-// service_role key (NOT shown anywhere here) is the secret one and
-// must never appear in client code.
+// The product is currently single-browser (localStorage only) and
+// does not call any backend. This file remains so older code paths
+// that read window.CONFIG don't throw.
+//
+// To re-introduce a backend later (e.g. Supabase), populate the
+// fields below and re-wire js/auth.js / js/supa.js to use them.
 // ============================================================
-
-// To re-enable the multi-user product, paste the project URL + anon key
-// here and re-deploy. The previous live values were:
-//   SUPABASE_URL:      'https://gnxqhhtzweiqpwpvsqqn.supabase.co'
-//   SUPABASE_ANON_KEY: 'sb_publishable_azCGx6ttYXdAz_kindNp5g_4pWZguLw'
 
 window.CONFIG = {
   SUPABASE_URL:      '',
