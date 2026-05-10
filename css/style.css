@@ -3120,7 +3120,10 @@ input[type="date"]:focus {
     linear-gradient(180deg, var(--ink-1) 0%, var(--ink-0) 100%);
   border: 1px solid var(--gold);
   border-radius: 2px;
-  z-index: 12;
+  /* must sit ABOVE .stage::before (z-index 50) which is the
+     backdrop-blur layer triggered by .has-inspector. Otherwise the
+     panel itself ends up blurred along with the page behind it. */
+  z-index: 60;
   display: flex; flex-direction: column;
   box-shadow:
     0 14px 36px rgba(26, 37, 64, 0.10),
