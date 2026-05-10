@@ -156,7 +156,7 @@
     })();
     if (savedBranch === 'angular' && Pedigree.setBranchStyle) {
       Pedigree.setBranchStyle('angular');
-      $$('#btnBranchCurve, #btnBranchAngular').forEach(b =>
+      document.querySelectorAll('#btnBranchCurve, #btnBranchAngular').forEach(b =>
         b.classList.toggle('active', b.dataset.branch === 'angular'));
     }
     Pedigree.render({ people, meta: { title: 'Your Tree' } });
@@ -216,7 +216,7 @@
     $('#btnLayoutFull').addEventListener('click', () => applyLayout('full'));
 
     function applyBranchStyle(style) {
-      $$('#btnBranchCurve, #btnBranchAngular').forEach(b =>
+      document.querySelectorAll('#btnBranchCurve, #btnBranchAngular').forEach(b =>
         b.classList.toggle('active', b.dataset.branch === style));
       if (Pedigree.setBranchStyle) Pedigree.setBranchStyle(style);
       try { localStorage.setItem('pa_branch_style', style); } catch (_) {}
