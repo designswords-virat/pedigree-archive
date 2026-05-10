@@ -3152,9 +3152,9 @@ input[type="date"]:focus {
   position: sticky;
   bottom: 0;
   background: linear-gradient(180deg,
-    rgba(20, 16, 10, 0.0) 0%,
-    rgba(20, 16, 10, 0.95) 30%,
-    rgba(20, 16, 10, 0.98) 100%);
+    rgba(251, 248, 241, 0)  0%,
+    rgba(251, 248, 241, 0.96) 30%,
+    rgba(251, 248, 241, 1)    100%);
   backdrop-filter: blur(4px);
   z-index: 5;
 }
