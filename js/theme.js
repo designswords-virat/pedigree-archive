@@ -36,9 +36,11 @@
     try { if (typeof Sound !== 'undefined') Sound.click(); } catch (e) {}
   }
 
-  // make sure the attribute matches the saved value (even if the
-  // pre-paint inline script set it earlier — keeps things in sync).
-  set(get());
+  // Picker is hidden right now; force everyone onto the new minimal
+  // default theme regardless of any pa_theme value left over from the
+  // heritage themes. When the picker is re-enabled, restore set(get()).
+  document.documentElement.removeAttribute('data-theme');
+  // set(get());
 
   function buildPicker() {
     if (document.querySelector('.theme-picker')) return;

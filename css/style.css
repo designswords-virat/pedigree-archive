@@ -1,53 +1,79 @@
 /* ============================================================
-   PEDIGREE ARCHIVE — Tudor portrait theme
-   Aged dark ground, ornate gold ovals, antique serif type.
+   PEDIGREE ARCHIVE — clean minimal modern theme
+   White ground, near-black text, hairline rules, sans-serif.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&display=swap');
 
 :root {
-  /* DEFAULT THEME — Bordeaux. The variable NAMES come from the prior
-     dark theme and are kept to avoid touching thousands of references;
-     their VALUES describe whatever the active theme should look like.
-     Other themes below override these.
+  /* DEFAULT THEME — clean minimal modern.
+     Pure white surface, near-black text, hairline rules, sans-serif.
+     Variable names kept from the prior heritage themes to avoid
+     touching thousands of references; their VALUES now describe the
+     minimal palette. Heritage themes below as opt-in overrides. */
+  --ink-0:        #ffffff;     /* page background */
+  --ink-1:        #fafafa;     /* card / surface */
+  --ink-2:        #f1f1f1;     /* panel / inset */
+  --ink-3:        #e5e5e5;     /* divider */
 
-       ink-*               = page surfaces (lightest → slightly tinted)
-       ivory / parchment*  = text scale (strongest → faintest) */
-  --ink-0:        #490c1e;     /* page background (Bordeaux) */
-  --ink-1:        #561328;     /* card background */
-  --ink-2:        #631c33;     /* panel / inset background */
-  --ink-3:        #72253f;     /* tinted divider surface */
+  /* "gold" is now black/charcoal — accent role, no metallic tone */
+  --gold:         #181818;
+  --gold-bright:  #2a2a2a;
+  --gold-deep:    #0e0e0e;
+  --gold-dim:     #6e6e6e;
+  --gold-faint:   rgba(0, 0, 0, 0.06);
+  --gold-soft:    rgba(0, 0, 0, 0.18);
 
-  /* antique gold accents — Or vieilli */
-  --gold:         #bfa06a;
-  --gold-bright:  #d4b87f;
-  --gold-deep:    #8a7a4a;
-  --gold-dim:     #5e5230;
-  --gold-faint:   rgba(191, 160, 106, 0.22);
-  --gold-soft:    rgba(191, 160, 106, 0.45);
+  /* text scale — strongest → faintest */
+  --ivory:        #0e0e0e;
+  --parchment:    #181818;
+  --parchment-dim:#6e6e6e;
+  --parchment-faint: #a0a0a0;
 
-  /* ivory text scale on Bordeaux ground */
-  --ivory:        #f0e6c2;
-  --parchment:    #e8d8a8;
-  --parchment-dim:#c79c9e;
-  --parchment-faint: #8a6b71;
-
-  /* heraldic accents */
-  --rose:         #f0a8b5;
-  --rose-deep:    #c97a8a;
-  --ivy:          #8fbf7e;
-  --crimson:      #f0a8b5;
+  /* sparing colour accents — only used for danger/in-memoriam */
+  --rose:         #c42a2a;
+  --rose-deep:    #9a1f1f;
+  --ivy:          #2a8b3e;
+  --crimson:      #c42a2a;
   --royal-blue:   #1b2e49;
 
-  --border:       rgba(240, 230, 194, 0.22);
-  --border-soft:  rgba(240, 230, 194, 0.12);
-  --panel:        rgba(86, 19, 40, 0.96);
+  --border:       rgba(0, 0, 0, 0.10);
+  --border-soft:  rgba(0, 0, 0, 0.06);
+  --panel:        #ffffff;
 
   --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
   --font-body:    'Cormorant Garamond', 'EB Garamond', Georgia, serif;
   --font-script:  'Pinyon Script', 'Cormorant Garamond', cursive;
 
-  /* Photo treatment for the Bordeaux ground. */
+  /* Photo treatment: no sepia tint — portraits read as themselves */
+  --photo-filter:       grayscale(0) saturate(1) brightness(1) contrast(1);
+  --photo-filter-hover: grayscale(0) saturate(1.05) brightness(1.02) contrast(1.02);
+}
+
+/* Bordeaux — previous default, now opt-in. */
+[data-theme="bordeaux"] {
+  --ink-0: #490c1e;
+  --ink-1: #561328;
+  --ink-2: #631c33;
+  --ink-3: #72253f;
+  --gold: #bfa06a;
+  --gold-bright: #d4b87f;
+  --gold-deep: #8a7a4a;
+  --gold-dim: #5e5230;
+  --gold-faint: rgba(191, 160, 106, 0.22);
+  --gold-soft:  rgba(191, 160, 106, 0.45);
+  --ivory:        #f0e6c2;
+  --parchment:    #e8d8a8;
+  --parchment-dim:#c79c9e;
+  --parchment-faint: #8a6b71;
+  --rose:         #f0a8b5;
+  --rose-deep:    #c97a8a;
+  --ivy:          #8fbf7e;
+  --border:       rgba(240, 230, 194, 0.22);
+  --border-soft:  rgba(240, 230, 194, 0.12);
+  --panel:        rgba(86, 19, 40, 0.96);
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-body:    'Cormorant Garamond', 'EB Garamond', Georgia, serif;
   --photo-filter:       sepia(0.20) saturate(0.88) brightness(1.00) contrast(1.03);
   --photo-filter-hover: sepia(0.10) saturate(1.00) brightness(1.05) contrast(1.06);
 }
@@ -172,6 +198,8 @@
    ============================================================ */
 
 .theme-picker {
+  /* Hidden for now — feature kept in code so we can re-enable later. */
+  display: none !important;
   position: fixed;
   bottom: 60px; right: 14px;     /* clears the bottombar legend on tree pages */
   z-index: 1500;
