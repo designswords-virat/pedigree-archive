@@ -39,10 +39,77 @@
   function parentsOf(p) { return (p.parentIds || []).map(id => byId[id]).filter(Boolean); }
   function partnersOf(p){ return (p.partnerIds || []).map(id => byId[id]).filter(Boolean); }
   function childrenOf(p){ return people.filter(c => (c.parentIds || []).includes(p.id)); }
-  function siblingsOf(p){
-    const par = (p.parentIds || []);
-    if (par.length === 0) return [];
-    return people.filter(s => s.id !== p.id && (s.parentIds || []).some(pid => par.includes(pid)));
+
+  // Sibling categories derived from parentIds / partnerIds.
+  //   full      — every parent in common (the everyday meaning of "sibling")
+  //   half      — at least one parent in common but not all
+  //   step      — no parents in common, but one of my parents is married
+  //                to a person whose child this is (no shared blood)
+  function fullSiblingsOf(p) {
+    const par = new Set(p.parentIds || []);
+    if (!par.size) return [];
+    return people.filter(s => {
+      if (s.id === p.id) return false;
+      const sp = s.parentIds || [];
+      return sp.length === par.size && sp.every(pid => par.has(pid));
+    });
+  }
+  function halfSiblingsOf(p) {
+    const par = new Set(p.parentIds || []);
+    if (!par.size) return [];
+    return people.filter(s => {
+      if (s.id === p.id) return false;
+      const sp = s.parentIds || [];
+      if (!sp.length) return false;
+      const shared = sp.filter(pid => par.has(pid)).length;
+      const sameSet = sp.length === par.size && sp.every(pid => par.has(pid));
+      return shared > 0 && !sameSet;
+    });
+  }
+  function stepSiblingsOf(p) {
+    const myParents = new Set(p.parentIds || []);
+    const out = new Set();
+    parentsOf(p).forEach(par => {
+      (par.partnerIds || [])
+        .filter(pid => !myParents.has(pid) && pid !== p.id)
+        .map(pid => byId[pid]).filter(Boolean)
+        .forEach(sp => {
+          childrenOf(sp).forEach(c => {
+            if (c.id === p.id) return;
+            const shared = (c.parentIds || []).some(pid => myParents.has(pid));
+            if (!shared) out.add(c.id);
+          });
+        });
+    });
+    return Array.from(out).map(id => byId[id]).filter(Boolean);
+  }
+  // Combined sibling list (used wherever the legacy code just said "siblings").
+  function siblingsOf(p) {
+    return [...fullSiblingsOf(p), ...halfSiblingsOf(p)];
+  }
+
+  // Step-parent: a partner of one of my biological parents who is NOT a
+  // biological parent of mine. Includes ex-partners too — the data model
+  // keeps every partnerIds entry.
+  function stepParentsOf(p) {
+    const myParents = new Set(p.parentIds || []);
+    const out = new Set();
+    parentsOf(p).forEach(par => {
+      (par.partnerIds || []).forEach(pid => {
+        if (!myParents.has(pid) && pid !== p.id) out.add(pid);
+      });
+    });
+    return Array.from(out).map(id => byId[id]).filter(Boolean);
+  }
+  // Step-child: any child of one of my partners who is NOT also my child.
+  function stepChildrenOf(p) {
+    const out = new Set();
+    partnersOf(p).forEach(partner => {
+      childrenOf(partner).forEach(c => {
+        if (!(c.parentIds || []).includes(p.id)) out.add(c.id);
+      });
+    });
+    return Array.from(out).map(id => byId[id]).filter(Boolean);
   }
   function fatherOf(p) { return parentsOf(p).find(x => x.gender === 'male')   || null; }
   function motherOf(p) { return parentsOf(p).find(x => x.gender === 'female') || null; }
@@ -52,9 +119,13 @@
     if (!self) return '';
     if (person.id === self.id) return 'You';
     if ((self.parentIds || []).includes(person.id)) return person.gender === 'female' ? 'Mother' : person.gender === 'male' ? 'Father' : 'Parent';
+    if (stepParentsOf(self).some(s => s.id === person.id)) return person.gender === 'female' ? 'Step-mother' : person.gender === 'male' ? 'Step-father' : 'Step-parent';
     if ((self.partnerIds || []).includes(person.id)) return 'Spouse';
     if ((person.parentIds || []).includes(self.id)) return person.gender === 'female' ? 'Daughter' : person.gender === 'male' ? 'Son' : 'Child';
-    if (siblingsOf(self).some(s => s.id === person.id)) return person.gender === 'female' ? 'Sister' : person.gender === 'male' ? 'Brother' : 'Sibling';
+    if (stepChildrenOf(self).some(s => s.id === person.id)) return person.gender === 'female' ? 'Step-daughter' : person.gender === 'male' ? 'Step-son' : 'Step-child';
+    if (fullSiblingsOf(self).some(s => s.id === person.id)) return person.gender === 'female' ? 'Sister' : person.gender === 'male' ? 'Brother' : 'Sibling';
+    if (halfSiblingsOf(self).some(s => s.id === person.id)) return person.gender === 'female' ? 'Half-sister' : person.gender === 'male' ? 'Half-brother' : 'Half-sibling';
+    if (stepSiblingsOf(self).some(s => s.id === person.id)) return person.gender === 'female' ? 'Step-sister' : person.gender === 'male' ? 'Step-brother' : 'Step-sibling';
     return '';
   }
 
@@ -132,11 +203,30 @@
       }
       rel.appendChild(group);
     };
-    renderGroup('Father',   [fatherOf(p)].filter(Boolean));
-    renderGroup('Mother',   [motherOf(p)].filter(Boolean));
-    renderGroup('Spouse',   partnersOf(p));
-    renderGroup('Children', childrenOf(p));
-    renderGroup('Siblings', siblingsOf(p));
+    // Biological parents first, then any step-parents (partners of those
+    // parents who aren't blood-parents themselves).
+    renderGroup('Father',         [fatherOf(p)].filter(Boolean));
+    renderGroup('Mother',         [motherOf(p)].filter(Boolean));
+    const sp = stepParentsOf(p);
+    const stepMothers = sp.filter(x => x.gender === 'female');
+    const stepFathers = sp.filter(x => x.gender === 'male');
+    const stepOther   = sp.filter(x => x.gender !== 'male' && x.gender !== 'female');
+    if (stepFathers.length) renderGroup('Step-father', stepFathers);
+    if (stepMothers.length) renderGroup('Step-mother', stepMothers);
+    if (stepOther.length)   renderGroup('Step-parent', stepOther);
+
+    renderGroup('Spouse',         partnersOf(p));
+    renderGroup('Children',       childrenOf(p));
+    const sc = stepChildrenOf(p);
+    if (sc.length) renderGroup('Step-children', sc);
+
+    // Three flavours of sibling — only render the ones that exist so the
+    // panel doesn't fill up with empty rows for the common case.
+    renderGroup('Siblings',       fullSiblingsOf(p));
+    const halfs = halfSiblingsOf(p);
+    const steps = stepSiblingsOf(p);
+    if (halfs.length) renderGroup('Half-siblings', halfs);
+    if (steps.length) renderGroup('Step-siblings', steps);
   }
   function closeInspector() {
     $('#inspector').classList.add('hidden');
