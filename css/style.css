@@ -609,7 +609,21 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
   display: flex; align-items: center; gap: 16px;
 }
 
-/* heraldic emblem in lieu of sci-fi G */
+/* Active brand mark — bundled logo image (logo/logo1.png) */
+.brand-mark {
+  display: block;
+  height: 44px;
+  width: auto;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.landing-brand .brand-mark { height: 52px; }
+@media (max-width: 720px) {
+  .brand-mark { height: 36px; }
+  .landing-brand .brand-mark { height: 42px; }
+}
+
+/* heraldic emblem in lieu of sci-fi G — kept for legacy/fallback */
 .brand-logo {
   width: 46px; height: 46px;
   position: relative;
