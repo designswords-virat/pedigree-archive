@@ -8,9 +8,10 @@
 
   await Auth.init();
 
-  // No auth gate. If they haven't filled the form yet, route them through it.
+  // No redirect away from the chart -- if the user has no profile yet
+  // (e.g. came straight from the landing CTA), we still show whatever
+  // people exist in the active book (which tree-edit auto-seeds).
   const sessionUser = Auth.currentUser();
-  if (!sessionUser || !sessionUser.profile) { location.href = 'details.html'; return; }
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));

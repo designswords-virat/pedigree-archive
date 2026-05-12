@@ -12,10 +12,11 @@
 
   await Auth.init();
 
-  // No auth gate. If the user hasn't filled in their basics yet, send
-  // them to the details form first so the tree has a starting node.
+  // No auth gate. The particulars form is bypassed in the new flow --
+  // if the user has no profile yet, loadTree() below auto-seeds a
+  // placeholder "You" portrait so the canvas has something to anchor
+  // the + add-kinship gesture on. No redirect away from the canvas.
   const sessionUser = Auth.currentUser();
-  if (!sessionUser || !sessionUser.profile) { location.href = 'details.html'; return; }
 
   // ---- helpers ----
   function newId() {
