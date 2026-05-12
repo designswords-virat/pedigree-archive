@@ -117,22 +117,24 @@
     setTimeout(() => { if (lastSubjectId) showSpotlight(lastSubjectId); }, 350);
   });
 
-  // Apply a random `--glow-delay` CSS variable to each branch / rose /
-  // portrait in the hero tree so the CSS pulse animations stagger.
+  // Apply random `--glow-delay` AND `--glow-duration` per branch / rose /
+  // portrait so the CSS pulse animations don't fire in unison. Each line
+  // twinkles on its own clock — some quick, some slow, with arbitrary
+  // phase offsets — for an organic "breathing tree" effect.
+  function rand(min, max) { return (min + Math.random() * (max - min)).toFixed(2); }
   function sprinkleHeroGlow() {
-    const lines = document.querySelectorAll(
+    document.querySelectorAll(
       '.landing .lines-layer .parent-branch, .landing .lines-layer .mating-line'
-    );
-    lines.forEach(el => {
-      el.style.setProperty('--glow-delay', (Math.random() * 7).toFixed(2) + 's');
+    ).forEach(el => {
+      el.style.setProperty('--glow-delay',    rand(0, 7) + 's');
+      el.style.setProperty('--glow-duration', rand(3.5, 7.5) + 's');
     });
-    const roses = document.querySelectorAll('.landing .junction-rose-group .junction-rose');
-    roses.forEach(el => {
-      el.style.setProperty('--glow-delay', (Math.random() * 9).toFixed(2) + 's');
+    document.querySelectorAll('.landing .junction-rose-group .junction-rose').forEach(el => {
+      el.style.setProperty('--glow-delay',    rand(0, 9) + 's');
+      el.style.setProperty('--glow-duration', rand(5, 10) + 's');
     });
-    const nodes = document.querySelectorAll('.landing .nodes-layer .node-group');
-    nodes.forEach(el => {
-      el.style.setProperty('--glow-delay', (Math.random() * 10).toFixed(2) + 's');
+    document.querySelectorAll('.landing .nodes-layer .node-group').forEach(el => {
+      el.style.setProperty('--glow-delay',    rand(0, 10) + 's');
     });
   }
 
@@ -185,6 +187,9 @@
     if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
     if (Pedigree.setScrollMode)   Pedigree.setScrollMode(false);
     if (Pedigree.setBranchStyle)  Pedigree.setBranchStyle('angular');
+    // Compact vertical spacing so the chart fills the right half without
+    // running off the bottom. Default is 480px between generations.
+    if (Pedigree.setGenHeight)    Pedigree.setGenHeight(260);
 
     // LANDING_TREE is a tiny anonymous lineage so the canvas always
     // renders something. sprinkleHeroGlow staggers per-element delays.

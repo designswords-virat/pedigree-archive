@@ -12,8 +12,10 @@ const Pedigree = (() => {
   const NODE_H = 128;            // oval height (portrait proportion preserved)
   const COUPLE_GAP = 90;         // gap between mating partners
   const SIBLING_GAP = 90;        // gap between siblings — wide enough to read
-  const GEN_HEIGHT = 480;        // vertical gap from one generation to the next
-                                 // (large enough to hold wrapped sub-rows + grandkids)
+  let GEN_HEIGHT = 480;          // vertical gap from one generation to the next
+                                 // (large enough to hold wrapped sub-rows + grandkids).
+                                 // Mutable via Pedigree.setGenHeight() so the landing
+                                 // hero can use a more compact layout.
   const MARGIN = 100;
   const SIBSHIP_DROP = 50;       // how far below couple the sibship bar sits
   const LABEL_WRAP = 16;         // wrap names longer than this many chars
@@ -1048,6 +1050,14 @@ const Pedigree = (() => {
     // ('curve', default) and right-angle orthogonal ('angular').
     setBranchStyle(style) {
       branchStyle = (style === 'angular') ? 'angular' : 'curve';
+      if (currentData) this.render(currentData);
+    },
+
+    // Override vertical gap between generations. Used by the landing
+    // hero to render a more compact chart inside the right-half canvas.
+    setGenHeight(px) {
+      const n = Number(px);
+      if (Number.isFinite(n) && n > 0) GEN_HEIGHT = n;
       if (currentData) this.render(currentData);
     },
 

@@ -2058,25 +2058,50 @@ input[type="checkbox"]:checked::after {
   stroke: var(--ivory);
   stroke-dasharray: none !important;
   stroke-dashoffset: 0 !important;
-  opacity: 0.85;
+  opacity: 0.4;
   filter: none;
-  animation: heroBranchPulse 6s ease-in-out infinite;
+  animation-name: heroBranchPulse;
+  animation-duration: var(--glow-duration, 5.5s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
   animation-delay: var(--glow-delay, 0s);
-  will-change: opacity;
+  will-change: opacity, filter;
 }
 .landing .junction-rose-group .junction-rose {
-  opacity: 0.85;
-  animation: heroRosePulse 8s ease-in-out infinite;
+  opacity: 0.7;
+  animation-name: heroRosePulse;
+  animation-duration: var(--glow-duration, 7s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
   animation-delay: var(--glow-delay, 0s);
 }
 
+/* Branches breathe a warm gold halo on a randomised cycle (delay +
+   duration are sprinkled per-element by sprinkleHeroGlow in main.js)
+   so each line twinkles independently rather than pulsing in unison. */
 @keyframes heroBranchPulse {
-  0%, 100% { opacity: 0.75; }
-  50%      { opacity: 1;    }
+  0%, 100% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 0 rgba(191, 160, 106, 0));
+  }
+  50% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 4px rgba(191, 160, 106, 0.75))
+      drop-shadow(0 0 12px rgba(191, 160, 106, 0.45));
+  }
 }
 @keyframes heroRosePulse {
-  0%, 100% { opacity: 0.7; transform: scale(1);    }
-  50%      { opacity: 1;   transform: scale(1.18); }
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(191, 160, 106, 0));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 6px rgba(191, 160, 106, 0.7));
+  }
 }
 
 /* Subtle ambient breath on each portrait — soft greyscale halo. */
