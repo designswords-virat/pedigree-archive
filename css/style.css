@@ -2055,10 +2055,10 @@ input[type="checkbox"]:checked::after {
    must reset dasharray/dashoffset explicitly to keep the lines visible. */
 .landing .lines-layer .parent-branch,
 .landing .lines-layer .mating-line {
-  stroke: var(--ivory);
+  stroke: #bfa06a;                  /* aged gold, matches the logo emblem */
   stroke-dasharray: none !important;
   stroke-dashoffset: 0 !important;
-  opacity: 0.4;
+  opacity: 0.75;
   filter: none;
   animation-name: heroBranchPulse;
   animation-duration: var(--glow-duration, 5.5s);
@@ -2067,14 +2067,7 @@ input[type="checkbox"]:checked::after {
   animation-delay: var(--glow-delay, 0s);
   will-change: opacity, filter;
 }
-.landing .junction-rose-group .junction-rose {
-  opacity: 0.7;
-  animation-name: heroRosePulse;
-  animation-duration: var(--glow-duration, 7s);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-delay: var(--glow-delay, 0s);
-}
+.landing .junction-rose-group { display: none; }
 
 /* Branches breathe a warm gold halo on a randomised cycle (delay +
    duration are sprinkled per-element by sprinkleHeroGlow in main.js)
