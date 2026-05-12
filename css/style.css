@@ -1985,48 +1985,24 @@ input[type="checkbox"]:checked::after {
   overflow: hidden;
   z-index: 1;
   background: var(--ink-0);
+  display: flex;
+  flex-direction: column;
 }
 
-/* the pedigree tree fills the viewport behind the hero */
+/* Top half: pedigree tree only. The tree no longer wraps around centred
+   text, so the radial mask is gone -- the SVG just fills its half. */
 .landing-canvas {
-  position: absolute; inset: 0;
+  position: relative;
+  flex: 0 0 55vh;
+  width: 100%;
   z-index: 1;
-  /* Radial mask: the centre of the canvas is transparent so portraits
-     and lines behind the headline copy fade out, while the tree stays
-     visible at the edges. The tree appears to wrap around the title. */
-  -webkit-mask-image:
-    radial-gradient(ellipse 38% 32% at 50% 50%,
-      transparent 0%,
-      transparent 35%,
-      rgba(0, 0, 0, 0.40) 60%,
-      #000 90%);
-  mask-image:
-    radial-gradient(ellipse 38% 32% at 50% 50%,
-      transparent 0%,
-      transparent 35%,
-      rgba(0, 0, 0, 0.40) 60%,
-      #000 90%);
 }
 .landing-canvas svg {
   width: 100%; height: 100%;
   display: block;
 }
 @media (max-width: 720px) {
-  /* phones: the headline takes more vertical room, so widen the hole */
-  .landing-canvas {
-    -webkit-mask-image:
-      radial-gradient(ellipse 70% 40% at 50% 50%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.40) 65%,
-        #000 95%);
-    mask-image:
-      radial-gradient(ellipse 70% 40% at 50% 50%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.40) 65%,
-        #000 95%);
-  }
+  .landing-canvas { flex: 0 0 50vh; }
 }
 
 /* tree dimming — individual layers, NOT the parent (so spotlight can override) */
@@ -2115,63 +2091,72 @@ input[type="checkbox"]:checked::after {
   display: none;
 }
 
-/* the hero copy — sits centre-screen on top of everything */
+/* Bottom half: hero copy in a left-to-right column layout.
+   Heading | Subheading | Paragraph + CTA. */
 .hero {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
   z-index: 10;
-  width: min(640px, calc(100vw - 32px));
-  text-align: center;
-  pointer-events: none;       /* let the tree be clickable through the hero (we disable that anyway) */
+  display: flex;
+  align-items: center;
+  padding: clamp(32px, 5vh, 64px) clamp(28px, 6vw, 96px);
+  border-top: 1px solid var(--border-soft);
+  background: var(--ink-0);
 }
-.hero > * { pointer-events: auto; }
 
-.hero-eyebrow {
-  font-family: var(--font-body);
-  font-style: italic;
-  font-size: 14px;
-  color: var(--parchment-dim);
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  margin: 0 0 14px;
-  display: inline-block;
-  padding: 6px 18px;
-  background: var(--ink-2);
-  border-top: 1px solid var(--gold-soft);
-  border-bottom: 1px solid var(--gold-soft);
-  backdrop-filter: blur(2px);
+.hero-cols {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1.4fr;
+  gap: clamp(28px, 5vw, 72px);
+  width: 100%;
+  align-items: start;
 }
+
+.hero-col { text-align: left; }
 
 .hero-title {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(38px, 7vw, 76px);
-  letter-spacing: 0.10em;
-  color: var(--ivory);              /* navy */
-  margin: 0 0 18px;
-  line-height: 1.05;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-.hero-title .ornate {
-  display: block;
-  color: var(--gold);
-  font-family: var(--font-script);
-  font-size: 0.6em;
-  font-weight: 400;
+  font-size: clamp(28px, 3.6vw, 52px);
   letter-spacing: 0;
-  margin-bottom: 2px;
+  color: var(--ivory);
+  margin: 0;
+  line-height: 1.05;
+  text-shadow: none;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-body);
+  font-size: clamp(13px, 1vw, 15px);
+  color: var(--parchment-dim);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+  font-style: normal;
+  display: inline-block;
+  padding: 0;
+  background: none;
+  border: none;
+  backdrop-filter: none;
 }
 
 .hero-tagline {
   font-family: var(--font-body);
-  font-style: italic;
-  font-size: clamp(16px, 2.2vw, 22px);
+  font-style: normal;
+  font-size: clamp(14px, 1.05vw, 17px);
   color: var(--parchment);
-  line-height: 1.55;
-  max-width: 520px;
-  margin: 0 auto 32px;
+  line-height: 1.6;
+  max-width: 44ch;
+  margin: 0 0 24px;
   text-shadow: none;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
 }
 
 .hero-cta {
@@ -2180,33 +2165,26 @@ input[type="checkbox"]:checked::after {
   gap: 10px;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.22em;
+  font-size: 13px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  padding: 16px 34px;
-  background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 50%, var(--gold-deep) 100%);
+  padding: 14px 28px;
+  background: var(--ivory);
   color: var(--ink-0);
-  border: 1px solid var(--gold-bright);
+  border: 1px solid var(--ivory);
   text-decoration: none;
   border-radius: 2px;
   cursor: pointer;
-  text-shadow: 0 1px 0 rgba(255, 235, 180, 0.45);
-  box-shadow:
-    0 6px 20px rgba(26, 37, 64, 0.10),
-    0 0 0 1px rgba(241, 214, 138, 0.25),
-    inset 0 1px 0 rgba(255, 245, 200, 0.6),
-    inset 0 -2px 4px rgba(26, 37, 64, 0.06);
-  transition: all 0.2s ease;
+  text-shadow: none;
+  box-shadow: none;
+  transition: all 0.15s ease;
   position: relative;
 }
 .hero-cta:hover {
-  transform: translateY(-2px);
-  color: var(--ink-0);
-  box-shadow:
-    0 12px 28px rgba(26, 37, 64, 0.10),
-    0 0 0 1px rgba(241, 214, 138, 0.55),
-    0 0 28px rgba(241, 214, 138, 0.5),
-    inset 0 1px 0 rgba(255, 245, 200, 0.7);
+  background: var(--ink-0);
+  color: var(--ivory);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 .hero-cta:active { transform: translateY(0); }
 .hero-cta::after {
@@ -2221,26 +2199,25 @@ input[type="checkbox"]:checked::after {
 
 .hero-sub-link {
   display: block;
-  margin-top: 20px;
+  margin-top: 4px;
   font-family: var(--font-body);
-  font-style: italic;
-  font-size: 14px;
+  font-style: normal;
+  font-size: 13px;
   color: var(--parchment-dim);
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-decoration: none;
   transition: color 0.15s;
 }
-.hero-sub-link:hover { color: var(--gold-deep); }
+.hero-sub-link:hover { color: var(--ivory); }
 
-/* small flourish above the title */
-.hero-flourish {
-  font-family: var(--font-script);
-  font-size: 28px;
-  color: var(--gold);
-  letter-spacing: 0.05em;
-  opacity: 0.8;
-  margin-bottom: 6px;
-  text-shadow: none;
+/* Stack columns on narrower viewports. */
+@media (max-width: 880px) {
+  .landing { overflow-y: auto; }
+  .hero-cols {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .hero { padding: 28px 24px 40px; }
 }
 
 /* On the landing the caption competes with the headline copy — hide. */
@@ -2350,11 +2327,10 @@ body:has(.landing) .spotlight-caption { display: none; }
 
 /* mobile tweaks for landing */
 @media (max-width: 720px) {
-  .hero { width: calc(100vw - 24px); }
-  .hero-eyebrow { font-size: 11px; padding: 5px 12px; letter-spacing: 0.24em; }
-  .hero-title { font-size: clamp(32px, 9vw, 50px); }
-  .hero-tagline { font-size: 16px; max-width: none; }
-  .hero-cta { font-size: 12px; padding: 14px 24px; letter-spacing: 0.18em; }
+  .hero-eyebrow { font-size: 12px; letter-spacing: 0.16em; }
+  .hero-title { font-size: clamp(28px, 8vw, 44px); }
+  .hero-tagline { font-size: 15px; max-width: none; }
+  .hero-cta { font-size: 12px; padding: 12px 22px; letter-spacing: 0.14em; }
   .landing-brand { top: 12px; left: 12px; gap: 8px; }
   .landing-brand .brand-logo { width: 32px; height: 32px; }
   .landing-brand .brand-logo span { font-size: 16px; }
