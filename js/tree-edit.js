@@ -43,6 +43,25 @@
   function loadTree() {
     const u = Auth.currentUser();
     people = (u && Array.isArray(u.people)) ? u.people.slice() : [];
+    // Bootstrap: if the book is empty (no people at all), seed a single
+    // "You" placeholder so the user has a portrait whose + badge they
+    // can click to start adding kindred. Without this the empty
+    // canvas has nothing to anchor an "Add" gesture onto.
+    if (people.length === 0) {
+      people.push({
+        id: 'p_self_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+        name: 'You',
+        nickname: '',
+        gender: 'unknown',
+        birthDate: null, birthYear: null, birthPlace: '',
+        deceased: false, deathDate: null, deathYear: null, deathPlace: '',
+        photo: '', notes: '',
+        parentIds: [], parentMeta: {},
+        partnerIds: [], partnerMeta: {},
+        affected: false, carrier: false,
+        isSelf: true,
+      });
+    }
     rebuildIndex();
     // Heal any pre-existing data that was saved before the co-parent /
     // partner-symmetry rules existed (or before they were correct).

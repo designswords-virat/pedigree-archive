@@ -46,7 +46,7 @@
       joined by the threads of generation. An heirloom for your house —
       built in a quiet hour.
     </p>
-    <a class="hero-cta" href="details.html" id="ctaMain">Develop Your Family Tree</a>
+    <a class="hero-cta" href="tree-edit.html" id="ctaMain">Develop Your Family Tree</a>
     <a class="hero-sub-link" href="dashboard.html" id="ctaSub" style="display:none;">— or open your existing book</a>
   </section>
 
@@ -62,45 +62,29 @@
 <script src="js/supa.js?v=39"></script>
 <script src="js/auth.js?v=39"></script>
 <script src="js/sounds.js?v=39"></script>
-<script src="js/pedigree.js?v=56"></script>
-<script src="js/hero-demo.js?v=56"></script>
-<script src="js/main.js?v=56"></script>
+<script src="js/pedigree.js?v=57"></script>
+<script src="js/hero-demo.js?v=57"></script>
+<script src="js/main.js?v=57"></script>
 <script src="js/gate.js?v=39"></script>
 <script src="js/demo.js?v=39"></script>
 <script>
-// Smart CTA — route based on the gate state and saved data.
-//   - no credentials yet            → "Create Your Book"   → login.html
-//   - credentials set, session shut → "Login to Your Book" → login.html
-//   - logged in, has data           → "Open Your Book"     → dashboard.html
-//   - logged in, no data yet        → keep default details.html
+// Smart CTA — login flow is currently disabled, so the only branch
+// is: do you already have a tree?
+//   - has tree -> "Open Your Book" -> dashboard.html
+//   - no tree  -> default "Develop Your Family Tree" -> tree-edit.html
 (function () {
   try {
     const cta = document.getElementById('ctaMain');
     const sub = document.getElementById('ctaSub');
     if (!cta) return;
-    const hasCreds = Gate.hasCredentials();
-    const open     = Gate.isOpen();
-
-    if (!hasCreds) {
-      cta.textContent = 'Create Your Book';
-      cta.href = 'login.html';
-      return;
-    }
-    if (!open) {
-      cta.textContent = 'Login to Your Book';
-      cta.href = 'login.html';
-      return;
-    }
-
-    // logged in — does the user already have a profile?
     const raw = localStorage.getItem('pa_local_v1');
     const data = raw ? JSON.parse(raw) : null;
-    if (data && data.profile && data.profile.fullName) {
+    if (data && Array.isArray(data.people) && data.people.length > 0) {
       cta.textContent = 'Open Your Book';
       cta.href = 'dashboard.html';
       if (sub) {
         sub.textContent = '— or start a fresh one';
-        sub.href = 'details.html';
+        sub.href = 'tree-edit.html';
         sub.style.display = '';
       }
     }

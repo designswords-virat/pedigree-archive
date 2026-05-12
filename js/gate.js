@@ -78,19 +78,21 @@
   function currentId()      { return read().id; }
 
   function require() {
-    // call from protected pages. If no credentials exist OR the session
-    // is closed, kick to the LANDING (index.html) -- not directly to
-    // login -- so the user sees the public hero + headline first and
-    // then clicks the smart-CTA to log in. login.html and index.html
-    // are themselves never gated.
+    // TEMPORARILY DISABLED — the login gate is off by user request.
+    // The full implementation is preserved below (commented out) so we
+    // can switch it back on with a single edit. While disabled, every
+    // page is reachable without credentials.
+    return;
+
+    /* original gate logic — restore by removing the early return above
     const s = read();
     const here = location.pathname.split('/').pop().toLowerCase();
     if (here === 'login.html' || here === 'index.html' || here === '') return;
     if (!s.id || !s.hash || !s.open) {
-      // preserve where the user wanted to go so we can return after login
       try { sessionStorage.setItem('pa_gate_returnTo', location.href); } catch (_) {}
       location.replace('index.html');
     }
+    */
   }
 
   window.Gate = {
