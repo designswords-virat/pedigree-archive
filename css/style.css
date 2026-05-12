@@ -1990,19 +1990,26 @@ input[type="checkbox"]:checked::after {
 }
 
 /* Top half: pedigree tree only. The tree no longer wraps around centred
-   text, so the radial mask is gone -- the SVG just fills its half. */
+   text, so the radial mask is gone -- the SVG just fills its half.
+   `min-height: 0` + `overflow: hidden` + absolute SVG keeps the SVG's
+   intrinsic content from pushing the flex item past its 55vh basis. */
 .landing-canvas {
   position: relative;
   flex: 0 0 55vh;
+  height: 55vh;
+  min-height: 0;
   width: 100%;
   z-index: 1;
+  overflow: hidden;
 }
 .landing-canvas svg {
+  position: absolute;
+  inset: 0;
   width: 100%; height: 100%;
   display: block;
 }
 @media (max-width: 720px) {
-  .landing-canvas { flex: 0 0 50vh; }
+  .landing-canvas { flex: 0 0 50vh; height: 50vh; }
 }
 
 /* tree dimming — individual layers, NOT the parent (so spotlight can override) */
