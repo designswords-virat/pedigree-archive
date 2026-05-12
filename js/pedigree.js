@@ -471,6 +471,49 @@ const Pedigree = (() => {
     }, parent);
   }
 
+  // Sibship connector: in angular mode, draw ONE trunk down from the parent
+  // junction to a horizontal bar that spans all kids, then ONE vertical drop
+  // per child. Avoids the visual stacking of N overlapping per-child L-paths
+  // and gives the chart a clean traditional family-tree look. In curve mode
+  // we keep the per-child Bezier so each branch sweeps independently.
+  function drawSibship(srcX, srcY, kids, nodes, linesG) {
+    if (branchStyle !== 'angular' || kids.length === 1) {
+      kids.forEach(c => {
+        const cn = nodes[c.id];
+        const childX = cn.x + NODE_W / 2;
+        const childTop = cn.y;
+        drawCurve(srcX, srcY, childX, childTop, linesG, 'parent-branch');
+      });
+      return;
+    }
+    const childTops = kids.map(c => nodes[c.id].y);
+    const minTop = Math.min(...childTops);
+    const barY = (srcY + minTop) / 2;
+    const childXs = kids.map(c => nodes[c.id].x + NODE_W / 2);
+    const minX = Math.min(...childXs, srcX);
+    const maxX = Math.max(...childXs, srcX);
+
+    // logical → screen flip via xy() so vertical (mobile) mode works too
+    const path = (lx1, ly1, lx2, ly2) => {
+      const [a, b] = xy(lx1, ly1);
+      const [c, d] = xy(lx2, ly2);
+      el('path', {
+        d: `M ${a} ${b} L ${c} ${d}`,
+        pathLength: 1, fill: 'none', class: 'parent-branch',
+      }, linesG);
+    };
+    // trunk from junction to the shared bar
+    path(srcX, srcY, srcX, barY);
+    // horizontal sibship bar
+    path(minX, barY, maxX, barY);
+    // drop per child
+    kids.forEach(c => {
+      const cn = nodes[c.id];
+      const childX = cn.x + NODE_W / 2;
+      path(childX, barY, childX, cn.y);
+    });
+  }
+
   function drawConnections(layout) {
     const { nodes, byId } = layout;
     const linesG = el('g', { class: 'lines-layer' }, g);
@@ -501,15 +544,7 @@ const Pedigree = (() => {
         if (kids && kids.length > 0) {
           // tudor rose where the partnership joins the lineage
           drawRose(matingMid, yMid, linesG, 5);
-
-          // each child gets its own curving branch from the couple's centre
-          // straight down to the child's top — like a branch growing outward.
-          kids.forEach(c => {
-            const cn = nodes[c.id];
-            const childX = cn.x + NODE_W / 2;
-            const childTop = cn.y;
-            drawCurve(matingMid, yMid, childX, childTop, linesG, 'parent-branch');
-          });
+          drawSibship(matingMid, yMid, kids, nodes, linesG);
         }
       } else if (!partner && p._children && p._children.length > 0) {
         // ===== single parent with children =====
@@ -517,12 +552,7 @@ const Pedigree = (() => {
         const startX = a.x + NODE_W / 2;
         const startY = a.y + NODE_H;
         drawRose(startX, startY, linesG, 4);
-        p._children.forEach(c => {
-          const cn = nodes[c.id];
-          const childX = cn.x + NODE_W / 2;
-          const childTop = cn.y;
-          drawCurve(startX, startY, childX, childTop, linesG, 'parent-branch');
-        });
+        drawSibship(startX, startY, p._children, nodes, linesG);
       }
     });
   }

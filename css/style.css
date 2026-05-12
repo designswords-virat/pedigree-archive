@@ -939,18 +939,19 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
    the parent→child link; mating lines stay straight as spousal connectors. */
 .mating-line, .parent-branch {
   stroke: var(--gold);
-  stroke-width: 1.4;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 2px rgba(203, 166, 86, 0.6));
+  stroke-width: 2.6;
+  opacity: 1;
+  filter: none;
   fill: none;
-  stroke-linecap: round;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: drawLine 1.2s ease-out forwards;
   animation-delay: 0.3s;
 }
-.mating-line   { stroke-width: 1.8; }
-.parent-branch { stroke-width: 1.6; animation-delay: 0.7s; animation-duration: 1.4s; }
+.mating-line   { stroke-width: 2.6; }
+.parent-branch { stroke-width: 2.6; animation-delay: 0.7s; animation-duration: 1.4s; }
 @keyframes drawLine {
   to { stroke-dashoffset: 0; }
 }
