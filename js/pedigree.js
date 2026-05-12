@@ -347,10 +347,20 @@ const Pedigree = (() => {
     if (person.deceased) group.classList.add('deceased');
 
     // name cartouche & label
-    const nameLines = wrapName(person.name, LABEL_WRAP);
+    //   line 1: "Name (Nickname)" — nickname appended in parens when present
+    //   line 2: "DOB–Living" for living people, "DOB–DOD" for deceased
+    const displayName = person.nickname && person.nickname.trim()
+      ? person.name + ' (' + person.nickname.trim() + ')'
+      : person.name;
+    const nameLines = wrapName(displayName, LABEL_WRAP);
     const years = [];
-    if (person.birthYear) years.push(person.birthYear);
-    if (person.deceased && person.deathYear) years.push('†' + person.deathYear);
+    if (person.birthYear || person.deceased) {
+      const left  = person.birthYear || '?';
+      const right = person.deceased
+        ? (person.deathYear || '?')
+        : 'Living';
+      years.push(left + '–' + right);
+    }
 
     if (isVertical) {
       // VERTICAL (mobile): label sits to the right of the oval, single line.
