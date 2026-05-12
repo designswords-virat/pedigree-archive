@@ -321,6 +321,16 @@ const Pedigree = (() => {
       }, group);
       img.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', photoUrl);
       img.setAttribute('href', photoUrl);
+    } else {
+      // No likeness: a transparent + glyph sits centred in the oval as an
+      // "empty portrait" affordance. Disappears the moment a photo lands.
+      const ph = el('text', {
+        x: cx, y: cy,
+        class: 'node-placeholder-plus',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'central'
+      }, group);
+      ph.textContent = '+';
     }
 
     // outer ornate gold ring
@@ -407,11 +417,12 @@ const Pedigree = (() => {
       group.style.pointerEvents = 'none';
     }
 
-    // Edit-mode affordance: small '+' badge floating above the oval. Clicking
-    // it opens the kinship-add panel for this person. The badge is drawn last
-    // so it sits on top of the photo and frame.
+    // Edit-mode affordance: small '+' badge floating off the right edge of
+    // the oval, vertically centred. Clicking it opens the kinship-add panel
+    // for this person. The badge is drawn last so it sits on top of the
+    // photo and frame.
     if (editMode) {
-      const bx = NODE_W - 4, by = -4;
+      const bx = NODE_W + 14, by = NODE_H / 2;
       const btn = el('g', {
         class: 'node-add-btn',
         transform: `translate(${bx},${by})`,

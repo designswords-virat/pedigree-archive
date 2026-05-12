@@ -351,7 +351,11 @@
     Pedigree.init(svgEl, {
       editMode: true,
       wrapSiblings: false,                              // edit canvas keeps strict gen rows
-      onSelect: (person) => openInspector(person.id),
+      // Clicking a portrait skips the read-only inspector and jumps
+      // straight to the full multi-tab details editor — one fewer step.
+      onSelect: (person) => {
+        location.href = 'details.html?source=person&id=' + encodeURIComponent(person.id);
+      },
       onAdd:    (person) => openKinPanel(person.id),
     });
     // honour the branch style chosen on tree-view, if any

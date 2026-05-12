@@ -3,7 +3,7 @@
    White ground, near-black text, hairline rules, sans-serif.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Cinzel:wght@400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&display=swap');
 
 :root {
   /* DEFAULT THEME — clean minimal modern.
@@ -41,9 +41,9 @@
   --border-soft:  rgba(0, 0, 0, 0.06);
   --panel:        #ffffff;
 
-  --font-display: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  --font-body:    'Inter', 'Helvetica Neue', Arial, sans-serif;
-  --font-script:  'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:    'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+  --font-script:  'Montserrat', 'Helvetica Neue', Arial, sans-serif;
 
   /* Photo treatment: no sepia tint — portraits read as themselves */
   --photo-filter:       grayscale(0) saturate(1) brightness(1) contrast(1);
@@ -3204,12 +3204,24 @@ input[type="date"]:focus {
    TREE EDIT MODE — + button on every node, kinship-add panel
    ============================================================ */
 
+/* Centred '+' glyph drawn inside an empty oval — placeholder affordance
+   when a person has no likeness yet. Sits behind the gold frame ring. */
+.node-placeholder-plus {
+  fill: var(--parchment-faint);
+  opacity: 0.55;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 48px;
+  pointer-events: none;
+  user-select: none;
+}
+
 /* the + badge on each portrait */
 .node-add-bg {
-  fill: var(--gold);
-  stroke: var(--gold-bright);
+  fill: var(--ivory);
+  stroke: var(--ivory);
   stroke-width: 1;
-  filter: drop-shadow(0 1px 2px rgba(26, 37, 64, 0.10));
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.18));
   transition: fill 0.15s, transform 0.15s;
 }
 .node-add-plus {
