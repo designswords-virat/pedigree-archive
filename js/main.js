@@ -180,9 +180,11 @@
     Pedigree.init(svg, { interactive: false });
     // Render the hero tree the same way tree-view.html does in its
     // "Full Tree" mode: every generation on its own horizontal line
-    // (no wrapped sub-rows), fitted to the viewport.
+    // (no wrapped sub-rows), fitted to the viewport. Branches are
+    // right-angle orthogonal — classic genealogy-chart look.
     if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
     if (Pedigree.setScrollMode)   Pedigree.setScrollMode(false);
+    if (Pedigree.setBranchStyle)  Pedigree.setBranchStyle('angular');
 
     // LANDING_TREE is a tiny anonymous lineage so the canvas always
     // renders something. sprinkleHeroGlow staggers per-element delays.

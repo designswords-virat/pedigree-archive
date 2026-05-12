@@ -51,15 +51,19 @@ const Pedigree = (() => {
 
   // Resolve a person.photo to a usable URL. Self-contained so the renderer
   // works without Data being on the page (tree-edit / tree-view don't load
-  // data.js). Treats data: and http(s): as absolute, anything else as a
-  // filename inside the Profiles/ folder (used by the landing demo).
+  // data.js).
+  //   - http(s): / data: / blob: -> absolute, returned as-is
+  //   - leading "/" -> absolute path on the site root, returned as-is
+  //   - contains "/" (e.g. "image/foo.jpg") -> relative URL, encoded but kept
+  //   - bare filename -> assumed to be inside the legacy Profiles/ folder
   function resolvePhoto(photoOrPerson) {
     const v = (typeof photoOrPerson === 'string'
                 ? photoOrPerson
                 : photoOrPerson && photoOrPerson.photo) || '';
     if (!v) return null;
-    if (/^(https?:|data:)/i.test(v)) return v;
-    return 'Profiles/' + v.split('/').map(encodeURIComponent).join('/');
+    if (/^(https?:|data:|blob:|\/)/i.test(v)) return v;
+    if (v.includes('/'))   return v.split('/').map(encodeURIComponent).join('/');
+    return 'Profiles/' + encodeURIComponent(v);
   }
 
   function wrapName(text, max) {
