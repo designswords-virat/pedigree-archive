@@ -41,9 +41,9 @@
   --border-soft:  rgba(0, 0, 0, 0.06);
   --panel:        #ffffff;
 
-  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
-  --font-body:    'Cormorant Garamond', 'EB Garamond', Georgia, serif;
-  --font-script:  'Pinyon Script', 'Cormorant Garamond', cursive;
+  --font-display: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:    'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-script:  'Inter', 'Helvetica Neue', Arial, sans-serif;
 
   /* Photo treatment: no sepia tint — portraits read as themselves */
   --photo-filter:       grayscale(0) saturate(1) brightness(1) contrast(1);
