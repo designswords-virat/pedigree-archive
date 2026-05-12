@@ -136,79 +136,26 @@
     });
   }
 
-  // Bundled hero demo — a richly populated family tree (22 people with
-  // photos) loaded from js/hero-demo.js. Shown on the public landing
-  // for any visitor without a saved book of their own. If hero-demo.js
-  // somehow fails to load, fall back to a tiny generic placeholder so
-  // the hero still renders something.
-  const PLACEHOLDER_TREE = (typeof window.HeroDemo !== 'undefined' && window.HeroDemo)
-    ? window.HeroDemo
-    : {
-        meta: { title: 'A book of kindred' },
-        people: [
-          { id: 'g_m', name: 'Grandfather', gender: 'male',   parentIds: [],          partnerIds: ['g_f'] },
-          { id: 'g_f', name: 'Grandmother', gender: 'female', parentIds: [],          partnerIds: ['g_m'] },
-          { id: 'p_m', name: 'Father',      gender: 'male',   parentIds: ['g_m','g_f'], partnerIds: ['p_f'] },
-          { id: 'p_f', name: 'Mother',      gender: 'female', parentIds: [],          partnerIds: ['p_m'] },
-          { id: 'c_a', name: 'Sibling',     gender: 'female', parentIds: ['p_m','p_f'] },
-          { id: 'c_b', name: 'You',         gender: 'unknown',parentIds: ['p_m','p_f'] },
-          { id: 'c_c', name: 'Sibling',     gender: 'male',   parentIds: ['p_m','p_f'] },
-        ],
-      };
-
-  // ---- INIT ----
-  // Hero shows the LARGEST book from the user's library on this browser
-  // (active book or any saved snapshot). This way a brand-new "+ New
-  // project" empty active book doesn't hide a richer tree the user
-  // built earlier. Falls back to a generic placeholder if the whole
-  // library is empty.
-  function safeRead(key) {
-    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
-    catch (_) { return null; }
-  }
-
-  function pickLargestBook() {
-    const candidates = [];
-    const active = safeRead('pa_local_v1');
-    if (active && Array.isArray(active.people) && active.people.length) {
-      candidates.push({ book: active, people: active.people });
-    }
-    const idx = safeRead('pa_books_index');
-    if (idx && Array.isArray(idx.books)) {
-      idx.books.forEach(b => {
-        const snap = safeRead('pa_book_' + b.id);
-        if (snap && Array.isArray(snap.people) && snap.people.length) {
-          candidates.push({ book: snap, people: snap.people });
-        }
-      });
-    }
-    if (!candidates.length) return null;
-    candidates.sort((a, b) => b.people.length - a.people.length);
-    return candidates[0];
-  }
-
-  async function chooseHeroData() {
-    // The hero has a radial mask cutting a hole around the headline.
-    // A 1- or 2-person tree falls entirely inside that hole and looks
-    // invisible. So only use the user's data if it has at least as
-    // many people as the bundled hero demo — otherwise the bundled
-    // 22-person tree fills the canvas properly.
-    const demoCount = (PLACEHOLDER_TREE.people || []).length;
-    if (typeof Auth === 'undefined') return PLACEHOLDER_TREE;
-    try {
-      await Auth.init();
-      const pick = pickLargestBook();
-      if (pick && pick.people.length >= demoCount) {
-        const fullName = pick.book.profile && pick.book.profile.fullName;
-        const title = fullName ? (fullName + '’s lineage') : 'Your lineage';
-        return { people: pick.people, meta: { title } };
-      }
-    } catch (_) {}
-    return PLACEHOLDER_TREE;
-  }
+  // Decorative landing tree — never the user's real lineage. A tiny
+  // anonymous family (3 generations, 7 people, no photos) so the canvas
+  // shows initials inside oval frames and the renderer's draw-in
+  // animations have something to animate. Generic names so nobody reads
+  // the chart as a real story.
+  const LANDING_TREE = {
+    meta: { title: 'A book of kindred' },
+    people: [
+      { id: 'a1', name: 'Aldwin',  gender: 'male',    parentIds: [],          partnerIds: ['a2'] },
+      { id: 'a2', name: 'Avis',    gender: 'female',  parentIds: [],          partnerIds: ['a1'] },
+      { id: 'b1', name: 'Bram',    gender: 'male',    parentIds: ['a1','a2'], partnerIds: ['b2'] },
+      { id: 'b2', name: 'Briar',   gender: 'female',  parentIds: [],          partnerIds: ['b1'] },
+      { id: 'c1', name: 'Cael',    gender: 'male',    parentIds: ['b1','b2'] },
+      { id: 'c2', name: 'Clio',    gender: 'female',  parentIds: ['b1','b2'] },
+      { id: 'c3', name: 'Cyra',    gender: 'unknown', parentIds: ['b1','b2'] },
+    ],
+  };
 
   async function init() {
-    demoData = await chooseHeroData();
+    demoData = LANDING_TREE;
 
     const svg = $('#pedigreeSvg');
     Pedigree.init(svg, { interactive: false });
@@ -218,8 +165,8 @@
     if (Pedigree.setWrapSiblings) Pedigree.setWrapSiblings(false);
     if (Pedigree.setScrollMode)   Pedigree.setScrollMode(false);
 
-    // chooseHeroData() always returns *some* tree (saved or placeholder),
-    // so we always render. Glow staggers branches asynchronously.
+    // LANDING_TREE is a tiny anonymous lineage so the canvas always
+    // renders something. sprinkleHeroGlow staggers per-element delays.
     svg.style.display = '';
     Pedigree.render(demoData);
     sprinkleHeroGlow();

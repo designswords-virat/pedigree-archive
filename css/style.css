@@ -2001,21 +2001,21 @@ input[type="checkbox"]:checked::after {
   z-index: 1;
   background: var(--ink-0);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
-/* Top half: pedigree tree only. The tree no longer wraps around centred
-   text, so the radial mask is gone -- the SVG just fills its half.
-   `min-height: 0` + `overflow: hidden` + absolute SVG keeps the SVG's
-   intrinsic content from pushing the flex item past its 55vh basis. */
+/* Right half: decorative pedigree tree only (no real user data; main.js
+   renders a small placeholder lineage so the canvas always feels alive).
+   `min-width: 0` + `overflow: hidden` + absolute SVG keeps the SVG's
+   intrinsic content from pushing the flex item past its 50vw basis. */
 .landing-canvas {
   position: relative;
-  flex: 0 0 55vh;
-  height: 55vh;
-  min-height: 0;
-  width: 100%;
+  flex: 1 1 50%;
+  min-width: 0;
+  height: 100vh;
   z-index: 1;
   overflow: hidden;
+  border-left: 1px solid var(--border-soft);
 }
 .landing-canvas svg {
   position: absolute;
@@ -2023,8 +2023,14 @@ input[type="checkbox"]:checked::after {
   width: 100%; height: 100%;
   display: block;
 }
-@media (max-width: 720px) {
-  .landing-canvas { flex: 0 0 50vh; height: 50vh; }
+@media (max-width: 880px) {
+  .landing { flex-direction: column; }
+  .landing-canvas {
+    flex: 0 0 50vh;
+    height: 50vh;
+    border-left: none;
+    border-top: 1px solid var(--border-soft);
+  }
 }
 
 /* tree dimming — individual layers, NOT the parent (so spotlight can override) */
@@ -2048,38 +2054,40 @@ input[type="checkbox"]:checked::after {
    must reset dasharray/dashoffset explicitly to keep the lines visible. */
 .landing .lines-layer .parent-branch,
 .landing .lines-layer .mating-line {
-  stroke: var(--gold);
+  stroke: var(--ivory);
   stroke-dasharray: none !important;
   stroke-dashoffset: 0 !important;
-  opacity: 0.25;
+  opacity: 0.85;
   filter: none;
   animation: heroBranchPulse 6s ease-in-out infinite;
   animation-delay: var(--glow-delay, 0s);
-  will-change: opacity, filter;
+  will-change: opacity;
 }
 .landing .junction-rose-group .junction-rose {
-  opacity: 0.4;
+  opacity: 0.85;
   animation: heroRosePulse 8s ease-in-out infinite;
   animation-delay: var(--glow-delay, 0s);
 }
 
 @keyframes heroBranchPulse {
-  0%, 100% { opacity: 0.55; filter: drop-shadow(0 0 1px rgba(184, 147, 44, 0.30)); }
-  50%      { opacity: 1;    filter: drop-shadow(0 0 10px rgba(184, 147, 44, 0.85)); }
+  0%, 100% { opacity: 0.75; }
+  50%      { opacity: 1;    }
 }
 @keyframes heroRosePulse {
-  0%, 100% { opacity: 0.6; filter: none; }
-  50%      { opacity: 1;   filter: drop-shadow(0 0 8px rgba(184, 147, 44, 0.85)); }
+  0%, 100% { opacity: 0.7; transform: scale(1);    }
+  50%      { opacity: 1;   transform: scale(1.18); }
 }
 
-/* Subtle ambient glow on each portrait, also randomised. */
+/* Subtle ambient breath on each portrait — soft greyscale halo. */
 .landing .nodes-layer .node-group .frame-ring {
   animation: heroNodeBreathe 9s ease-in-out infinite;
   animation-delay: var(--glow-delay, 0s);
+  transform-origin: center;
+  transform-box: fill-box;
 }
 @keyframes heroNodeBreathe {
-  0%, 100% { filter: drop-shadow(0 1px 2px rgba(26, 37, 64, 0.18)); }
-  50%      { filter: drop-shadow(0 0 12px rgba(184, 147, 44, 0.75)); }
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));     transform: scale(1);     }
+  50%      { filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.18)); transform: scale(1.02); }
 }
 
 /* spotlight ring — slight emphasis, no overpowering halo */
@@ -2113,35 +2121,34 @@ input[type="checkbox"]:checked::after {
   display: none;
 }
 
-/* Bottom half: hero copy in a left-to-right column layout.
-   Heading | Subheading | Paragraph + CTA. */
+/* Left half: hero copy in a single vertical column.
+   Eyebrow / Heading / Paragraph / CTA, top-to-bottom, left-aligned. */
 .hero {
   position: relative;
-  flex: 1 1 auto;
-  width: 100%;
+  flex: 1 1 50%;
+  min-width: 0;
   z-index: 10;
   display: flex;
   align-items: center;
-  padding: clamp(32px, 5vh, 64px) clamp(28px, 6vw, 96px);
-  border-top: 1px solid var(--border-soft);
+  padding: clamp(40px, 6vh, 80px) clamp(32px, 5vw, 88px);
   background: var(--ink-0);
 }
 
-.hero-cols {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr 1.4fr;
-  gap: clamp(28px, 5vw, 72px);
+.hero-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(18px, 2.4vh, 28px);
   width: 100%;
-  align-items: start;
+  max-width: 540px;
+  text-align: left;
 }
-
-.hero-col { text-align: left; }
 
 .hero-title {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(28px, 3.6vw, 52px);
-  letter-spacing: 0;
+  font-size: clamp(34px, 4.2vw, 60px);
+  letter-spacing: -0.005em;
   color: var(--ivory);
   margin: 0;
   line-height: 1.05;
@@ -2150,9 +2157,9 @@ input[type="checkbox"]:checked::after {
 
 .hero-eyebrow {
   font-family: var(--font-body);
-  font-size: clamp(13px, 1vw, 15px);
+  font-size: clamp(12px, 0.95vw, 14px);
   color: var(--parchment-dim);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   margin: 0;
   font-style: normal;
@@ -2166,11 +2173,11 @@ input[type="checkbox"]:checked::after {
 .hero-tagline {
   font-family: var(--font-body);
   font-style: normal;
-  font-size: clamp(14px, 1.05vw, 17px);
+  font-size: clamp(15px, 1.1vw, 18px);
   color: var(--parchment);
   line-height: 1.6;
-  max-width: 44ch;
-  margin: 0 0 24px;
+  max-width: 48ch;
+  margin: 0;
   text-shadow: none;
 }
 
@@ -2179,6 +2186,7 @@ input[type="checkbox"]:checked::after {
   flex-direction: column;
   gap: 10px;
   align-items: flex-start;
+  margin-top: 4px;
 }
 
 .hero-cta {
@@ -2232,14 +2240,15 @@ input[type="checkbox"]:checked::after {
 }
 .hero-sub-link:hover { color: var(--ivory); }
 
-/* Stack columns on narrower viewports. */
+/* Stack the two halves on narrower viewports (tree drops below). */
 @media (max-width: 880px) {
   .landing { overflow-y: auto; }
-  .hero-cols {
-    grid-template-columns: 1fr;
-    gap: 18px;
+  .hero {
+    flex: 0 0 auto;
+    padding: 32px 24px 40px;
+    align-items: flex-start;
   }
-  .hero { padding: 28px 24px 40px; }
+  .hero-stack { max-width: none; gap: 16px; }
 }
 
 /* On the landing the caption competes with the headline copy — hide. */
