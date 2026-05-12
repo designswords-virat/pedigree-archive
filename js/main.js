@@ -136,21 +136,40 @@
     });
   }
 
-  // Decorative landing tree — never the user's real lineage. A tiny
-  // anonymous family (3 generations, 7 people, no photos) so the canvas
-  // shows initials inside oval frames and the renderer's draw-in
-  // animations have something to animate. Generic names so nobody reads
-  // the chart as a real story.
+  // Decorative landing tree — never the user's real lineage. An 11-person,
+  // 3-generation anonymous family using stock portraits from /image so the
+  // canvas reads as a "real" lineage chart without ever displaying the
+  // visitor's own people. Generic names so nobody reads it as a real story.
   const LANDING_TREE = {
     meta: { title: 'A book of kindred' },
     people: [
-      { id: 'a1', name: 'Aldwin',  gender: 'male',    parentIds: [],          partnerIds: ['a2'] },
-      { id: 'a2', name: 'Avis',    gender: 'female',  parentIds: [],          partnerIds: ['a1'] },
-      { id: 'b1', name: 'Bram',    gender: 'male',    parentIds: ['a1','a2'], partnerIds: ['b2'] },
-      { id: 'b2', name: 'Briar',   gender: 'female',  parentIds: [],          partnerIds: ['b1'] },
-      { id: 'c1', name: 'Cael',    gender: 'male',    parentIds: ['b1','b2'] },
-      { id: 'c2', name: 'Clio',    gender: 'female',  parentIds: ['b1','b2'] },
-      { id: 'c3', name: 'Cyra',    gender: 'unknown', parentIds: ['b1','b2'] },
+      // Gen 1 — founders
+      { id: 'aldwin', name: 'Aldwin', gender: 'male',   parentIds: [], partnerIds: ['avila'],
+        photo: 'image/3af1391f1d8b9cb088a7328fe448d4ba.jpg', birthYear: 1949 },
+      { id: 'avila',  name: 'Avila',  gender: 'female', parentIds: [], partnerIds: ['aldwin'],
+        photo: 'image/0d14653854706dfaf7a36347955c36a6.jpg', birthYear: 1952 },
+
+      // Gen 2 — three children + their spouses
+      { id: 'thom',   name: 'Thom',   gender: 'male',   parentIds: ['aldwin','avila'], partnerIds: ['iris'],
+        photo: 'image/b0d54b664bfb4071e713496c34508008.jpg', birthYear: 1975 },
+      { id: 'iris',   name: 'Iris',   gender: 'female', parentIds: [], partnerIds: ['thom'],
+        photo: 'image/62124012f713b001c3d3ac1a89258610.jpg', birthYear: 1978 },
+      { id: 'eva',    name: 'Eva',    gender: 'female', parentIds: ['aldwin','avila'], partnerIds: ['wren'],
+        photo: 'image/a25acfb8a8c059ddfa5abf9be5b491ba.jpg', birthYear: 1980 },
+      { id: 'wren',   name: 'Wren',   gender: 'male',   parentIds: [], partnerIds: ['eva'],
+        photo: 'image/06cee1a00fd4131369935943f021f3bc.jpg', birthYear: 1979 },
+      { id: 'marcus', name: 'Marcus', gender: 'male',   parentIds: ['aldwin','avila'], partnerIds: ['mei'],
+        photo: 'image/7cfd0a8912559c4c9067367998561112.jpg', birthYear: 1982 },
+      { id: 'mei',    name: 'Mei',    gender: 'female', parentIds: [], partnerIds: ['marcus'],
+        photo: 'image/f7e509e54dbb27427428e922d22255ae.jpg', birthYear: 1985 },
+
+      // Gen 3 — grandchildren
+      { id: 'liam',   name: 'Liam',   gender: 'male',   parentIds: ['thom','iris'],
+        photo: 'image/bc4846a7f51d1100393359a0cb7ba81f.jpg', birthYear: 2002 },
+      { id: 'amara',  name: 'Amara',  gender: 'female', parentIds: ['marcus','mei'],
+        photo: 'image/109aa3b4a02a4dd88150ad269d5e5de8.jpg', birthYear: 2005 },
+      { id: 'cole',   name: 'Cole',   gender: 'male',   parentIds: ['marcus','mei'],
+        photo: 'image/2bcc55b3291035c4e53afbaa5dd1ae83.jpg', birthYear: 2007 },
     ],
   };
 

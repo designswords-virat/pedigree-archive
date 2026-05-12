@@ -2004,13 +2004,14 @@ input[type="checkbox"]:checked::after {
   flex-direction: row;
 }
 
-/* Right half: decorative pedigree tree only (no real user data; main.js
-   renders a small placeholder lineage so the canvas always feels alive).
+/* Right side: decorative pedigree chart (no real user data — main.js
+   renders an 11-person, 3-generation lineage with stock portraits).
+   60% basis gives the chart room to read as a "full" tree view.
    `min-width: 0` + `overflow: hidden` + absolute SVG keeps the SVG's
-   intrinsic content from pushing the flex item past its 50vw basis. */
+   intrinsic content from pushing the flex item past its basis. */
 .landing-canvas {
   position: relative;
-  flex: 1 1 50%;
+  flex: 1 1 60%;
   min-width: 0;
   height: 100vh;
   z-index: 1;
@@ -2125,7 +2126,7 @@ input[type="checkbox"]:checked::after {
    Eyebrow / Heading / Paragraph / CTA, top-to-bottom, left-aligned. */
 .hero {
   position: relative;
-  flex: 1 1 50%;
+  flex: 1 1 40%;
   min-width: 0;
   z-index: 10;
   display: flex;
