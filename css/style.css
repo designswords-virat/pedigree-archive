@@ -612,15 +612,15 @@ a:hover { color: var(--gold-deep); text-shadow: none; }
 /* Active brand mark — bundled logo image (logo/logo1.png) */
 .brand-mark {
   display: block;
-  height: 44px;
+  height: 72px;
   width: auto;
-  border-radius: 3px;
+  border-radius: 4px;
   flex-shrink: 0;
 }
-.landing-brand .brand-mark { height: 52px; }
+.landing-brand .brand-mark { height: 110px; }
 @media (max-width: 720px) {
-  .brand-mark { height: 36px; }
-  .landing-brand .brand-mark { height: 42px; }
+  .brand-mark { height: 52px; }
+  .landing-brand .brand-mark { height: 76px; }
 }
 
 /* heraldic emblem in lieu of sci-fi G — kept for legacy/fallback */
