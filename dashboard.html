@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Your Book — Pedigree Archive</title>
-<link rel="stylesheet" href="css/style.css?v=57" />
+<link rel="stylesheet" href="css/style.css?v=58" />
 </head>
 <body>
 
@@ -83,15 +83,15 @@
 </div>
 
 
-<script src="js/config.js?v=57"></script>
-<script src="js/supa.js?v=57"></script>
-<script src="js/gate.js?v=57"></script>
+<script src="js/config.js?v=58"></script>
+<script src="js/supa.js?v=58"></script>
+<script src="js/gate.js?v=58"></script>
 <script>Gate.require();</script>
-<script src="js/auth.js?v=57"></script>
-<script src="js/books.js?v=57"></script>
-<script src="js/sounds.js?v=57"></script>
-<script src="js/click-sound.js?v=57"></script>
-<script src="js/theme.js?v=57"></script>
+<script src="js/auth.js?v=58"></script>
+<script src="js/books.js?v=58"></script>
+<script src="js/sounds.js?v=58"></script>
+<script src="js/click-sound.js?v=58"></script>
+<script src="js/theme.js?v=58"></script>
 <script>
 (async function () {
   const $ = (s) => document.querySelector(s);
@@ -115,7 +115,7 @@
         <div class="ps-empty">
           <h2>This book is blank</h2>
           <p class="lead">Tell us about yourself to start this family tree.</p>
-          <a class="btn primary big" href="details.html">⏵ Set up this book</a>
+          <a class="btn primary big" href="tree-edit.html">⏵ Set up this book</a>
         </div>
       `;
     }
@@ -204,8 +204,9 @@
     if (!confirm('Start a new family tree?\n\nYour current tree will be auto-saved into your books library so you can switch back any time.')) return;
     try {
       Books.createNew();
-      alert('Fresh book created. The page will reload so you can fill in your particulars.');
-      location.href = 'details.html';
+      // Skip the particulars form -- tree-edit auto-seeds a placeholder
+      // "You" portrait so the canvas opens with a + ready to click.
+      location.href = 'tree-edit.html';
     } catch (err) {
       alert('Could not start a new book: ' + (err.message || err));
     }
