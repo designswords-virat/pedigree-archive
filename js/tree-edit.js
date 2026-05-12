@@ -1002,6 +1002,7 @@
         break;
       }
       case 'spouse': {
+        const isFirstSpouse = !((a.partnerIds || []).length);
         // bilateral partnership with marriage meta
         if (!a.partnerIds) a.partnerIds = [];
         a.partnerIds.push(newPerson.id);
@@ -1011,18 +1012,21 @@
         newPerson.partnerIds.push(a.id);
         if (!newPerson.partnerMeta) newPerson.partnerMeta = {};
         newPerson.partnerMeta[a.id] = { marriedDate: marriageDate, divorcedDate: divorceDate };
-        // Spouse-of-a-parent inference: if the anchor already has
-        // children, the new spouse automatically becomes their co-parent
-        // too. This matches the obvious reading of "Meera is Om's wife,
-        // and Dinesh is Om's son, so Meera is Dinesh's mother." For
-        // step-parents the user can later remove the parent link.
-        const aKids = childrenOf(a);
-        aKids.forEach(c => {
-          if (!c.parentIds) c.parentIds = [];
-          if (!c.parentIds.includes(newPerson.id)) c.parentIds.push(newPerson.id);
-          if (!c.parentMeta) c.parentMeta = {};
-          if (!c.parentMeta[newPerson.id]) c.parentMeta[newPerson.id] = { type: 'biological' };
-        });
+        // Spouse-of-a-parent inference: ONLY when this is the anchor's
+        // very first spouse. The everyday reading of "Meera is Om's
+        // wife, and Dinesh is Om's son, so Meera is Dinesh's mother"
+        // applies for a first marriage, but for a second/third wife the
+        // existing children belong to a different (earlier) marriage —
+        // auto-claiming them as her biological kids would be wrong.
+        if (isFirstSpouse) {
+          const aKids = childrenOf(a);
+          aKids.forEach(c => {
+            if (!c.parentIds) c.parentIds = [];
+            if (!c.parentIds.includes(newPerson.id)) c.parentIds.push(newPerson.id);
+            if (!c.parentMeta) c.parentMeta = {};
+            if (!c.parentMeta[newPerson.id]) c.parentMeta[newPerson.id] = { type: 'biological' };
+          });
+        }
         break;
       }
       case 'child': {

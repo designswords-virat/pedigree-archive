@@ -96,20 +96,22 @@ const Pedigree = (() => {
     const nodes = {};
 
     function partnerOf(pid) {
+      // Back-compat: return the FIRST married-in partner. Kept for callers
+      // that only need one partner; multi-partner cases use partnersAllOf.
+      return partnersAllOf(pid)[0] || null;
+    }
+    // Every married-in partner (preserving partnerIds order). A bloodline
+    // person paired up with another bloodline person is excluded because
+    // each belongs in their own lineage subtree.
+    function partnersAllOf(pid) {
       const p = byId[pid];
-      // Only treat as a couple-partner someone who has no parents in the
-      // tree (i.e., a married-in spouse). If both members of the couple are
-      // bloodline (each has parents in the tree), they each belong in their
-      // own lineage subtree — pairing them at one would cause one of them
-      // to be positioned twice (once as partner, once as bloodline child)
-      // and crash visually.
       return (p.partnerIds || [])
         .map(id => byId[id])
-        .find(x =>
+        .filter(x =>
           x &&
           !visited.has(x.id) &&
           (!x.parentIds || x.parentIds.length === 0)
-        ) || null;
+        );
     }
 
     function childrenOf(p1, p2) {
@@ -124,33 +126,69 @@ const Pedigree = (() => {
       if (widths[pid] != null) return widths[pid];
       const p = byId[pid];
       visited.add(pid);
-      const partner = partnerOf(pid);
-      if (partner) visited.add(partner.id);
+      const partners = partnersAllOf(pid);
+      partners.forEach(par => visited.add(par.id));
 
-      const coupleW = partner ? 2 * NODE_W + COUPLE_GAP : NODE_W;
-      const kids = childrenOf(pid, partner ? partner.id : null);
+      // ===== Single-or-no-partner: existing layout (with wrap support) =====
+      if (partners.length <= 1) {
+        const partner = partners[0] || null;
+        const coupleW = partner ? 2 * NODE_W + COUPLE_GAP : NODE_W;
+        const kids = childrenOf(pid, partner ? partner.id : null);
 
-      p._partner = partner;
-      p._children = kids;
-      p._coupleW = coupleW;
+        p._partner       = partner;
+        p._partners      = partners;
+        p._children      = kids;
+        p._marriages     = partner ? [{ partner, kids }] : [];
+        p._coupleW       = coupleW;
 
-      let w;
-      if (kids.length === 0) {
-        w = coupleW;
-      } else {
-        kids.forEach(c => computeWidth(c.id));
-        const perRow = wrapSiblings ? MAX_SIBS_PER_ROW : kids.length;
-        let maxRowWidth = 0;
-        for (let r = 0; r < kids.length; r += perRow) {
-          const rowKids = kids.slice(r, r + perRow);
-          const rowSum = rowKids.reduce((s, c) => s + widths[c.id], 0)
-                        + (rowKids.length - 1) * SIBLING_GAP;
-          if (rowSum > maxRowWidth) maxRowWidth = rowSum;
+        let w;
+        if (kids.length === 0) {
+          w = coupleW;
+        } else {
+          kids.forEach(c => computeWidth(c.id));
+          const perRow = wrapSiblings ? MAX_SIBS_PER_ROW : kids.length;
+          let maxRowWidth = 0;
+          for (let r = 0; r < kids.length; r += perRow) {
+            const rowKids = kids.slice(r, r + perRow);
+            const rowSum = rowKids.reduce((s, c) => s + widths[c.id], 0)
+                          + (rowKids.length - 1) * SIBLING_GAP;
+            if (rowSum > maxRowWidth) maxRowWidth = rowSum;
+          }
+          w = Math.max(coupleW, maxRowWidth);
         }
-        w = Math.max(coupleW, maxRowWidth);
+        widths[pid] = w;
+        return w;
       }
-      widths[pid] = w;
-      return w;
+
+      // ===== Multi-partner: H followed by one slot per marriage =====
+      //   [H][W1 + their kids subtree][W2 + their kids subtree]...
+      // Each marriage's slot is wide enough for either the partner portrait
+      // alone or the full kids row (whichever is wider), so the partner sits
+      // centred above their own kids regardless of the other marriages.
+      // Wrapping/SIB_ROW logic is skipped in this branch — extra partners
+      // already make the layout wide enough that compacting kids gains
+      // little, and the layout code stays simple.
+      const marriages = partners.map(par => {
+        const kids = childrenOf(pid, par.id);
+        kids.forEach(c => computeWidth(c.id));
+        const kidsW = kids.length > 0
+          ? kids.reduce((s, c, i) => s + widths[c.id] + (i > 0 ? SIBLING_GAP : 0), 0)
+          : 0;
+        const slot = Math.max(NODE_W, kidsW);
+        return { partner: par, kids, kidsW, slot };
+      });
+
+      // Back-compat: keep first-marriage in `_partner` / `_children` so old
+      // code paths (e.g. maxSubtreeDepth) still walk down through them.
+      p._partner   = marriages[0].partner;
+      p._partners  = partners;
+      p._children  = marriages[0].kids;
+      p._marriages = marriages;
+
+      const coupleW = NODE_W + marriages.reduce((s, m) => s + COUPLE_GAP + m.slot, 0);
+      p._coupleW = coupleW;
+      widths[pid] = coupleW;
+      return coupleW;
     }
 
     // Recursive max-depth helper (memoised). Returns how many generations
@@ -178,6 +216,37 @@ const Pedigree = (() => {
       const kids = p._children;
       const coupleW = p._coupleW;
       const y = depth * GEN_HEIGHT + yShift;
+
+      // ===== Multi-partner layout: H, then each marriage flowing right =====
+      if (p._marriages && p._marriages.length > 1) {
+        const coupleX = x + (w - coupleW) / 2;
+        nodes[pid] = { x: coupleX, y, person: p, depth };
+        let cursor = coupleX + NODE_W;
+        const childCentersM = [];
+
+        p._marriages.forEach(m => {
+          cursor += COUPLE_GAP;
+          // Partner centred inside their marriage slot
+          const partnerX = cursor + (m.slot - NODE_W) / 2;
+          nodes[m.partner.id] = { x: partnerX, y, person: m.partner, depth, marriedIn: true };
+
+          // Kids row, centred under the slot
+          if (m.kids.length > 0) {
+            let kidCursor = cursor + (m.slot - m.kidsW) / 2;
+            m.kids.forEach((c, i) => {
+              if (i > 0) kidCursor += SIBLING_GAP;
+              position(c.id, kidCursor, depth + 1, yShift);
+              childCentersM.push(nodes[c.id].x + NODE_W / 2);
+              kidCursor += widths[c.id];
+            });
+          }
+          cursor += m.slot;
+        });
+
+        p._childCenters = childCentersM;
+        p._x = coupleX; p._y = y;
+        return;
+      }
 
       const childCenters = [];
       if (kids.length > 0) {
@@ -554,8 +623,42 @@ const Pedigree = (() => {
     Object.values(byId).forEach(p => {
       const node = nodes[p.id];
       if (!node) return;
-      const partner = p._partner;
+      const marriages = p._marriages || [];
 
+      if (marriages.length > 1) {
+        // ===== multi-partner: draw one mating-line + sibship per marriage.
+        //   marriage 0: straight horizontal (closest partner sits right next to H)
+        //   marriage 1..N: curved arc routed ABOVE intermediate partners so it
+        //   stays distinguishable from the regular bloodline branches below.
+        const a = nodes[p.id];
+        const yMid = a.y + NODE_H / 2;
+        marriages.forEach((m, i) => {
+          const b = nodes[m.partner.id];
+          if (!b) return;
+          const x1 = a.x + NODE_W;
+          const x2 = b.x;
+          if (i === 0) {
+            line({ x1, y1: yMid, x2, y2: yMid }, 'mating-line');
+          } else {
+            // Bezier arc bowing upward — the higher the partner index, the
+            // higher the arc, so multiple arcs don't overlap.
+            const lift = 28 + i * 14;
+            const cx  = (x1 + x2) / 2;
+            el('path', {
+              d: `M ${x1} ${yMid} Q ${cx} ${yMid - lift} ${x2} ${yMid}`,
+              fill: 'none', class: 'mating-line', pathLength: 1,
+            }, linesG);
+          }
+          const matingMid = (x1 + x2) / 2;
+          if (m.kids && m.kids.length > 0) {
+            drawRose(matingMid, yMid, linesG, 5);
+            drawSibship(matingMid, yMid, m.kids, nodes, linesG);
+          }
+        });
+        return;
+      }
+
+      const partner = p._partner;
       if (partner && nodes[partner.id]) {
         // ===== couple with children =====
         const a = nodes[p.id], b = nodes[partner.id];
